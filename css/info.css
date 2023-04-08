@@ -164,7 +164,7 @@ body {
 #banner {
     user-select: none;
     height: 400px;
-    background-image: url(Top_Picture.gif);
+    background-image: url(https://img.tucang.cc/api/image/show/e02c95556faf96dd6c0666832c3cd115);
     background-position-x: center;
     background-position-y: center;
     background-size: cover;
@@ -259,7 +259,6 @@ table {
     border-radius: 8px;
     border: solid 1px #d1d9e6;
     width: auto;
-    text-align: center;
 }
 
 #cs {
