@@ -36,7 +36,7 @@ if ($nr['api'][$num]['now'] != "正常" && $nr['api'][$num]['now'] != "收费") 
         </div>
     </div>
     <div id="banner">
-        <a href="<?php echo '//' . $nr['ym'] ?>">
+        <a ks-tag="bottom" ks-text="返回首页" href="<?php echo '//' . $nr['ym'] ?>">
             <h1><?php echo $nr['api'][$num]['name'] ?></h1>
         </a>
     </div>
