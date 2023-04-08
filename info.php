@@ -8,7 +8,7 @@ if ($num == "") {
 if ($nr['api'][$num]['name'] == "") {
     die(header("Location:http://" . $nr['ym']));
 }
-if ($nr['api'][$num]['now'] != "正常") {
+if ($nr['api'][$num]['now'] != "正常" && $nr['api'][$num]['now'] != "收费") {
     die(header("Location:http://" . $nr['ym']));
 }
 ?>
