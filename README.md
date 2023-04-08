@@ -23,6 +23,17 @@ https://api.zxz.ee
 
 我在main.json中写了几个例子，方便理解
 
+
+
+目录：api/tongji，此API请勿删除或更改名称，否则将会影响API调用统计。
+在自己的API中顶部加入代码（记得把域名改成API管理站点的域名）
+
+```php
+file_get_contents('http://域名/api/tongji/?t=1');
+```
+
+
+
 ### 相关参数说明：
 
 > title - 网站标题
