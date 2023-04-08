@@ -2,7 +2,7 @@
 
 @font-face {
     font-family: "hm";
-    src: url("https://jsd.cdn.zzko.cn/gh/xiaoyanu/file-test@2022.9.21/more/HarmonyOS_Sans_SC_Medium.subset.woff2") format("truetype");
+    src: url("https://cdn.jsdelivr.net/gh/xiaoyanu/file-test@2022.9.21/more/HarmonyOS_Sans_SC_Medium.subset.woff2") format("truetype");
     /* 兼容Safari */
 }
 
