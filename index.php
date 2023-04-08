@@ -24,7 +24,7 @@ $nr = json_decode($temp, true);
     <div id="head">
         <img id="logo" src="<?php echo $nr['logo'] ?>">
         <a id="title" href="<?php echo '//' . $nr['ym'] ?>"><?php echo $nr['title'] ?></a>
-        <img id="tj" src="./api/tongji/?t=2">
+        <img id="tj" src="//api.zxz.ee/api/tongji/?t=2">
         <div id="head-right">
             <a id="wt" href="<?php echo $nr['qqurl'] ?>">问题反馈</a>
         </div>
@@ -84,7 +84,7 @@ $nr = json_decode($temp, true);
             <p><?php echo $nr['footer']; ?></p>
         </div>
         <div id="xf">
-            <a href="#tj">
+            <a ks-tag="left" ks-text="返回顶部" href="#tj">
                 <svg t="1680926673355" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="2320">
                     <path d="M188.274526 257.534448l0-97.428983 645.061528 0 0 97.428983L188.274526 257.534448zM252.732583 515.366677l255.82655-226.355331 260.329097 226.355331-192.371332 0 0 192.362122 0 161.89625-130.911562 0 0-354.258373L252.732583 515.366677z" p-id="2321" fill="#61677C"></path>
                 </svg>
