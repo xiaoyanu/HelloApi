@@ -81,7 +81,7 @@ if ($nr['api'][$num]['now'] != "正常" && $nr['api'][$num]['now'] != "收费") 
                 ?>
             </table>
             <p id="cs">&nbsp;返回参数</p>
-            <p class="cs-main"><?php echo $nr['api'][$num]['fh'] ?></p>
+            <p class="cs-main"><?php echo str_replace(" ","&nbsp;",$nr['api'][$num]['fh']) ?></p>
         </div>
         <div id="footer">
             <p><?php echo $nr['footer']; ?></p>
