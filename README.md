@@ -27,7 +27,9 @@ https://api.zxz.ee
 
 目录：api/tongji，此API请勿删除或更改名称，否则将会影响API调用统计。
 
-在自己的API中顶部加入代码（记得把域名改成API管理站点的域名）
+在自己的API中顶部加入代码，即可开始统计API总体调用次数
+
+（记得把域名改成API管理站点的域名）
 
 ```php
 file_get_contents('http://域名/api/tongji/?t=1');
