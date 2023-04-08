@@ -8,6 +8,9 @@ if ($num == "") {
 if ($nr['api'][$num]['name'] == "") {
     die(header("Location:http://" . $nr['ym']));
 }
+if ($nr['api'][$num]['now'] !== "正常") {
+    die(header("Location:http://" . $nr['ym']));
+}
 ?>
 <!DOCTYPE html>
 <html lang="zh">
@@ -27,7 +30,7 @@ if ($nr['api'][$num]['name'] == "") {
     <div id="head">
         <img id="logo" src="<?php echo $nr['logo'] ?>">
         <a id="title" href="<?php echo '//' . $nr['ym'] ?>"><?php echo $nr['title'] ?></a>
-        <img id="tj" src="./api/tongji/?t=2">
+        <img id="tj" src="//api.zxz.ee/api/tongji/?t=2">
         <div id="head-right">
             <a id="wt" href="<?php echo $nr['qqurl'] ?>">问题反馈</a>
         </div>
