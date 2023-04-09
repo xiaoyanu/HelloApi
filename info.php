@@ -1,5 +1,5 @@
 <?php
-$temp = file_get_contents("main.json");
+$temp = file_get_contents("css/hapi.json");
 $nr = json_decode($temp, true);
 $num = $_GET['id'];
 if ($num == "") {
@@ -81,7 +81,15 @@ if ($nr['api'][$num]['now'] != "正常" && $nr['api'][$num]['now'] != "收费") 
                 ?>
             </table>
             <p id="cs">&nbsp;返回参数</p>
-            <p class="cs-main"><?php echo str_replace(" ", "&nbsp;", $nr['api'][$num]['fh']) ?></p>
+            <p class="cs-main">
+                <?php
+                if (strstr($nr['api'][$num]['fh'], "<")) {
+                    echo $nr['api'][$num]['fh'];
+                } else {
+                    echo str_replace(" ", "&nbsp;", $nr['api'][$num]['fh']);
+                }
+                ?>
+            </p>
         </div>
         <div id="footer">
             <p><?php echo $nr['footer']; ?></p>
