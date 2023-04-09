@@ -58,10 +58,10 @@ if ($nr['api'][$num]['now'] != "正常" && $nr['api'][$num]['now'] != "收费") 
             <p id="cs">&nbsp;请求参数</p>
             <table>
                 <tr>
-                    <th>名称</th>
-                    <th>必填</th>
-                    <th>类型</th>
-                    <th>描述</th>
+                    <th class="name" id="name1">名称</th>
+                    <th class="sfbt" id="sfbt1">必填</th>
+                    <th class="type" id="type1">类型</th>
+                    <th class="ms" id="ms1">描述</th>
                 </tr>
                 <?php
                 $i = $nr['api'][$num]['count'];
@@ -70,10 +70,10 @@ if ($nr['api'][$num]['now'] != "正常" && $nr['api'][$num]['now'] != "收费") 
                     if ($nr['api'][$num][$k . '-name'] != "") {
                         echo
                         '<tr>
-                        <td>' . $nr['api'][$num][$k . '-name'] . '</td>
-                        <td>' . $nr['api'][$num][$k . '-ok'] . '</td>
-                        <td>' . $nr['api'][$num][$k . '-type'] . '</td>
-                        <td>' . $nr['api'][$num][$k . '-main'] . '</td>
+                        <td class="name">' . $nr['api'][$num][$k . '-name'] . '</td>
+                        <td class="sfbt">' . $nr['api'][$num][$k . '-ok'] . '</td>
+                        <td class="type">' . $nr['api'][$num][$k . '-type'] . '</td>
+                        <td class="ms">' . $nr['api'][$num][$k . '-main'] . '</td>
                         </tr>';
                     }
                     $k++;
@@ -81,7 +81,7 @@ if ($nr['api'][$num]['now'] != "正常" && $nr['api'][$num]['now'] != "收费") 
                 ?>
             </table>
             <p id="cs">&nbsp;返回参数</p>
-            <p class="cs-main"><?php echo str_replace(" ","&nbsp;",$nr['api'][$num]['fh']) ?></p>
+            <p class="cs-main"><?php echo str_replace(" ", "&nbsp;", $nr['api'][$num]['fh']) ?></p>
         </div>
         <div id="footer">
             <p><?php echo $nr['footer']; ?></p>
