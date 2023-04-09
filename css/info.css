@@ -252,6 +252,46 @@ table {
     width: 100%;
     text-align: center;
     margin-bottom: 20px;
+    border-spacing: 0;
+    padding-top: 1px;
+    padding-bottom: 1px;
+}
+
+.name,
+.type.sfbt.ms {
+    padding-top: 3px;
+    padding-bottom: 3px;
+}
+
+.name {
+    width: 20%;
+    border-right: solid .5px #d1d9e6;
+    border-top: solid .5px #d1d9e6;
+}
+
+#name1,
+#sfbt1,
+#type1,
+#ms1 {
+    border-top: none;
+}
+
+.sfbt {
+    width: 5%;
+    border-right: solid .5px #d1d9e6;
+    border-top: solid .5px #d1d9e6;
+}
+
+.type {
+    width: 20%;
+    border-right: solid .5px #d1d9e6;
+    border-top: solid .5px #d1d9e6;
+}
+
+.ms {
+    width: 55%;
+    word-break: break-all;
+    border-top: solid .5px #d1d9e6;
 }
 
 .cs-main {
@@ -511,5 +551,29 @@ notice {
 
     #center {
         width: 85%;
+    }
+
+    .name,
+    .sfbt,
+    .type,
+    .ms {
+        padding-left: 2px;
+        padding-right: 2px;
+    }
+
+    .name {
+        width: 20%;
+    }
+
+    .sfbt {
+        width: 5%;
+    }
+
+    .type {
+        width: 15%;
+    }
+
+    .ms {
+        width: 60%;
     }
 }
