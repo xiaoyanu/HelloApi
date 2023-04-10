@@ -42,16 +42,16 @@ $nr = json_decode($temp, true);
                 //判断是否是维护状态
                 switch ($nr['api'][$i]['now']) {
                     case "未公开":
-                        $now = '<div class="zt" style="background-color: #0288D1">' . $nr['api'][$i]['now'] . '</div>';
+                        $now = '<span class="zt" style="background-color: #0288D1">' . $nr['api'][$i]['now'] . '</span>';
                         break;
                     case "维护":
-                        $now = '<div class="zt" style="background-color: #f56c6c">' . $nr['api'][$i]['now'] . '</div>';
+                        $now = '<span class="zt" style="background-color: #f56c6c">' . $nr['api'][$i]['now'] . '</span>';
                         break;
                     case "收费":
-                        $now = '<div class="zt" style="background-color: #FF9800">' . $nr['api'][$i]['now'] . '</div>';
+                        $now = '<span class="zt" style="background-color: #FF9800">' . $nr['api'][$i]['now'] . '</span>';
                         break;
                     default:
-                        $now = '<div class="zt" style="background-color: #67c23a">' . $nr['api'][$i]['now'] . '</div>';
+                        $now = '<span class="zt" style="background-color: #67c23a">' . $nr['api'][$i]['now'] . '</span>';
                         break;
                 }
 
@@ -73,7 +73,9 @@ $nr = json_decode($temp, true);
                 '<div class="apibox">
                 ' . $now . '
                 <p class="title">' . $nr['api'][$i]['name'] . '</p>
-                <p class="text">' . $nr['api'][$i]['txt'] . '</p>
+                <div class="text">
+                <p>' . $nr['api'][$i]['txt'] . '</p>
+                </div>
                 ' . $url . '</div>';
                 $i++;
             }
