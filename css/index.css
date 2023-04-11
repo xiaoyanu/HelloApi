@@ -234,7 +234,6 @@ body {
     margin-top: 10px;
     overflow: hidden;
     word-break: break-all;
-    background-color: #000;
 }
 
 .url {
@@ -242,7 +241,7 @@ body {
     outline: 0;
     float: right;
     position: relative;
-    bottom: 40px;
+    bottom: 36px;
     right: 20px;
     border-radius: 8px;
     background-color: #ecf0f3;
@@ -510,6 +509,15 @@ notice {
     .apibox {
         width: 100%;
         margin: 0;
-        margin-top: 15px;
+        margin-top: 20px;
+    }
+    .url{
+        bottom: 32px;
+    }
+    .text {
+        margin: 0;
+        margin-top: 10px;
+        margin-left: 20px;
+        width: 88%;
     }
 }
