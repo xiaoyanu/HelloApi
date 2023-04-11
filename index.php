@@ -58,7 +58,6 @@ $nr = json_decode($temp, true);
                 //辨别链接
                 switch ($nr['api'][$i]['now']) {
                     case "未公开":
-
                         $url = '<a class="url" onclick="ks.notice(\'' . $nr['api'][$i]['name'] . ' 未公开\', {time: 1500});">查看</a>';
                         break;
                     case "维护":
@@ -72,7 +71,9 @@ $nr = json_decode($temp, true);
                 echo
                 '<div class="apibox">
                 ' . $now . '
-                <p class="title">' . $nr['api'][$i]['name'] . '</p>
+                <div class="title">
+                <p>' . $nr['api'][$i]['name'] . '</p>
+                </div>
                 <div class="text">
                 <p>' . $nr['api'][$i]['txt'] . '</p>
                 </div>
