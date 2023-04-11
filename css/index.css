@@ -209,23 +209,32 @@ body {
     text-align: center;
     border-radius: 6px;
     float: right;
-    margin: 20px;
     font-size: 12px;
     font-weight: 400;
+    position: relative;
+    right: 20px;
+    top: 20px;
 }
 
 .title {
+    width: 285px;
+    height: 32px;
     margin-left: 20px;
+    margin-right: 20px;
     margin-top: 20px;
     font-size: 24px;
+    word-break: break-all;
+    overflow: hidden;
 }
 
 .text {
+    width: 285px;
+    height: 74px;
     margin: 0 auto;
     margin-top: 10px;
-    width: 90%;
-    height: 50%;
     overflow: hidden;
+    word-break: break-all;
+    background-color: #000;
 }
 
 .url {
