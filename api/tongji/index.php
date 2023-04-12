@@ -20,12 +20,7 @@ if ($type == "1") {
 }
 //查询
 if ($type == "2") {
-
-    if (strlen($i) < 7) {
-        while (strlen($lssum) != 7 - strlen($i)) {
-            $lssum = $lssum . "0";
-        }
-    }
+    $lssum = str_pad($i,7,"0",STR_PAD_LEFT); 
     header("content-type: image/svg+xml;charset=utf-8");
     $lssum = $lssum . $i;
     echo "<svg width='315' height='100' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'><title>小言uAPI访问统计</title><g><image x='0' y='0' width='45' height='100' xlink:href='" . getimg(substr($lssum, 0, 1)) . "' /><image x='45' y='0' width='45' height='100' xlink:href='" . getimg(substr($lssum, 1, 1)) . "' /><image x='90' y='0' width='45' height='100' xlink:href='" . getimg(substr($lssum, 2, 1)) . "' /><image x='135' y='0' width='45' height='100' xlink:href='" . getimg(substr($lssum, 3, 1)) . "' /><image x='180' y='0' width='45' height='100' xlink:href='" . getimg(substr($lssum, 4, 1)) . "' /><image x='225' y='0' width='45' height='100' xlink:href='" . getimg(substr($lssum, 5, 1)) . "' /><image x='270' y='0' width='45' height='100' xlink:href='" . getimg(substr($lssum, 6, 1)) . "' /></g></svg>";
