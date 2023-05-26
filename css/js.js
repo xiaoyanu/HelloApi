@@ -175,7 +175,7 @@ Array.prototype.remove = function (value) {
 function copyText() {
     var text = document.getElementById("text").innerHTML;
     var input = document.getElementById("input");
-    input.value = text.replace("&amp;", "&");
+    input.value = text.replace(/&amp;/g, "&");
     input.select(); //选中文本
     document.execCommand("copy");
     ks.notice("复制成功", {
