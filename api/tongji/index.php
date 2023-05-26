@@ -1,26 +1,26 @@
 <?php
+//注意：需要频繁读取/写入数据，会导致数据冲突（如果客流量大的话），间接导致统计失去原本的数量，或不准确
+//如果遇到了上述问题，请自行用其他方法来统计使用数量。
 //插件使用数量统计
 $type = $_GET['t'];
 if ($type == "") {
     echo '请填写t值，1或者2，1为增加，2为查询';
     die;
 }
-$i = file_get_contents("i.txt");
-//如果没有数字
-if ($i == "") {
+$i = (int)file_get_contents("i.txt");
+// 如果文件内容不是数字
+if ($i === "" || $i === false) {
     $i = 0;
 }
-//增加
+// 增加
 if ($type == "1") {
-    $i++;
-    $myfile = fopen("i.txt", "w");
-    fwrite($myfile, $i);
-    fclose($myfile);
+    $i += 1; // 增加
+    file_put_contents("i.txt", $i);
     die;
 }
 //查询
 if ($type == "2") {
-    $lssum = str_pad($i,7,"0",STR_PAD_LEFT); 
+    $lssum = str_pad($i, 7, "0", STR_PAD_LEFT);
     header("content-type: image/svg+xml;charset=utf-8");
     $lssum = $lssum . $i;
     echo "<svg width='315' height='100' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'><title>小言uAPI访问统计</title><g><image x='0' y='0' width='45' height='100' xlink:href='" . getimg(substr($lssum, 0, 1)) . "' /><image x='45' y='0' width='45' height='100' xlink:href='" . getimg(substr($lssum, 1, 1)) . "' /><image x='90' y='0' width='45' height='100' xlink:href='" . getimg(substr($lssum, 2, 1)) . "' /><image x='135' y='0' width='45' height='100' xlink:href='" . getimg(substr($lssum, 3, 1)) . "' /><image x='180' y='0' width='45' height='100' xlink:href='" . getimg(substr($lssum, 4, 1)) . "' /><image x='225' y='0' width='45' height='100' xlink:href='" . getimg(substr($lssum, 5, 1)) . "' /><image x='270' y='0' width='45' height='100' xlink:href='" . getimg(substr($lssum, 6, 1)) . "' /></g></svg>";
