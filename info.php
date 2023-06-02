@@ -37,7 +37,7 @@ if ($nr['api'][$num]['now'] != "正常" && $nr['api'][$num]['now'] != "收费") 
     <div id="head">
         <img id="logo" src="<?php echo $nr['logo'] ?>">
         <a id="title" href="<?php echo '//' . $nr['ym'] ?>"><?php echo $nr['title'] ?></a>
-        <img id="tj" src="//api.zxz.ee/api/tongji/?t=2">
+        <img id="tj" src="./api/tongji/?t=2">
         <div id="head-right">
             <a id="wt" href="<?php echo $nr['qqurl'] ?>">问题反馈</a>
         </div>
