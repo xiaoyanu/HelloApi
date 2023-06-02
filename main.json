@@ -1,6 +1,8 @@
 {
     "title": "站点名称",
     "ym": "填写网站域名",
+    "ms": "这是网站描述，可以写一句话来描述你的网站",
+    "keywords": "免费API, 稳定API",
     "logo": "https://zxz.ee/touxiang.png",
     "icon": "https://zxz.ee/favicon.ico",
     "footer": "&copy;2023 小言u",
