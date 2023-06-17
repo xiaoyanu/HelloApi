@@ -120,7 +120,7 @@ $nr = json_decode($temp, true);
                         </center>
                         </form>
                         <br>
-                        <h2>没有找到与相关 ' . $word . ' 的接口</h2>
+                        <h2>没有找到与 ' . $word . ' 相关的接口</h2>
                     </div>
                     </center>
                     ';
