@@ -94,6 +94,11 @@ $nr = json_decode($temp, true);
             <p><?php echo $nr['footer']; ?></p>
         </div>
         <div id="xf">
+            <a ks-tag="left" ks-text="搜索" id="searchButton">
+                <svg t="1686984175067" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="2531" id="mx_n_1686984175067" width="56" height="56">
+                    <path d="M949.76 884.3264a88.68864 88.68864 0 0 1-25.64096 62.67904 87.14752 87.14752 0 0 1-123.76576 0.16896l-164.29568-160.87552a382.4128 382.4128 0 0 1-26.43968 12.6208 382.83776 382.83776 0 0 1-300.032 0 383.38048 383.38048 0 0 1-122.48064-83.39968 391.296 391.296 0 0 1 0-550.36928 384.56832 384.56832 0 0 1 627.55328 123.648 391.00416 391.00416 0 0 1-40.704 376.57088l150.32832 156.56448a88.576 88.576 0 0 1 25.47712 62.39232z m-153.6512-444.04736c0-186.33216-150.41536-337.92-335.30368-337.92s-335.32928 151.6032-335.32928 337.92S275.89632 778.24 460.8 778.24s335.3088-151.64928 335.3088-337.96096z m-503.61344 168.90368a240.45568 240.45568 0 0 1 0-337.73568l34.63168 40.07424a183.46496 183.46496 0 0 0 0 257.50528z" p-id="2532" data-spm-anchor-id="a313x.7781069.0.i5" class="selected" fill="#61677C"></path>
+                </svg>
+            </a>
             <a ks-tag="left" ks-text="返回顶部" href="#tj">
                 <svg t="1680926673355" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="2320">
                     <path d="M188.274526 257.534448l0-97.428983 645.061528 0 0 97.428983L188.274526 257.534448zM252.732583 515.366677l255.82655-226.355331 260.329097 226.355331-192.371332 0 0 192.362122 0 161.89625-130.911562 0 0-354.258373L252.732583 515.366677z" p-id="2321" fill="#61677C"></path>
@@ -101,6 +106,62 @@ $nr = json_decode($temp, true);
             </a>
         </div>
     </div>
+    <!-- 搜索盒子 -->
+    <div id="main-ss">
+        <center>
+            <h1>🔍搜索接口</h1>
+        </center>
+        <form action="ss.php" method="GET">
+            <input id="ss" type="text" name="s" placeholder="请输入关键字...">
+            <center>
+                <input id="g-ss" type="submit" value="搜索">
+            </center>
+        </form>
+    </div>
+
+    <script>
+        // 获取搜索按钮元素
+        const searchButton = document.querySelector('#searchButton');
+        // 获取弹出的DIV元素
+        const popupDiv = document.querySelector('#main-ss');
+        // 添加点击事件监听器
+        searchButton.addEventListener('click', () => {
+            // 显示弹出的DIV
+            popupDiv.classList.add('show');
+            // 创建背景层
+            const backdrop = document.createElement('div');
+            backdrop.classList.add('backdrop');
+            // 将背景层插入到弹出DIV之前
+            popupDiv.parentNode.insertBefore(backdrop, popupDiv);
+            // 延迟添加动画类以触发动画效果
+            setTimeout(() => {
+                backdrop.style.opacity = '1';
+                popupDiv.style.opacity = '1';
+                popupDiv.style.transform = 'translate(-50%, -50%)';
+            }, 10);
+
+            // 添加点击事件监听器到背景层
+            backdrop.addEventListener('click', () => {
+                popupDiv.classList.remove('show');
+                removeBackdrop();
+            });
+        });
+
+        // 删除背景层
+        function removeBackdrop() {
+            const backdrop = document.querySelector('.backdrop');
+            if (backdrop) {
+                backdrop.style.opacity = '0';
+                popupDiv.style.opacity = '0';
+                popupDiv.style.transform = 'translate(-50%, -55%)';
+                // 延迟移除背景层以等待动画完成
+                setTimeout(() => {
+                    backdrop.remove();
+                }, 300);
+            }
+        }
+    </script>
+
 </body>
 
 </html>
