@@ -107,7 +107,7 @@ $nr = json_decode($temp, true);
         </div>
     </div>
     <!-- 搜索盒子 -->
-    <div id="main-ss">
+    <div id="main-ss" style="display: none;">
         <center>
             <h1>🔍搜索接口</h1>
         </center>
@@ -128,6 +128,7 @@ $nr = json_decode($temp, true);
         searchButton.addEventListener('click', () => {
             // 显示弹出的DIV
             popupDiv.classList.add('show');
+            popupDiv.style.display = 'block';
             // 创建背景层
             const backdrop = document.createElement('div');
             backdrop.classList.add('backdrop');
@@ -143,6 +144,7 @@ $nr = json_decode($temp, true);
             // 添加点击事件监听器到背景层
             backdrop.addEventListener('click', () => {
                 popupDiv.classList.remove('show');
+                popupDiv.style.display = 'none';
                 removeBackdrop();
             });
         });
