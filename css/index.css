@@ -330,7 +330,6 @@ body {
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    z-index: 9999;
     padding: 20px;
     width: 300px;
     height: 180px;
