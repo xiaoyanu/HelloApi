@@ -42,9 +42,8 @@ $nr = json_decode($temp, true);
     <div id="main">
         <div id="center">
             <?php
-            $num = count($nr['api']) - 1;
-            $i = 0;
-            while ($num >= $i) {
+            $i = count($nr['api']) - 1;
+            while ($i >= 0) {
 
                 //判断是否是维护状态
                 switch ($nr['api'][$i]['now']) {
@@ -85,7 +84,7 @@ $nr = json_decode($temp, true);
                 <p>' . $nr['api'][$i]['txt'] . '</p>
                 </div>
                 ' . $url . '</div>';
-                $i++;
+                $i--;
             }
             ?>
 
