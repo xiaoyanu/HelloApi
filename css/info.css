@@ -191,7 +191,6 @@ body {
     background-color: #ecf0f3;
     box-shadow: inset 1px 1px 2px #d1d9e6, inset -1px -1px 2px #FFF;
     padding: 15px;
-    overflow: hidden;
 }
 
 #center h2 {
@@ -215,6 +214,7 @@ body {
 
 .url {
     margin-top: 10px;
+    overflow-wrap: break-word;
 }
 
 .url button {
@@ -300,6 +300,7 @@ table {
     border-radius: 8px;
     border: solid 1px #d1d9e6;
     width: auto;
+    overflow-wrap: break-word;
 }
 
 #cs {
