@@ -1,8 +1,9 @@
 <?php
-// 这是路径
-$temp = file_get_contents("main.json");
-if ($temp == "") {
-    echo "核心文件Json未找到，可能是文件路径没有正确填写或文件名称您更改，请修正index.php、info.php文件的第一行代码的路径为正确路径。";
+include 'config.php';
+$Api = new ApiMain();
+$temp = $Api->GetApi();
+if ($temp == false) {
+    echo "核心文件Json未找到，可能是文件路径没有正确填写或文件名称您更改，请修正config.php文件中的路径为正确路径。";
     die;
 }
 $nr = json_decode($temp, true);
