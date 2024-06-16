@@ -102,6 +102,9 @@ body {
     box-shadow: -5px -5px 20px #fff, 5px 5px 20px #d1d9e6;
     background-color: #ecf0f3;
     text-shadow: 1px 1px 0 #FFF;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
     user-select: none;
 }
 
@@ -162,6 +165,9 @@ body {
 
 /* banner图 */
 #banner {
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
     user-select: none;
     height: 400px;
     background-image: url(Top_Picture.gif);
@@ -191,6 +197,7 @@ body {
     background-color: #ecf0f3;
     box-shadow: inset 1px 1px 2px #d1d9e6, inset -1px -1px 2px #FFF;
     padding: 15px;
+    overflow-wrap: break-word;
 }
 
 #center h2 {
@@ -214,7 +221,6 @@ body {
 
 .url {
     margin-top: 10px;
-    overflow-wrap: break-word;
 }
 
 .url button {
@@ -311,6 +317,9 @@ table {
 
 /* 底部版权声名 */
 #footer {
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
     user-select: none;
     margin-top: 15px;
     background-color: #ecf0f3;
@@ -487,6 +496,9 @@ notice {
     z-index: 10;
     padding: 1em;
     position: fixed;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
     user-select: none;
     pointer-events: none
 }
