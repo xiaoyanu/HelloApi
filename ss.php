@@ -31,7 +31,9 @@ $nr = json_decode($temp, true);
         </div>
     </div>
     <div id="banner">
-        <h1>🔍搜索接口</h1>
+        <a ks-tag="bottom" ks-text="继续搜索" href="//<?php echo $nr['ym'] ?>/ss.php">
+            <h1>🔍搜索接口</h1>
+        </a>
     </div>
     <div id="main">
         <div id="center">
@@ -55,13 +57,13 @@ $nr = json_decode($temp, true);
                 $ms = [];
                 $out = [];
                 while ($num >= $i) {
-                    if (strpos($nr['api'][$i]['name'], $word) !== false)
+                    if (strpos($nr['api'][$i]['name'], strtoupper($word)) !== false)
                         array_push($name, $i);
                     $i++;
                 }
                 $i = 0;
                 while ($num >= $i) {
-                    if (strpos($nr['api'][$i]['txt'], $word) !== false)
+                    if (strpos($nr['api'][$i]['txt'], strtoupper($word)) !== false)
                         array_push($ms, $i);
                     $i++;
                 }
