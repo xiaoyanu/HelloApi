@@ -119,6 +119,7 @@ body {
     height: 50px;
     margin-left: 20px;
     margin-top: -10px;
+    border-radius: 10px;
 }
 
 #head img {
