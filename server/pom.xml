@@ -56,6 +56,27 @@
 			<version>3.0.5</version>
 			<scope>test</scope>
 		</dependency>
+
+        <!-- https://mvnrepository.com/artifact/com.auth0/java-jwt Token-->
+        <dependency>
+            <groupId>com.auth0</groupId>
+            <artifactId>java-jwt</artifactId>
+            <version>4.5.0</version>
+        </dependency>
+
+        <!-- JSON解析 -->
+        <dependency>
+            <groupId>com.alibaba</groupId>
+            <artifactId>fastjson</artifactId>
+            <version>1.2.83</version>
+        </dependency>
+
+        <!-- 验证码 -->
+        <dependency>
+            <groupId>com.pig4cloud.plugin</groupId>
+            <artifactId>captcha-spring-boot-starter</artifactId>
+            <version>2.2.5</version>
+        </dependency>
 	</dependencies>
 
 	<build>
