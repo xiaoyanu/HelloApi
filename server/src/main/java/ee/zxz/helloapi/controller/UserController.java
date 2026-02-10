@@ -19,8 +19,8 @@ public class UserController {
 
     // Captcha - 获取验证码图片 - GET
     @GetMapping("/Captcha")
-    public void Captcha(HttpServletRequest request, HttpServletResponse response) throws Exception {
-        userService.generateCaptcha(request, response);
+    public void GetCaptcha(HttpServletRequest request, HttpServletResponse response) throws Exception {
+        userService.getCaptcha(request, response);
     }
 
     // Register - 注册账号 - POST
@@ -28,4 +28,35 @@ public class UserController {
     public Map<String, Object> Register(@RequestBody(required = false) Map<String, String> requestBody, HttpServletRequest request) {
         return userService.register(requestBody, request);
     }
+
+    // Login - 登录账号 - POST
+    @PostMapping("/Login")
+    public Map<String, Object> Login(@RequestBody(required = false) Map<String, String> requestBody, HttpServletRequest request) {
+        return userService.login(requestBody, request);
+    }
+
+    // GetUserInfo - 获取用户信息 - GET
+    @GetMapping("/")
+    public Map<String, Object> GetUserInfo(@RequestParam(required = false) Map<String, String> requestParam, HttpServletRequest request) {
+        return userService.getUserInfo(requestParam, request);
+    }
+
+    // GetUserKey - 获取用户密钥 - GET
+    @GetMapping("/key")
+    public Map<String, Object> GetUserKey(@RequestParam(required = false) Map<String, String> requestParam, HttpServletRequest request) {
+        return userService.getUserKey(requestParam, request);
+    }
+
+    // DeleteUser - 删除用户 - DELETE
+    @DeleteMapping("/")
+    public Map<String, Object> DeleteUser(@RequestBody(required = false) Map<String, String> requestBody, HttpServletRequest request) {
+        return userService.deleteUser(requestBody, request);
+    }
+
+    // GetUserApiList - 获取用户API列表 - GET
+    @GetMapping("/AppList")
+    public Map<String, Object> GetUserApiList(@RequestParam(required = false) Map<String, String> requestParam, HttpServletRequest request) {
+        return userService.getUserApiList(requestParam, request);
+    }
+
 }

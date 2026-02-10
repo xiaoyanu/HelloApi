@@ -39,4 +39,18 @@ public class Tools {
         }
     }
 
+    /**
+     * 获取Token对应的用户ID
+     *
+     * @param authorizationHeader Authorization头信息
+     * @return 用户ID(0表示无效Token)
+     */
+    public static int tokenToUserId(String authorizationHeader) {
+        if (authorizationHeader == null || !authorizationHeader.startsWith("Bearer ")) {
+            return 0;
+        }
+        String token = authorizationHeader.substring(7);
+        return JwtUtil.deToken(token, "id");
+    }
+
 }

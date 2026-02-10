@@ -36,19 +36,20 @@ public class JwtUtil {
      * 通过token获取UID
      *
      * @param token JWT token
+     * @param name 字段名
      * @return 用户ID(0表示无效Token)
      */
-    public static int deToken(String token) {
+    public static int deToken(String token, String name) {
         if (token == null || token.trim().isEmpty()) {
             return 0;
         }
         try {
             JWTVerifier jwtVerifier = JWT.require(Algorithm.HMAC256(KEY)).build();
             DecodedJWT verify = jwtVerifier.verify(token);
-            if (verify.getClaim("uid").isNull()) {
+            if (verify.getClaim(name).isNull()) {
                 return 0;
             }
-            return verify.getClaim("uid").asInt();
+            return verify.getClaim(name).asInt();
         } catch (Exception e) {
             return 0;
         }
