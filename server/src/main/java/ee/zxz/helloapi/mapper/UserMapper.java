@@ -88,19 +88,17 @@ public interface UserMapper {
      * DeleteUser - 删除用户
      *
      * @param userId 用户ID
-     * @return 返回删除条数大于0则为成功
      */
     @Delete("DELETE FROM `users` WHERE `id` = #{userId}")
-    int deleteUser(int userId);
+    void deleteUser(int userId);
 
      /**
       * DeleteUserKey - 删除用户密钥
       *
       * @param userId 用户ID
-      * @return 返回删除条数大于0则为成功
       */
     @Delete("DELETE FROM `user_keys` WHERE `user_id` = #{userId}")
-    int deleteUserKey(int userId);
+    void deleteUserKey(int userId);
 
     /**
      * CheckUserIdExists - 检查用户ID是否存在

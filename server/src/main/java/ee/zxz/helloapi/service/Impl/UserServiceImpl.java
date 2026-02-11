@@ -7,6 +7,7 @@ import com.pig4cloud.captcha.utils.CaptchaJakartaUtil;
 import ee.zxz.helloapi.domain.ApiApp;
 import ee.zxz.helloapi.domain.User;
 import ee.zxz.helloapi.domain.UserKey;
+import ee.zxz.helloapi.mapper.ApiMapper;
 import ee.zxz.helloapi.mapper.UserMapper;
 import ee.zxz.helloapi.service.UserService;
 import ee.zxz.helloapi.utils.Finals;
@@ -22,9 +23,11 @@ import java.util.*;
 @Service
 public class UserServiceImpl implements UserService {
     private final UserMapper userMapper;
+    private final ApiMapper apiMapper;
 
-    public UserServiceImpl(UserMapper userMapper) {
+    public UserServiceImpl(UserMapper userMapper, ApiMapper apiMapper) {
         this.userMapper = userMapper;
+        this.apiMapper = apiMapper;
     }
 
     @Override
@@ -166,13 +169,13 @@ public class UserServiceImpl implements UserService {
         password = Tools.getTextMd5(password);
 
         if (userMapper.checkUsernameExists(name) <= 0) {
-            return ResponseUtil.response(401, "账号不存在");
+            return ResponseUtil.response(400, "账号不存在");
         }
 
         // 获取用户信息
         User user = userMapper.login(name, password);
         if (user == null) {
-            return ResponseUtil.response(401, "密码错误");
+            return ResponseUtil.response(400, "密码错误");
         }
 
         // 生成JWT token
@@ -193,6 +196,9 @@ public class UserServiceImpl implements UserService {
     @Override
     public Map<String, Object> getUserInfo(Map<String, String> requestParam, HttpServletRequest request) {
         int userId = (int) request.getAttribute("userId");
+        if (userMapper.checkUserIdExists(userId) < 1) {
+            return ResponseUtil.response(401, Finals.MESSAGES_ERROR_USER_NOT_FOUND);
+        }
         if (requestParam.get("id") != null && !requestParam.get("id").trim().isEmpty()) {
             // 检查Token是否为管理员
             if ((int) request.getAttribute("userMode") != Finals.Admin) {
@@ -204,7 +210,7 @@ public class UserServiceImpl implements UserService {
         // 获取用户信息
         User user = userMapper.getUserInfo(userId);
         if (user == null) {
-            return ResponseUtil.response(401, Finals.MESSAGES_ERROR_USER_NOT_EXISTS);
+            return ResponseUtil.response(400, Finals.MESSAGES_ERROR_USER_NOT_FOUND);
         }
 
         Map<String, Object> data = new LinkedHashMap<>();
@@ -219,7 +225,9 @@ public class UserServiceImpl implements UserService {
     @Override
     public Map<String, Object> getUserKey(Map<String, String> requestParam, HttpServletRequest request) {
         int userId = (int) request.getAttribute("userId");
-
+        if (userMapper.checkUserIdExists(userId) < 1) {
+            return ResponseUtil.response(401, Finals.MESSAGES_ERROR_USER_NOT_FOUND);
+        }
         UserKey user_key = userMapper.getUserKey(userId);
 
         Map<String, Object> data = new LinkedHashMap<>();
@@ -234,42 +242,52 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Map<String, Object> deleteUser(Map<String, String> requestBody, HttpServletRequest request) {
-        int userId = (int) request.getAttribute("userId");
-
-        if (requestBody.get("id") != null && !requestBody.get("id").trim().isEmpty()) {
-            if (userId == Integer.parseInt(requestBody.get("id"))) {
-                return ResponseUtil.response(403, "你不能删除自己");
+    public Map<String, Object> deleteUser(int userId, HttpServletRequest request) {
+        try {
+            if (userId != 0) {
+                if (userId == (int) request.getAttribute("userId")) {
+                    return ResponseUtil.response(403, "你不能删除自己");
+                }
+                // 检查用户ID是否存在
+                if (userMapper.checkUserIdExists(userId) < 1) {
+                    return ResponseUtil.response(400, Finals.MESSAGES_ERROR_USER_NOT_FOUND);
+                }
+                // 删除用户
+                userMapper.deleteUser(userId);
+                // 删除用户密钥
+                userMapper.deleteUserKey(userId);
+                // 删除用户API
+                List<ApiApp> apiAppList = userMapper.getUserApiList(userId);
+                if (!apiAppList.isEmpty()) {
+                    for (ApiApp apiApp : apiAppList) {
+                        // 删除API参数
+                        apiMapper.deleteApiParamAll(apiApp.getId());
+                        // 删除API应用
+                        apiMapper.deleteApiApp(apiApp.getId());
+                    }
+                }
+                return ResponseUtil.success();
+            } else {
+                return ResponseUtil.response(400, Finals.MESSAGES_ERROR_PARAM);
             }
-            userId = Integer.parseInt(requestBody.get("id"));
-            // 检查用户ID是否存在
-            if (userMapper.checkUserIdExists(userId) < 1) {
-                return ResponseUtil.response(401, Finals.MESSAGES_ERROR_USER_NOT_EXISTS);
-            }
-            // 删除用户
-            if (userMapper.deleteUser(userId) < 1) {
-                return ResponseUtil.response(401, "用户删除失败");
-            }
-            // 删除用户密钥
-            if (userMapper.deleteUserKey(userId) < 1) {
-                return ResponseUtil.response(401, "用户密钥删除失败");
-            }
-        } else {
+        } catch (Exception e) {
             return ResponseUtil.response(400, Finals.MESSAGES_ERROR_PARAM);
         }
-        return ResponseUtil.success();
     }
 
     @Override
     public Map<String, Object> getUserApiList(Map<String, String> requestParam, HttpServletRequest request) {
         int userId = (int) request.getAttribute("userId");
+        if (userMapper.checkUserIdExists(userId) < 1) {
+            return ResponseUtil.response(401, Finals.MESSAGES_ERROR_USER_NOT_FOUND);
+        }
         if (requestParam.get("id") != null && !requestParam.get("id").trim().isEmpty()) {
             if ((int) request.getAttribute("userMode") != Finals.Admin) {
                 return ResponseUtil.response(403, Finals.MESSAGES_ERROR_NOT_ADMIN);
             }
             userId = Integer.parseInt(requestParam.get("id"));
             if (userMapper.checkUserIdExists(userId) < 1) {
-                return ResponseUtil.response(401, Finals.MESSAGES_ERROR_USER_NOT_EXISTS);
+                return ResponseUtil.response(400, Finals.MESSAGES_ERROR_USER_NOT_FOUND);
             }
         }
 

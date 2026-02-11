@@ -1,18 +1,18 @@
 package ee.zxz.helloapi.domain;
 
 public class ApiParam {
-    private int app_id;
+    private int api_id;
     private String name;
     private int required;
     private String type;
     private String msg;
 
-    public int getApp_id() {
-        return app_id;
+    public int getApi_id() {
+        return api_id;
     }
 
-    public void setApp_id(int app_id) {
-        this.app_id = app_id;
+    public void setApi_id(int api_id) {
+        this.api_id = api_id;
     }
 
     public String getName() {

@@ -3,7 +3,7 @@ package ee.zxz.helloapi.domain;
 public class ApiApp {
     private int id;
     private String title;
-    private String smalltitle;
+    private String smallTitle;
     private int status;
     private int type;
     private String url;
@@ -29,12 +29,12 @@ public class ApiApp {
         this.title = title;
     }
 
-    public String getSmalltitle() {
-        return smalltitle;
+    public String getSmallTitle() {
+        return smallTitle;
     }
 
-    public void setSmalltitle(String smalltitle) {
-        this.smalltitle = smalltitle;
+    public void setSmallTitle(String smallTitle) {
+        this.smallTitle = smallTitle;
     }
 
     public int getStatus() {
