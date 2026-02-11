@@ -20,7 +20,7 @@ public class JwtUtil {
      * @param username 用户名
      * @return JWT token
      */
-    public static String getToken(int uid, String username) {
+    public static String getToken(int uid, String username, int mode) {
         Calendar instance = Calendar.getInstance();
         // 7天过期
         instance.add(Calendar.DATE, 7);
@@ -28,6 +28,7 @@ public class JwtUtil {
         return JWT.create()
                 .withClaim("id", uid)  // 用户UID
                 .withClaim("name", username)  // 用户名
+                .withClaim("mode", mode)  // 用户权限
                 .withExpiresAt(instance.getTime()) // 过期时间
                 .sign(Algorithm.HMAC256(KEY));// 签名
     }

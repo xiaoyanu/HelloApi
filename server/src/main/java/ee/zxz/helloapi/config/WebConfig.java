@@ -1,8 +1,10 @@
 package ee.zxz.helloapi.config;
 
 
+import ee.zxz.helloapi.config.interceptor.JwtInterceptor;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
+import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 /**
@@ -11,6 +13,22 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
  */
 @Configuration
 public class WebConfig implements WebMvcConfigurer {
+
+    private final JwtInterceptor jwtInterceptor;
+    public WebConfig(JwtInterceptor jwtInterceptor) {
+        this.jwtInterceptor = jwtInterceptor;
+    }
+
+    /**
+     * 配置拦截器
+     */
+    @Override
+    public void addInterceptors(InterceptorRegistry registry) {
+        // 注册自定义拦截器
+        registry.addInterceptor(jwtInterceptor)
+                .addPathPatterns("/**") // 拦截所有路径
+                .excludePathPatterns("/error"); // 排除Spring默认错误路径
+    }
 
     /**
      * 配置CORS跨域访问
@@ -30,7 +48,7 @@ public class WebConfig implements WebMvcConfigurer {
                 // 允许的源模式
                 .allowedOriginPatterns("http://localhost:*", "http://127.0.0.1:*", "http://*.zxz.ee", "https://*.zxz.ee")
                 // 允许的请求方法
-                .allowedMethods("GET", "POST",  "OPTIONS")
+                .allowedMethods("GET", "POST",  "OPTIONS", "DELETE", "PUT")
                 // 允许的请求头
                 .allowedHeaders("*")
                 // 允许暴露的响应头

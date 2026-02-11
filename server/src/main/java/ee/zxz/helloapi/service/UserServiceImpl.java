@@ -175,7 +175,7 @@ public class UserServiceImpl implements UserService {
         }
 
         // 生成JWT token
-        String token = JwtUtil.getToken(user.getId(), user.getName());
+        String token = JwtUtil.getToken(user.getId(), user.getName(), user.getMode());
 
         // 构建返回
         Map<String, Object> data = new LinkedHashMap<>();
@@ -191,14 +191,10 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public Map<String, Object> getUserInfo(Map<String, String> requestParam, HttpServletRequest request) {
-        String authorizationHeader = request.getHeader("Authorization");
-        int userId = Tools.tokenToUserId(authorizationHeader);
-        if (userId < 1) {
-            return ResponseUtil.response(401, Finals.MESSAGES_TOKEN_TIME_OUT);
-        }
-        if (requestParam.get("id") != null) {
+        int userId = (int) request.getAttribute("userId");
+        if (requestParam.get("id") != null && !requestParam.get("id").trim().isEmpty()) {
             // 检查Token是否为管理员
-            if (userMapper.checkUserAdmin(userId) < 1) {
+            if ((int) request.getAttribute("userMode") != Finals.Admin) {
                 return ResponseUtil.response(403, Finals.MESSAGES_ERROR_NOT_ADMIN);
             }
             userId = Integer.parseInt(requestParam.get("id"));
@@ -221,11 +217,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public Map<String, Object> getUserKey(Map<String, String> requestParam, HttpServletRequest request) {
-        String authorizationHeader = request.getHeader("Authorization");
-        int userId = Tools.tokenToUserId(authorizationHeader);
-        if (userId < 1) {
-            return ResponseUtil.response(401, Finals.MESSAGES_TOKEN_TIME_OUT);
-        }
+        int userId = (int) request.getAttribute("userId");
 
         User_key user_key = userMapper.getUserKey(userId);
 
@@ -242,14 +234,8 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public Map<String, Object> deleteUser(Map<String, String> requestBody, HttpServletRequest request) {
-        String authorizationHeader = request.getHeader("Authorization");
-        int userId = Tools.tokenToUserId(authorizationHeader);
-        if (userId < 1) {
-            return ResponseUtil.response(401, Finals.MESSAGES_TOKEN_TIME_OUT);
-        }
-        if (userMapper.checkUserAdmin(userId) < 1) {
-            return ResponseUtil.response(403, Finals.MESSAGES_ERROR_NOT_ADMIN);
-        }
+        int userId = (int) request.getAttribute("userId");
+
         if (requestBody.get("id") != null && !requestBody.get("id").trim().isEmpty()) {
             if (userId == Integer.parseInt(requestBody.get("id"))) {
                 return ResponseUtil.response(403, "你不能删除自己");
@@ -275,14 +261,9 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public Map<String, Object> getUserApiList(Map<String, String> requestParam, HttpServletRequest request) {
-        String authorizationHeader = request.getHeader("Authorization");
-        int userId = Tools.tokenToUserId(authorizationHeader);
-        if (userId < 1) {
-            return ResponseUtil.response(401, Finals.MESSAGES_TOKEN_TIME_OUT);
-        }
-
+        int userId = (int) request.getAttribute("userId");
         if (requestParam.get("id") != null && !requestParam.get("id").trim().isEmpty()) {
-            if (userMapper.checkUserAdmin(userId) < 1) {
+            if ((int) request.getAttribute("userMode") != Finals.Admin) {
                 return ResponseUtil.response(403, Finals.MESSAGES_ERROR_NOT_ADMIN);
             }
             userId = Integer.parseInt(requestParam.get("id"));

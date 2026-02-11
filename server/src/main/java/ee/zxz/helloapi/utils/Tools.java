@@ -1,7 +1,8 @@
 package ee.zxz.helloapi.utils;
 
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
+import org.springframework.util.DigestUtils;
+
+import java.nio.charset.StandardCharsets;
 
 public class Tools {
 
@@ -16,27 +17,7 @@ public class Tools {
         if (input == null) {
             input = "";
         }
-        try {
-            // 获取MD5实例
-            MessageDigest md = MessageDigest.getInstance("MD5");
-            // 计算MD5哈希值
-            byte[] messageDigest = md.digest(input.getBytes());
-            // 使用字符数组预分配空间，避免重复拼接字符串
-            char[] hexArray = "0123456789abcdef".toCharArray();
-            char[] hexChars = new char[32]; // MD5固定32位
-
-            // 转换字节数组为16进制字符串
-            for (int i = 0; i < messageDigest.length; i++) {
-                int v = messageDigest[i] & 0xFF;
-                hexChars[i * 2] = hexArray[v >>> 4]; // 高4位
-                hexChars[i * 2 + 1] = hexArray[v & 0x0F]; // 低4位
-            }
-
-            return new String(hexChars);
-        } catch (NoSuchAlgorithmException e) {
-            // MD5算法几乎在所有Java环境中都可用，抛出运行时异常
-            throw new RuntimeException("无法初始化MD5算法", e);
-        }
+        return DigestUtils.md5DigestAsHex(input.getBytes(StandardCharsets.UTF_8));
     }
 
     /**
@@ -51,6 +32,20 @@ public class Tools {
         }
         String token = authorizationHeader.substring(7);
         return JwtUtil.deToken(token, "id");
+    }
+
+    /**
+     * 获取Token对应的用户权限
+     *
+     * @param authorizationHeader Authorization头信息
+     * @return 用户权限 0-普通用户 1-管理员
+     */
+    public static int tokenToUserMode(String authorizationHeader) {
+        if (authorizationHeader == null || !authorizationHeader.startsWith("Bearer ")) {
+            return 0;
+        }
+        String token = authorizationHeader.substring(7);
+        return JwtUtil.deToken(token, "mode");
     }
 
 }

@@ -1,5 +1,6 @@
 package ee.zxz.helloapi.controller;
 
+import ee.zxz.helloapi.annotation.RequiresLogin;
 import ee.zxz.helloapi.service.UserService;
 import ee.zxz.helloapi.utils.Finals;
 import jakarta.servlet.http.HttpServletRequest;
@@ -37,24 +38,28 @@ public class UserController {
 
     // GetUserInfo - 获取用户信息 - GET
     @GetMapping("/")
+    @RequiresLogin
     public Map<String, Object> GetUserInfo(@RequestParam(required = false) Map<String, String> requestParam, HttpServletRequest request) {
         return userService.getUserInfo(requestParam, request);
     }
 
     // GetUserKey - 获取用户密钥 - GET
     @GetMapping("/key")
+    @RequiresLogin
     public Map<String, Object> GetUserKey(@RequestParam(required = false) Map<String, String> requestParam, HttpServletRequest request) {
         return userService.getUserKey(requestParam, request);
     }
 
     // DeleteUser - 删除用户 - DELETE
     @DeleteMapping("/")
+    @RequiresLogin(mode = Finals.Admin)
     public Map<String, Object> DeleteUser(@RequestBody(required = false) Map<String, String> requestBody, HttpServletRequest request) {
         return userService.deleteUser(requestBody, request);
     }
 
     // GetUserApiList - 获取用户API列表 - GET
     @GetMapping("/AppList")
+    @RequiresLogin
     public Map<String, Object> GetUserApiList(@RequestParam(required = false) Map<String, String> requestParam, HttpServletRequest request) {
         return userService.getUserApiList(requestParam, request);
     }
