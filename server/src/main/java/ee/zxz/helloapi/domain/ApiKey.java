@@ -1,6 +1,6 @@
 package ee.zxz.helloapi.domain;
 
-public class Api_key {
+public class ApiKey {
     private int app_id;
     private String keys;
     private long created;

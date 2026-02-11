@@ -1,6 +1,6 @@
 package ee.zxz.helloapi.domain;
 
-public class Api_view {
+public class ApiView {
     private int app_id;
     private long count;
 

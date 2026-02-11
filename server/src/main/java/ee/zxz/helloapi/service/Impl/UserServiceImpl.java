@@ -1,13 +1,14 @@
-package ee.zxz.helloapi.service;
+package ee.zxz.helloapi.service.Impl;
 
 import com.pig4cloud.captcha.GifCaptcha;
 import com.pig4cloud.captcha.SpecCaptcha;
 import com.pig4cloud.captcha.base.Captcha;
 import com.pig4cloud.captcha.utils.CaptchaJakartaUtil;
-import ee.zxz.helloapi.domain.Api_app;
+import ee.zxz.helloapi.domain.ApiApp;
 import ee.zxz.helloapi.domain.User;
-import ee.zxz.helloapi.domain.User_key;
+import ee.zxz.helloapi.domain.UserKey;
 import ee.zxz.helloapi.mapper.UserMapper;
+import ee.zxz.helloapi.service.UserService;
 import ee.zxz.helloapi.utils.Finals;
 import ee.zxz.helloapi.utils.JwtUtil;
 import ee.zxz.helloapi.utils.ResponseUtil;
@@ -219,7 +220,7 @@ public class UserServiceImpl implements UserService {
     public Map<String, Object> getUserKey(Map<String, String> requestParam, HttpServletRequest request) {
         int userId = (int) request.getAttribute("userId");
 
-        User_key user_key = userMapper.getUserKey(userId);
+        UserKey user_key = userMapper.getUserKey(userId);
 
         Map<String, Object> data = new LinkedHashMap<>();
         data.put("id", userId);
@@ -274,7 +275,7 @@ public class UserServiceImpl implements UserService {
 
         // 获取用户API列表
         List<Map<String, Object>> resultList = new ArrayList<>();
-        for (Api_app apiApp : userMapper.getUserApiList(userId)) {
+        for (ApiApp apiApp : userMapper.getUserApiList(userId)) {
             Map<String, Object> map = new LinkedHashMap<>();
             map.put("id", apiApp.getId());
             map.put("title", apiApp.getTitle());

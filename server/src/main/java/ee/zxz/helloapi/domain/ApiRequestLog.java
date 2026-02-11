@@ -2,7 +2,7 @@ package ee.zxz.helloapi.domain;
 
 import java.time.LocalDateTime;
 
-public class Api_request_log {
+public class ApiRequestLog {
     private int app_id;
     private String ip;
     private LocalDateTime time;

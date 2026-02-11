@@ -1,6 +1,6 @@
 package ee.zxz.helloapi.domain;
 
-public class User_key {
+public class UserKey {
     private int user_id;
     private String key;
     private long created;

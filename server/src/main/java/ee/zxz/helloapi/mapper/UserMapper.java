@@ -1,15 +1,14 @@
 package ee.zxz.helloapi.mapper;
 
-import ee.zxz.helloapi.domain.Api_app;
+import ee.zxz.helloapi.domain.ApiApp;
 import ee.zxz.helloapi.domain.User;
-import ee.zxz.helloapi.domain.User_key;
+import ee.zxz.helloapi.domain.UserKey;
 import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * UserMapper - 用户Mapper
@@ -74,7 +73,7 @@ public interface UserMapper {
      * @return 返回用户密钥，否则返回null
      */
     @Select("SELECT * FROM `user_keys` WHERE `user_id` = #{userId}")
-    User_key getUserKey(int userId);
+    UserKey getUserKey(int userId);
 
     /**
      * CheckUserKey - 检查用户密钥是否正确
@@ -119,6 +118,6 @@ public interface UserMapper {
       * @return 返回用户API列表，否则返回null
       */
     @Select("SELECT * FROM `api_apps` WHERE `user_id` = #{userId}")
-    List<Api_app> getUserApiList(int userId);
+    List<ApiApp> getUserApiList(int userId);
 
 }

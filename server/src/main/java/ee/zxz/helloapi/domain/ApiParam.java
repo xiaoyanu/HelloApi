@@ -1,6 +1,6 @@
 package ee.zxz.helloapi.domain;
 
-public class Api_param {
+public class ApiParam {
     private int app_id;
     private String name;
     private int required;

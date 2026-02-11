@@ -1,6 +1,6 @@
 package ee.zxz.helloapi.domain;
 
-public class Api_app {
+public class ApiApp {
     private int id;
     private String title;
     private String smalltitle;
