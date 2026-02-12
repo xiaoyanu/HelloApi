@@ -7,6 +7,7 @@ import java.util.Map;
 public class ResponseUtil {
     /**
      * 响应体构造方法
+     *
      * @param code 状态码
      * @param msg  消息
      * @param data 数据
@@ -26,6 +27,7 @@ public class ResponseUtil {
 
     /**
      * 响应体构造方法
+     *
      * @param code 状态码
      * @param msg  消息
      * @return 响应体
@@ -36,10 +38,21 @@ public class ResponseUtil {
 
     /**
      * 成功响应体构造方法
+     *
      * @return 响应体
      */
     public static Map<String, Object> success() {
         return response(200, "成功");
+    }
+
+    /**
+     * 成功响应体构造方法
+     *
+     * @param data 数据
+     * @return 响应体
+     */
+    public static Map<String, Object> success(Object data) {
+        return response(200, "成功", data);
     }
 
 }

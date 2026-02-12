@@ -14,6 +14,7 @@ public class Finals {
     public static final String MESSAGES_ERROR_USER_NOT_FOUND = "用户不存在";
     public static final String MESSAGES_ERROR_NOT_CREATOR = "您不是创建人/管理员，没有操作权限";
     public static final String MESSAGES_ERROR_API_NOT_FOUND = "API不存在";
+    public static final String MESSAGES_ERROR_PARAM_NOT_FOUND = "参数不存在";
     public static final int Admin = 1;
 
 }

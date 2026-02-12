@@ -19,7 +19,6 @@ public class ApiServiceImpl implements ApiService {
     private final ApiMapper apiMapper;
     private final UserMapper userMapper;
 
-
     public ApiServiceImpl(ApiMapper apiMapper, UserMapper userMapper) {
         this.apiMapper = apiMapper;
         this.userMapper = userMapper;
@@ -27,29 +26,25 @@ public class ApiServiceImpl implements ApiService {
 
     @Override
     public Map<String, Object> getApiList(Map<String, String> requestParam, HttpServletRequest request) {
-        try {
-            int pageSize = Integer.parseInt(requestParam.get("pageSize"));
-            int page = Integer.parseInt(requestParam.get("page"));
-            if (pageSize < 1) {
-                pageSize = 30;
-            }
-            if (page < 1) {
-                page = 1;
-            }
-            List<Map<String, Object>> list = new ArrayList<>();
-            for (ApiApp apiApp : apiMapper.getApiList(pageSize, (page - 1) * pageSize)) {
-                Map<String, Object> map = new LinkedHashMap<>();
-                map.put("id", apiApp.getId());
-                map.put("title", apiApp.getTitle());
-                map.put("smallTitle", apiApp.getSmallTitle());
-                map.put("status", apiApp.getStatus());
-                map.put("type", apiApp.getType());
-                list.add(map);
-            }
-            return ResponseUtil.response(200, "获取成功", list);
-        } catch (Exception e) {
-            return ResponseUtil.response(400, Finals.MESSAGES_ERROR_PARAM);
+        int pageSize = Tools.strToInt(requestParam.get("pageSize"));
+        int page = Tools.strToInt(requestParam.get("page"));
+        if (pageSize < 1) {
+            pageSize = 30;
         }
+        if (page < 1) {
+            page = 1;
+        }
+        List<Map<String, Object>> list = new ArrayList<>();
+        for (ApiApp apiApp : apiMapper.getApiList(pageSize, Tools.getPageOffset(page, pageSize))) {
+            Map<String, Object> map = new LinkedHashMap<>();
+            map.put("id", apiApp.getId());
+            map.put("title", apiApp.getTitle());
+            map.put("smallTitle", apiApp.getSmallTitle());
+            map.put("status", apiApp.getStatus());
+            map.put("type", apiApp.getType());
+            list.add(map);
+        }
+        return ResponseUtil.response(200, "获取成功", list);
     }
 
     @Override
@@ -75,15 +70,16 @@ public class ApiServiceImpl implements ApiService {
             }
             return ResponseUtil.success();
         } catch (Exception e) {
-            return ResponseUtil.response(400, Finals.MESSAGES_ERROR_PARAM);
+            return ResponseUtil.response(400, Finals.MESSAGES_ERROR_PARAM, e.getMessage());
         }
     }
 
     @Override
-    public Map<String, Object> updateApi(int apiId, Map<String, Object> requestBody, HttpServletRequest request) {
+    public Map<String, Object> updateApi(String apiId, Map<String, Object> requestBody, HttpServletRequest request) {
         try {
+            int intApiId = Tools.strToInt(apiId);
             // 检查API是否存在
-            if (apiMapper.checkApiExist(apiId) < 1) {
+            if (apiMapper.checkApiExist(intApiId) < 1) {
                 return ResponseUtil.response(400, Finals.MESSAGES_ERROR_API_NOT_FOUND);
             }
 
@@ -92,15 +88,17 @@ public class ApiServiceImpl implements ApiService {
             if (userMapper.checkUserIdExists(userId) < 1) {
                 return ResponseUtil.response(401, Finals.MESSAGES_ERROR_USER_NOT_FOUND);
             }
-            int userMode = (int) request.getAttribute("userMode");
-            if (userMode < 1) {
-                if (apiMapper.checkApiCreator(apiId, userId) < 1) {
-                    return ResponseUtil.response(400, Finals.MESSAGES_ERROR_NOT_CREATOR);
+            if (apiMapper.checkApiCreator(intApiId, userId) < 1) {
+                int userMode = (int) request.getAttribute("userMode");
+                if (userMode < 1) {
+                    if (apiMapper.checkApiCreator(intApiId, userId) < 1) {
+                        return ResponseUtil.response(400, Finals.MESSAGES_ERROR_NOT_CREATOR);
+                    }
                 }
             }
 
             ApiApp apiApp = new ApiApp();
-            apiApp.setId(apiId);
+            apiApp.setId(intApiId);
             getRequestApiApp(requestBody, apiApp, userId);
             Object param = requestBody.get("params");
             List<ApiParam> params = JSON.parseArray(JSON.toJSONString(param), ApiParam.class);
@@ -110,7 +108,7 @@ public class ApiServiceImpl implements ApiService {
                 for (ApiParam apiParam : uniqueParams) {
                     apiParam.setApi_id(apiApp.getId());
                     // 检查参数是否存在
-                    if (apiMapper.checkApiParamExist(apiParam) > 0) {
+                    if (apiMapper.checkApiParamExistObj(apiParam) > 0) {
                         // 更新参数
                         if (apiMapper.updateApiParam(apiParam) < 1) {
                             return ResponseUtil.response(400, Finals.MESSAGES_ERROR_PARAM);
@@ -132,10 +130,11 @@ public class ApiServiceImpl implements ApiService {
     }
 
     @Override
-    public Map<String, Object> deleteApi(int apiId, HttpServletRequest request) {
+    public Map<String, Object> deleteApi(String apiId, HttpServletRequest request) {
         try {
+            int intApiId = Tools.strToInt(apiId);
             // 检查API是否存在
-            if (apiMapper.checkApiExist(apiId) < 1) {
+            if (apiMapper.checkApiExist(intApiId) < 1) {
                 return ResponseUtil.response(400, Finals.MESSAGES_ERROR_API_NOT_FOUND);
             }
 
@@ -144,16 +143,18 @@ public class ApiServiceImpl implements ApiService {
             if (userMapper.checkUserIdExists(userId) < 1) {
                 return ResponseUtil.response(401, Finals.MESSAGES_ERROR_USER_NOT_FOUND);
             }
-            int userMode = (int) request.getAttribute("userMode");
-            if (userMode < 1) {
-                if (apiMapper.checkApiCreator(apiId, userId) < 1) {
-                    return ResponseUtil.response(400, Finals.MESSAGES_ERROR_NOT_CREATOR);
+            if (apiMapper.checkApiCreator(intApiId, userId) < 1) {
+                int userMode = (int) request.getAttribute("userMode");
+                if (userMode < 1) {
+                    if (apiMapper.checkApiCreator(intApiId, userId) < 1) {
+                        return ResponseUtil.response(400, Finals.MESSAGES_ERROR_NOT_CREATOR);
+                    }
                 }
             }
 
 
-            apiMapper.deleteApiApp(apiId);
-            apiMapper.deleteApiParamAll(apiId);
+            apiMapper.deleteApiApp(intApiId);
+            apiMapper.deleteApiParamAll(intApiId);
             return ResponseUtil.success();
 
         } catch (Exception e) {
@@ -162,6 +163,90 @@ public class ApiServiceImpl implements ApiService {
         }
     }
 
+    @Override
+    public Map<String, Object> searchApiList(Map<String, String> requestParam) {
+        String keyword = requestParam.get("keyword");
+        if (keyword == null || keyword.isEmpty()) {
+            return ResponseUtil.response(400, Finals.MESSAGES_ERROR_PARAM);
+        }
+        int page = Tools.strToInt(requestParam.get("page"));
+        int pageSize = Tools.strToInt(requestParam.get("pageSize"));
+        if (page < 1) {
+            page = 1;
+        }
+        if (pageSize < 1) {
+            pageSize = 30;
+        }
+
+        List<ApiApp> apiAppList = apiMapper.searchApiList(keyword, pageSize, Tools.getPageOffset(page, pageSize));
+        return ResponseUtil.success(apiAppList);
+    }
+
+    @Override
+    public Map<String, Object> getApiApp(String apiId) {
+        int intApiId = Tools.strToInt(apiId);
+        ApiApp apiApp = apiMapper.getApiApp(intApiId);
+        if (apiApp == null) {
+            return ResponseUtil.response(400, Finals.MESSAGES_ERROR_API_NOT_FOUND);
+        }
+        List<ApiParam> apiParams = apiMapper.getApiParam(intApiId);
+        Map<String, Object> map = new LinkedHashMap<>();
+        List<Object> paramList = new ArrayList<>();
+        map.put("id", apiApp.getId());
+        map.put("title", apiApp.getTitle());
+        map.put("smallTitle", apiApp.getSmallTitle());
+        map.put("status", apiApp.getStatus());
+        map.put("type", apiApp.getType());
+        map.put("url", apiApp.getUrl());
+        map.put("sendType", apiApp.getSendType());
+        map.put("returnType", apiApp.getReturnType());
+        map.put("returnContent", apiApp.getReturnContent());
+        for (ApiParam apiParam : apiParams) {
+            Map<String, Object> paramMap = new LinkedHashMap<>();
+            paramMap.put("name", apiParam.getName());
+            paramMap.put("required", apiParam.getRequired());
+            paramMap.put("type", apiParam.getType());
+            paramMap.put("msg", apiParam.getMsg());
+            paramList.add(paramMap);
+        }
+        map.put("params", paramList);
+        return ResponseUtil.success(map);
+    }
+
+    @Override
+    public Map<String, Object> deleteApiParam(String apiId, Map<String, String> requestBody, HttpServletRequest request) {
+        int intApiId = Tools.strToInt(apiId);
+        String name = requestBody.get("name").trim();
+        if (name.isEmpty()) {
+            return ResponseUtil.response(400, Finals.MESSAGES_ERROR_PARAM);
+        }
+        // 检查API是否存在
+        if (apiMapper.checkApiExist(intApiId) < 1) {
+            return ResponseUtil.response(400, Finals.MESSAGES_ERROR_API_NOT_FOUND);
+        }
+        // 检查是否是创建人或管理员
+        int userId = (int) request.getAttribute("userId");
+        if (userMapper.checkUserIdExists(userId) < 1) {
+            return ResponseUtil.response(401, Finals.MESSAGES_ERROR_USER_NOT_FOUND);
+        }
+        if (apiMapper.checkApiCreator(intApiId, userId) < 1) {
+            int userMode = (int) request.getAttribute("userMode");
+            if (userMode < 1) {
+                if (apiMapper.checkApiCreator(intApiId, userId) < 1) {
+                    return ResponseUtil.response(400, Finals.MESSAGES_ERROR_NOT_CREATOR);
+                }
+            }
+        }
+
+
+
+        if (apiMapper.checkApiParamExist(intApiId, name) < 1) {
+            return ResponseUtil.response(400, Finals.MESSAGES_ERROR_PARAM_NOT_FOUND);
+        }
+        apiMapper.deleteApiParam(intApiId, name);
+
+        return ResponseUtil.success();
+    }
 
     /**
      * 从请求体中获取API应用信息

@@ -53,13 +53,13 @@ public class UserController {
     // DeleteUser - 删除用户 - DELETE
     @DeleteMapping("/")
     @RequiresLogin(mode = Finals.Admin)
-    public Map<String, Object> DeleteUserNone(HttpServletRequest request) {
-        return userService.deleteUser(0, request);
+    public Map<String, Object> DeleteUser(HttpServletRequest request) {
+        return userService.deleteUser("0", request);
     }
 
     @DeleteMapping("/{userId}")
     @RequiresLogin(mode = Finals.Admin)
-    public Map<String, Object> DeleteUser(@PathVariable int userId, HttpServletRequest request) {
+    public Map<String, Object> DeleteUser(@PathVariable String userId, HttpServletRequest request) {
         return userService.deleteUser(userId, request);
     }
 

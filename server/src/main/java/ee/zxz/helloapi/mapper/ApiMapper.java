@@ -13,7 +13,7 @@ public interface ApiMapper {
      * 获取所有API列表
      *
      * @param pageSize 每页数量
-     * @param offset 偏移量 = (page - 1) * pageSize
+     * @param offset   偏移量 = (page - 1) * pageSize
      * @return ApiApp列表
      */
     @Select("select * from api_apps ORDER BY created DESC LIMIT #{pageSize} OFFSET #{offset}")
@@ -86,13 +86,23 @@ public interface ApiMapper {
     int updateApiParam(ApiParam apiParam);
 
     /**
-     * API参数是否存在
+     * API参数是否存在（通过ApiParam对象）
      *
      * @param apiParam ApiParam对象
      * @return 大于0表示存在
      */
     @Select("select count(*) from api_params where api_id = #{api_id} and name = #{name}")
-    int checkApiParamExist(ApiParam apiParam);
+    int checkApiParamExistObj(ApiParam apiParam);
+
+    /**
+     * API参数是否存在
+     *
+     * @param apiId API ID
+     * @param name  参数名
+     * @return 大于0表示存在
+     */
+    @Select("select count(*) from api_params where api_id = #{apiId} and name = #{name}")
+    int checkApiParamExist(int apiId, String name);
 
     /**
      * 删除API参数
@@ -100,7 +110,7 @@ public interface ApiMapper {
      * @param apiId API ID
      * @param name  参数名
      */
-    @Delete("delete from api_params where api_id = #{api_id} and name = #{name}")
+    @Delete("delete from api_params where api_id = #{apiId} and name = #{name}")
     void deleteApiParam(int apiId, String name);
 
     /**
@@ -118,4 +128,24 @@ public interface ApiMapper {
      */
     @Delete("delete from api_apps where id = #{apiId}")
     void deleteApiApp(int apiId);
+
+    /**
+     * 搜索Api接口
+     *
+     * @param keyword  搜索关键词
+     * @param pageSize 每页数量
+     * @param offset   偏移量
+     * @return ApiApp列表
+     */
+    @Select("select * from api_apps where  (`title` LIKE CONCAT('%',#{keyword},'%') OR `smalltitle` LIKE CONCAT('%',#{keyword},'%')) ORDER BY created DESC LIMIT #{pageSize} OFFSET #{offset}")
+    List<ApiApp> searchApiList(String keyword, int pageSize, int offset);
+
+    /**
+     * 获取Api接口详情
+     *
+     * @param apiId API ID
+     * @return ApiApp对象
+     */
+    @Select("select * from api_apps where id = #{apiId}")
+    ApiApp getApiApp(int apiId);
 }

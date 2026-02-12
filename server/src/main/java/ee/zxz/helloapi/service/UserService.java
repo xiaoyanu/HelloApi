@@ -25,5 +25,5 @@ public interface UserService {
     Map<String, Object> getUserApiList(Map<String, String> requestParam, HttpServletRequest request);
 
     // 删除用户
-    Map<String, Object> deleteUser(int userId, HttpServletRequest request);
+    Map<String, Object> deleteUser(String userId, HttpServletRequest request);
 }

@@ -110,12 +110,23 @@ public interface UserMapper {
     int checkUserIdExists(int userId);
 
      /**
-      * GetUserApiList - 获取用户API列表
+      * GetUserApiList - 获取用户API列表(分页)
       *
       * @param userId 用户ID
+      * @param pageSize 每页数量
+      * @param offset 偏移量
       * @return 返回用户API列表，否则返回null
       */
+    @Select("SELECT * FROM `api_apps` WHERE `user_id` = #{userId} LIMIT #{pageSize} OFFSET #{offset}")
+    List<ApiApp> getUserApiList(int userId, int pageSize, int offset);
+
+    /**
+     * GetUserApiListAll - 获取用户API列表(全部)
+     *
+     * @param userId 用户ID
+     * @return 返回用户API列表，否则返回null
+     */
     @Select("SELECT * FROM `api_apps` WHERE `user_id` = #{userId}")
-    List<ApiApp> getUserApiList(int userId);
+    List<ApiApp> getUserApiListAll(int userId);
 
 }

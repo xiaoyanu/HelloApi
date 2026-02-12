@@ -33,27 +33,56 @@ public class ApiController {
     // UpdateApi - 更新API - PUT
     @PutMapping("/")
     @RequiresLogin
-    public Map<String, Object> UpdateApiNone(@RequestBody Map<String, Object> requestBody, HttpServletRequest request) {
-        return apiService.updateApi(0, requestBody, request);
+    public Map<String, Object> UpdateApi(@RequestBody Map<String, Object> requestBody, HttpServletRequest request) {
+        return apiService.updateApi("0", requestBody, request);
     }
 
     @PutMapping("/{apiId}")
     @RequiresLogin
-    public Map<String, Object> UpdateApi(@PathVariable("apiId") int apiId, @RequestBody Map<String, Object> requestBody, HttpServletRequest request) {
+    public Map<String, Object> UpdateApi(@PathVariable("apiId") String apiId, @RequestBody Map<String, Object> requestBody, HttpServletRequest request) {
         return apiService.updateApi(apiId, requestBody, request);
     }
 
     // DeleteApi - 删除API - DELETE
     @DeleteMapping("/")
     @RequiresLogin
-    public Map<String, Object> DeleteApiNone( HttpServletRequest request) {
-        return apiService.deleteApi(0, request);
+    public Map<String, Object> DeleteApi(HttpServletRequest request) {
+        return apiService.deleteApi("0", request);
     }
+
     @DeleteMapping("/{apiId}")
     @RequiresLogin
-    public Map<String, Object> DeleteApi(@PathVariable("apiId") int apiId, HttpServletRequest request) {
+    public Map<String, Object> DeleteApi(@PathVariable("apiId") String apiId, HttpServletRequest request) {
         return apiService.deleteApi(apiId, request);
     }
 
+    // SearchApiList - 搜索Api接口 - GET
+    @GetMapping("/search")
+    public Map<String, Object> SearchApiList(@RequestParam Map<String, String> requestParam) {
+        return apiService.searchApiList(requestParam);
+    }
+
+    // GetApiApp - 获取Api接口详情 - GET
+    @GetMapping("/")
+    public Map<String, Object> GetApiApp() {
+        return apiService.getApiApp("0");
+    }
+
+    @GetMapping("/{apiId}")
+    public Map<String, Object> GetApiApp(@PathVariable("apiId") String apiId) {
+        return apiService.getApiApp(apiId);
+    }
+
+    // DeleteApiParam - 删除API参数 - DELETE
+    @DeleteMapping("/param/")
+    @RequiresLogin
+    public Map<String, Object> DeleteApiParam(@RequestBody Map<String, String> requestBody, HttpServletRequest request) {
+        return apiService.deleteApiParam("0", requestBody, request);
+    }
+    @DeleteMapping("/param/{apiID}")
+    @RequiresLogin
+    public Map<String, Object> DeleteApiParam(@PathVariable("apiID") String apiID,@RequestBody Map<String, String> requestBody, HttpServletRequest request) {
+        return apiService.deleteApiParam(apiID, requestBody, request);
+    }
 
 }

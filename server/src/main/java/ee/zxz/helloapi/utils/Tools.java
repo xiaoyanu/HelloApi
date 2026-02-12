@@ -78,4 +78,30 @@ public class Tools {
         return result;
     }
 
+    /**
+     * 获取分页偏移量
+     *
+     * @param page     页码
+     * @param pageSize 每页数量
+     * @return 偏移量
+     */
+    public static int getPageOffset(int page, int pageSize) {
+        return (page - 1) * pageSize;
+    }
+
+
+    /**
+     * 字符串转整数
+     *
+     * @param str 字符串
+     * @return 失败返回-1
+     */
+    public static int strToInt(String str) {
+        try {
+            return Integer.parseInt(str);
+        } catch (NumberFormatException e) {
+            return -1;
+        }
+    }
+
 }

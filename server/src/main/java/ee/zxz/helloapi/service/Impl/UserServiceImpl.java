@@ -204,7 +204,7 @@ public class UserServiceImpl implements UserService {
             if ((int) request.getAttribute("userMode") != Finals.Admin) {
                 return ResponseUtil.response(403, Finals.MESSAGES_ERROR_NOT_ADMIN);
             }
-            userId = Integer.parseInt(requestParam.get("id"));
+            userId = Tools.strToInt(requestParam.get("id"));
         }
 
         // 获取用户信息
@@ -242,22 +242,23 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Map<String, Object> deleteUser(int userId, HttpServletRequest request) {
+    public Map<String, Object> deleteUser(String userId, HttpServletRequest request) {
         try {
-            if (userId != 0) {
-                if (userId == (int) request.getAttribute("userId")) {
+            int intUserId = Tools.strToInt(userId);
+            if (intUserId != 0) {
+                if (intUserId == (int) request.getAttribute("userId")) {
                     return ResponseUtil.response(403, "你不能删除自己");
                 }
                 // 检查用户ID是否存在
-                if (userMapper.checkUserIdExists(userId) < 1) {
+                if (userMapper.checkUserIdExists(intUserId) < 1) {
                     return ResponseUtil.response(400, Finals.MESSAGES_ERROR_USER_NOT_FOUND);
                 }
                 // 删除用户
-                userMapper.deleteUser(userId);
+                userMapper.deleteUser(intUserId);
                 // 删除用户密钥
-                userMapper.deleteUserKey(userId);
+                userMapper.deleteUserKey(intUserId);
                 // 删除用户API
-                List<ApiApp> apiAppList = userMapper.getUserApiList(userId);
+                List<ApiApp> apiAppList = userMapper.getUserApiListAll(intUserId);
                 if (!apiAppList.isEmpty()) {
                     for (ApiApp apiApp : apiAppList) {
                         // 删除API参数
@@ -281,11 +282,22 @@ public class UserServiceImpl implements UserService {
         if (userMapper.checkUserIdExists(userId) < 1) {
             return ResponseUtil.response(401, Finals.MESSAGES_ERROR_USER_NOT_FOUND);
         }
+
+        int pageSize = Tools.strToInt(requestParam.get("pageSize"));
+        int page = Tools.strToInt(requestParam.get("page"));
+        if (pageSize < 1) {
+            pageSize = 30;
+        }
+        if (page < 1) {
+            page = 1;
+        }
+
+        // 如果携带了ID，则验证是不是管理员，只有管理才可以带ID
         if (requestParam.get("id") != null && !requestParam.get("id").trim().isEmpty()) {
             if ((int) request.getAttribute("userMode") != Finals.Admin) {
                 return ResponseUtil.response(403, Finals.MESSAGES_ERROR_NOT_ADMIN);
             }
-            userId = Integer.parseInt(requestParam.get("id"));
+            userId = Tools.strToInt(requestParam.get("id"));
             if (userMapper.checkUserIdExists(userId) < 1) {
                 return ResponseUtil.response(400, Finals.MESSAGES_ERROR_USER_NOT_FOUND);
             }
@@ -293,7 +305,7 @@ public class UserServiceImpl implements UserService {
 
         // 获取用户API列表
         List<Map<String, Object>> resultList = new ArrayList<>();
-        for (ApiApp apiApp : userMapper.getUserApiList(userId)) {
+        for (ApiApp apiApp : userMapper.getUserApiList(userId, pageSize, Tools.getPageOffset(page, pageSize))) {
             Map<String, Object> map = new LinkedHashMap<>();
             map.put("id", apiApp.getId());
             map.put("title", apiApp.getTitle());
