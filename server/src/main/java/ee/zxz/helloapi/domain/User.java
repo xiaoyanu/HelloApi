@@ -6,6 +6,7 @@ public class User {
     private String password;
     private String nick;
     private int mode;
+    private String mail;
 
     public int getId() {
         return id;
@@ -45,5 +46,13 @@ public class User {
 
     public void setMode(int mode) {
         this.mode = mode;
+    }
+
+    public String getMail() {
+        return mail;
+    }
+
+    public void setMail(String mail) {
+        this.mail = mail;
     }
 }

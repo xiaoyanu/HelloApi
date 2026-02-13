@@ -1,6 +1,7 @@
 package ee.zxz.helloapi.controller;
 
 import ee.zxz.helloapi.annotation.RequiresLogin;
+import ee.zxz.helloapi.domain.ApiRequestLog;
 import ee.zxz.helloapi.service.ApiService;
 import ee.zxz.helloapi.utils.Finals;
 import jakarta.servlet.http.HttpServletRequest;
@@ -31,29 +32,19 @@ public class ApiController {
     }
 
     // UpdateApi - 更新API - PUT
-    @PutMapping("/")
+    @PutMapping({"/{apiId}", "/" })
     @RequiresLogin
-    public Map<String, Object> UpdateApi(@RequestBody Map<String, Object> requestBody, HttpServletRequest request) {
-        return apiService.updateApi("0", requestBody, request);
-    }
-
-    @PutMapping("/{apiId}")
-    @RequiresLogin
-    public Map<String, Object> UpdateApi(@PathVariable("apiId") String apiId, @RequestBody Map<String, Object> requestBody, HttpServletRequest request) {
-        return apiService.updateApi(apiId, requestBody, request);
+    public Map<String, Object> UpdateApi(@PathVariable(required = false) String apiId, @RequestBody Map<String, Object> requestBody, HttpServletRequest request) {
+        String finalApiID = (apiId == null) ? "0" : apiId;
+        return apiService.updateApi(finalApiID, requestBody, request);
     }
 
     // DeleteApi - 删除API - DELETE
-    @DeleteMapping("/")
+    @DeleteMapping({"/{apiId}", "/" })
     @RequiresLogin
-    public Map<String, Object> DeleteApi(HttpServletRequest request) {
-        return apiService.deleteApi("0", request);
-    }
-
-    @DeleteMapping("/{apiId}")
-    @RequiresLogin
-    public Map<String, Object> DeleteApi(@PathVariable("apiId") String apiId, HttpServletRequest request) {
-        return apiService.deleteApi(apiId, request);
+    public Map<String, Object> DeleteApi(@PathVariable(required = false) String apiId, HttpServletRequest request) {
+        String finalApiID = (apiId == null) ? "0" : apiId;
+        return apiService.deleteApi(finalApiID, request);
     }
 
     // SearchApiList - 搜索Api接口 - GET
@@ -63,26 +54,71 @@ public class ApiController {
     }
 
     // GetApiApp - 获取Api接口详情 - GET
-    @GetMapping("/")
-    public Map<String, Object> GetApiApp() {
-        return apiService.getApiApp("0");
-    }
-
-    @GetMapping("/{apiId}")
-    public Map<String, Object> GetApiApp(@PathVariable("apiId") String apiId) {
-        return apiService.getApiApp(apiId);
+    @GetMapping({"/{apiId}", "/" })
+    public Map<String, Object> GetApiApp(@PathVariable(required = false) String apiId) {
+        String finalApiID = (apiId == null) ? "0" : apiId;
+        return apiService.getApiApp(finalApiID);
     }
 
     // DeleteApiParam - 删除API参数 - DELETE
-    @DeleteMapping("/param/")
+    @DeleteMapping({"/param/{apiID}", "/param/" })
     @RequiresLogin
-    public Map<String, Object> DeleteApiParam(@RequestBody Map<String, String> requestBody, HttpServletRequest request) {
-        return apiService.deleteApiParam("0", requestBody, request);
-    }
-    @DeleteMapping("/param/{apiID}")
-    @RequiresLogin
-    public Map<String, Object> DeleteApiParam(@PathVariable("apiID") String apiID,@RequestBody Map<String, String> requestBody, HttpServletRequest request) {
-        return apiService.deleteApiParam(apiID, requestBody, request);
+    public Map<String, Object> DeleteApiParam(@PathVariable(required = false) String apiID, @RequestBody Map<String, String> requestBody, HttpServletRequest request) {
+        String finalApiID = (apiID == null) ? "0" : apiID;
+        return apiService.deleteApiParam(finalApiID, requestBody, request);
     }
 
+    // CreateApiKey - 创建API密钥 - POST
+    @PostMapping({"/key/{api_id}", "/key/" })
+    @RequiresLogin
+    public Map<String, Object> CreateApiKey(@PathVariable(required = false) String api_id, @RequestBody Map<String, Object> requestBody, HttpServletRequest request) {
+        String finalApiID = (api_id == null) ? "0" : api_id;
+        return apiService.createApiKey(finalApiID, requestBody, request);
+    }
+
+    // GetUserApiKeyList - 获取用户API密钥列表 - GET
+    @GetMapping({"/key/list/", "/key/list/{user_id}" })
+    @RequiresLogin
+    public Map<String, Object> GetUserApiKeyList(@PathVariable(required = false) String user_id, HttpServletRequest request) {
+        String finalUserId = (user_id == null) ? "0" : user_id;
+        return apiService.getUserApiKeyList(finalUserId, request);
+    }
+
+    // UpdateApiKey - 更新API密钥 - PUT
+    @PutMapping({"/key/{key}", "/key/" })
+    @RequiresLogin
+    public Map<String, Object> UpdateApiKey(@PathVariable(required = false) String key, @RequestBody Map<String, Object> requestBody, HttpServletRequest request) {
+        String finalKey = (key == null) ? "0" : key;
+        return apiService.updateApiKey(finalKey, requestBody, request);
+    }
+
+    // GetApiKey - 获取API密钥 - GET
+    @GetMapping({"/key/{key}", "/key/" })
+    @RequiresLogin
+    public Map<String, Object> GetApiKey(@PathVariable(required = false) String key, HttpServletRequest request) {
+        String finalKey = (key == null) ? "0" : key;
+        return apiService.getApiKey(finalKey, request);
+    }
+
+    // DeleteApiKey - 删除API密钥 - DELETE
+    @DeleteMapping({"/key/{key}", "/key/" })
+    @RequiresLogin
+    public Map<String, Object> DeleteApiKey(@PathVariable(required = false) String key, HttpServletRequest request) {
+        String finalKey = (key == null) ? "0" : key;
+        return apiService.deleteApiKey(finalKey, request);
+    }
+
+    // ResetApiKey - 重置API密钥 - PUT
+    @PutMapping({"/key/reset/{key}", "/key/reset/" })
+    @RequiresLogin
+    public Map<String, Object> ResetApiKey(@PathVariable(required = false) String key, HttpServletRequest request) {
+        String finalKey = (key == null) ? "0" : key;
+        return apiService.resetApiKey(finalKey, request);
+    }
+
+    // LogApi - 记录API日志/消耗等 - POST
+    @PostMapping({"/log/{userKey}/{key}", "/log/", "/log/{userKey}", "/log/{userKey}/" })
+    public Map<String, Object> LogApi(@PathVariable(required = false) String userKey, @PathVariable(required = false) String key, @RequestBody ApiRequestLog apiRequestLog, HttpServletRequest request) {
+        return apiService.logApi(userKey, key, apiRequestLog, request);
+    }
 }

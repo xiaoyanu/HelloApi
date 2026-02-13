@@ -3,10 +3,7 @@ package ee.zxz.helloapi.mapper;
 import ee.zxz.helloapi.domain.ApiApp;
 import ee.zxz.helloapi.domain.User;
 import ee.zxz.helloapi.domain.UserKey;
-import org.apache.ibatis.annotations.Delete;
-import org.apache.ibatis.annotations.Insert;
-import org.apache.ibatis.annotations.Mapper;
-import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.*;
 
 import java.util.List;
 
@@ -41,7 +38,7 @@ public interface UserMapper {
     /**
      * Login - 登录账号
      *
-     * @param name 用户名
+     * @param name     用户名
      * @param password 密码，需要先转为MD5再提交
      * @return 登录成功后返回用户信息，否则返回null
      */
@@ -58,15 +55,6 @@ public interface UserMapper {
     User getUserInfo(int id);
 
     /**
-     * CheckUserAdmin - 检查用户是否为管理员
-     *
-     * @param id 用户ID
-     * @return 返回条数大于0则为管理员
-     */
-    @Select("SELECT COUNT(*) FROM `users` WHERE `id` = #{id} AND `mode` = 1")
-    int checkUserAdmin(int id);
-
-    /**
      * GetUserKey - 获取用户密钥
      *
      * @param userId 用户ID
@@ -76,13 +64,13 @@ public interface UserMapper {
     UserKey getUserKey(int userId);
 
     /**
-     * CheckUserKey - 检查用户密钥是否正确
+     * CheckUserKeyExists - 检查用户密钥是否存在
      *
-     * @param userId 用户ID
-     * @return 返回条数大于0则为存在
+     * @param key    密钥
+     * @return 返回条数大于0则为密钥存在
      */
-    @Select("SELECT COUNT(*) FROM `user_keys` WHERE `user_id` = #{userId}")
-    int checkUserKey(int userId);
+    @Select("SELECT COUNT(*) FROM `user_keys` WHERE `key` = #{key}")
+    int checkUserKeyExists(String key);
 
     /**
      * DeleteUser - 删除用户
@@ -92,11 +80,11 @@ public interface UserMapper {
     @Delete("DELETE FROM `users` WHERE `id` = #{userId}")
     void deleteUser(int userId);
 
-     /**
-      * DeleteUserKey - 删除用户密钥
-      *
-      * @param userId 用户ID
-      */
+    /**
+     * DeleteUserKey - 删除用户密钥
+     *
+     * @param userId 用户ID
+     */
     @Delete("DELETE FROM `user_keys` WHERE `user_id` = #{userId}")
     void deleteUserKey(int userId);
 
@@ -109,14 +97,14 @@ public interface UserMapper {
     @Select("SELECT COUNT(*) FROM `users` WHERE `id` = #{userId}")
     int checkUserIdExists(int userId);
 
-     /**
-      * GetUserApiList - 获取用户API列表(分页)
-      *
-      * @param userId 用户ID
-      * @param pageSize 每页数量
-      * @param offset 偏移量
-      * @return 返回用户API列表，否则返回null
-      */
+    /**
+     * GetUserApiList - 获取用户API列表(分页)
+     *
+     * @param userId   用户ID
+     * @param pageSize 每页数量
+     * @param offset   偏移量
+     * @return 返回用户API列表，否则返回null
+     */
     @Select("SELECT * FROM `api_apps` WHERE `user_id` = #{userId} LIMIT #{pageSize} OFFSET #{offset}")
     List<ApiApp> getUserApiList(int userId, int pageSize, int offset);
 
@@ -129,4 +117,13 @@ public interface UserMapper {
     @Select("SELECT * FROM `api_apps` WHERE `user_id` = #{userId}")
     List<ApiApp> getUserApiListAll(int userId);
 
+    /**
+     * ResetUserKey - 重置用户密钥
+     *
+     * @param userId 用户ID
+     * @param key    密钥
+     * @param created 创建时间
+     */
+    @Insert("INSERT INTO `user_keys` (`user_id`, `key`,`created`) VALUES (#{userId}, #{key},#{created}) ON DUPLICATE KEY UPDATE `key` = #{key},`created` = #{created}")
+    void resetUserKey(int userId, String key, long created);
 }

@@ -55,4 +55,11 @@ public class ResponseUtil {
         return response(200, "成功", data);
     }
 
+    public static Map<String, Object> error() {
+        return response(400, "错误");
+    }
+    public static Map<String, Object> error(Object data) {
+        return response(400, "错误", data);
+    }
+
 }

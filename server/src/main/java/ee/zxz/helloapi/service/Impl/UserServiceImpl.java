@@ -317,4 +317,26 @@ public class UserServiceImpl implements UserService {
         }
         return ResponseUtil.response(200, "获取成功", resultList);
     }
+
+    @Override
+    public Map<String, Object> resetUserKey(String userId, HttpServletRequest request) {
+        int intUserId = Tools.strToInt(userId);
+        int tokenUserId = (int) request.getAttribute("userId");
+        if (intUserId != tokenUserId) {
+            if ((int) request.getAttribute("userMode") != Finals.Admin) {
+                return ResponseUtil.response(403, Finals.MESSAGES_ERROR_NOT_ADMIN);
+            }
+        }
+        // 验证用户ID是否存在
+        if (userMapper.checkUserIdExists(intUserId) < 1) {
+            return ResponseUtil.response(400, Finals.MESSAGES_ERROR_USER_NOT_FOUND);
+        }
+
+        // key 生成
+        String key = Tools.getTextMd5(String.valueOf(intUserId) + System.currentTimeMillis());
+
+        // 重置用户密钥
+        userMapper.resetUserKey(intUserId, key, System.currentTimeMillis());
+        return ResponseUtil.success(key);
+    }
 }

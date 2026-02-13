@@ -2,20 +2,27 @@ package ee.zxz.helloapi.service.Impl;
 
 import com.alibaba.fastjson.JSON;
 import ee.zxz.helloapi.domain.ApiApp;
+import ee.zxz.helloapi.domain.ApiKey;
 import ee.zxz.helloapi.domain.ApiParam;
+import ee.zxz.helloapi.domain.ApiRequestLog;
 import ee.zxz.helloapi.mapper.ApiMapper;
 import ee.zxz.helloapi.mapper.UserMapper;
+import ee.zxz.helloapi.service.ApiLogManager;
 import ee.zxz.helloapi.service.ApiService;
 import ee.zxz.helloapi.utils.Finals;
 import ee.zxz.helloapi.utils.ResponseUtil;
 import ee.zxz.helloapi.utils.Tools;
+import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 @Service
 public class ApiServiceImpl implements ApiService {
+    private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
     private final ApiMapper apiMapper;
     private final UserMapper userMapper;
 
@@ -23,6 +30,9 @@ public class ApiServiceImpl implements ApiService {
         this.apiMapper = apiMapper;
         this.userMapper = userMapper;
     }
+
+    @Resource
+    private ApiLogManager apiLogManager;
 
     @Override
     public Map<String, Object> getApiList(Map<String, String> requestParam, HttpServletRequest request) {
@@ -90,10 +100,8 @@ public class ApiServiceImpl implements ApiService {
             }
             if (apiMapper.checkApiCreator(intApiId, userId) < 1) {
                 int userMode = (int) request.getAttribute("userMode");
-                if (userMode < 1) {
-                    if (apiMapper.checkApiCreator(intApiId, userId) < 1) {
-                        return ResponseUtil.response(400, Finals.MESSAGES_ERROR_NOT_CREATOR);
-                    }
+                if (userMode != Finals.Admin) {
+                    return ResponseUtil.response(400, Finals.MESSAGES_ERROR_NOT_CREATOR);
                 }
             }
 
@@ -145,16 +153,16 @@ public class ApiServiceImpl implements ApiService {
             }
             if (apiMapper.checkApiCreator(intApiId, userId) < 1) {
                 int userMode = (int) request.getAttribute("userMode");
-                if (userMode < 1) {
-                    if (apiMapper.checkApiCreator(intApiId, userId) < 1) {
-                        return ResponseUtil.response(400, Finals.MESSAGES_ERROR_NOT_CREATOR);
-                    }
+                if (userMode != Finals.Admin) {
+                    return ResponseUtil.response(400, Finals.MESSAGES_ERROR_NOT_CREATOR);
                 }
             }
 
 
             apiMapper.deleteApiApp(intApiId);
             apiMapper.deleteApiParamAll(intApiId);
+            apiMapper.deleteApiCount(intApiId);
+            apiMapper.deleteApiLog(intApiId);
             return ResponseUtil.success();
 
         } catch (Exception e) {
@@ -231,13 +239,10 @@ public class ApiServiceImpl implements ApiService {
         }
         if (apiMapper.checkApiCreator(intApiId, userId) < 1) {
             int userMode = (int) request.getAttribute("userMode");
-            if (userMode < 1) {
-                if (apiMapper.checkApiCreator(intApiId, userId) < 1) {
-                    return ResponseUtil.response(400, Finals.MESSAGES_ERROR_NOT_CREATOR);
-                }
+            if (userMode != Finals.Admin) {
+                return ResponseUtil.response(400, Finals.MESSAGES_ERROR_NOT_CREATOR);
             }
         }
-
 
 
         if (apiMapper.checkApiParamExist(intApiId, name) < 1) {
@@ -245,6 +250,241 @@ public class ApiServiceImpl implements ApiService {
         }
         apiMapper.deleteApiParam(intApiId, name);
 
+        return ResponseUtil.success();
+    }
+
+    @Override
+    public Map<String, Object> createApiKey(String finalApiID, Map<String, Object> requestBody, HttpServletRequest request) {
+        int intApiId = Tools.strToInt(finalApiID);
+        // 检查API是否存在
+        if (apiMapper.checkApiExist(intApiId) < 1) {
+            return ResponseUtil.response(400, Finals.MESSAGES_ERROR_API_NOT_FOUND);
+        }
+        // 检查是否是创建人或管理员
+        int userId = (int) request.getAttribute("userId");
+        if (apiMapper.checkApiCreator(intApiId, userId) < 1) {
+            if ((int) request.getAttribute("userMode") != Finals.Admin) {
+                return ResponseUtil.response(400, Finals.MESSAGES_ERROR_NOT_CREATOR);
+            }
+        }
+
+        int type = (int) requestBody.get("type");
+        long created = System.currentTimeMillis();
+        long started, expired;
+        try {
+            started = Tools.timeStampEx(((Number) requestBody.getOrDefault("started", 0L)).longValue(), 0);
+            expired = Tools.timeStampEx(((Number) requestBody.getOrDefault("expired", 0L)).longValue(), 0);
+        } catch (Exception e) {
+            return ResponseUtil.response(400, Finals.MESSAGES_ERROR_PARAM);
+        }
+        int count = (int) requestBody.get("count");
+
+
+        // 校验数字长度
+        if (String.valueOf(started).length() < 10 || String.valueOf(expired).length() < 10) {
+            return ResponseUtil.response(400, Finals.MESSAGES_ERROR_PARAM);
+        }
+
+        if (started > expired || type < 0 || type > 1 || count < 0) {
+            return ResponseUtil.response(400, Finals.MESSAGES_ERROR_PARAM);
+        }
+
+        // 生成密钥
+        String key = Tools.getTextMd5(String.valueOf(intApiId) + System.currentTimeMillis());
+        while (apiMapper.checkApiKeyExist(key) > 0) {
+            key = Tools.getTextMd5(String.valueOf(intApiId) + System.currentTimeMillis());
+        }
+
+        apiMapper.createApiKey(intApiId, key, created, type, started, expired, count);
+
+        return ResponseUtil.success(key);
+    }
+
+    @Override
+    public Map<String, Object> getUserApiKeyList(String userId, HttpServletRequest request) {
+        int intUserId = Tools.strToInt(userId);
+        int tokenUserId = Tools.strToInt((String) request.getAttribute("tokenUserId"));
+        if (tokenUserId != intUserId) {
+            int userMode = (int) request.getAttribute("userMode");
+            if (userMode != Finals.Admin) {
+                return ResponseUtil.response(400, Finals.MESSAGES_ERROR_NOT_CREATOR);
+            }
+        }
+
+        // 检查用户是否存在
+        if (userMapper.checkUserIdExists(intUserId) < 1) {
+            return ResponseUtil.response(400, Finals.MESSAGES_ERROR_USER_NOT_FOUND);
+        }
+
+        List<ApiKey> apiKeyList = apiMapper.getApiKeyList(intUserId);
+        return ResponseUtil.success(apiKeyList);
+    }
+
+    @Override
+    public Map<String, Object> updateApiKey(String finalKey, Map<String, Object> requestBody, HttpServletRequest request) {
+
+        // 检查密钥是否存在
+        if (apiMapper.checkApiKeyExist(finalKey) < 1) {
+            return ResponseUtil.response(400, Finals.MESSAGES_ERROR_KEY_NOT_FOUND);
+        }
+
+        // 检查是否是创建人或管理员
+        int userId = (int) request.getAttribute("userId");
+        int intApiId = apiMapper.getApiIdByKey(finalKey);
+        if (apiMapper.checkApiCreator(intApiId, userId) < 1) {
+            if ((int) request.getAttribute("userMode") != Finals.Admin) {
+                return ResponseUtil.response(400, Finals.MESSAGES_ERROR_NOT_CREATOR);
+            }
+        }
+
+        int type = (int) requestBody.get("type");
+        long started, expired;
+        try {
+            started = Tools.timeStampEx(((Number) requestBody.getOrDefault("started", 0L)).longValue(), 0);
+            expired = Tools.timeStampEx(((Number) requestBody.getOrDefault("expired", 0L)).longValue(), 0);
+        } catch (Exception e) {
+            return ResponseUtil.response(400, Finals.MESSAGES_ERROR_PARAM);
+        }
+        int count = (int) requestBody.get("count");
+
+
+        // 校验数字长度
+        if (String.valueOf(started).length() < 10 || String.valueOf(expired).length() < 10) {
+            return ResponseUtil.response(400, Finals.MESSAGES_ERROR_PARAM);
+        }
+
+        if (started > expired || type < 0 || type > 1 || count < 0) {
+            return ResponseUtil.response(400, Finals.MESSAGES_ERROR_PARAM);
+        }
+
+        apiMapper.updateApiKey(finalKey, type, started, expired, count);
+
+        return ResponseUtil.success();
+    }
+
+    @Override
+    public Map<String, Object> getApiKey(String finalKey, HttpServletRequest request) {
+        // 检查密钥是否存在
+        if (apiMapper.checkApiKeyExist(finalKey) < 1) {
+            return ResponseUtil.response(400, Finals.MESSAGES_ERROR_KEY_NOT_FOUND);
+        }
+
+        // 检查是否是创建人或管理员
+        int userId = (int) request.getAttribute("userId");
+        int intApiId = apiMapper.getApiIdByKey(finalKey);
+        if (apiMapper.checkApiCreator(intApiId, userId) < 1) {
+            if ((int) request.getAttribute("userMode") != Finals.Admin) {
+                return ResponseUtil.response(400, Finals.MESSAGES_ERROR_NOT_CREATOR);
+            }
+        }
+
+        // 获取密钥详情
+        ApiKey apiKey = apiMapper.getApiKey(finalKey);
+        return ResponseUtil.success(apiKey);
+    }
+
+    @Override
+    public Map<String, Object> deleteApiKey(String finalKey, HttpServletRequest request) {
+        // 检查密钥是否存在
+        if (apiMapper.checkApiKeyExist(finalKey) < 1) {
+            return ResponseUtil.response(400, Finals.MESSAGES_ERROR_KEY_NOT_FOUND);
+        }
+
+        // 检查是否是创建人或管理员
+        int userId = (int) request.getAttribute("userId");
+        int intApiId = apiMapper.getApiIdByKey(finalKey);
+        if (apiMapper.checkApiCreator(intApiId, userId) < 1) {
+            if ((int) request.getAttribute("userMode") != Finals.Admin) {
+                return ResponseUtil.response(400, Finals.MESSAGES_ERROR_NOT_CREATOR);
+            }
+        }
+
+        // 删除密钥
+        apiMapper.deleteApiKey(finalKey);
+
+        return ResponseUtil.success();
+    }
+
+    @Override
+    public Map<String, Object> resetApiKey(String finalKey, HttpServletRequest request) {
+        // 检查密钥是否存在
+        if (apiMapper.checkApiKeyExist(finalKey) < 1) {
+            return ResponseUtil.response(400, Finals.MESSAGES_ERROR_KEY_NOT_FOUND);
+        }
+
+        // 检查是否是创建人或管理员
+        int userId = (int) request.getAttribute("userId");
+        int intApiId = apiMapper.getApiIdByKey(finalKey);
+        if (apiMapper.checkApiCreator(intApiId, userId) < 1) {
+            if ((int) request.getAttribute("userMode") != Finals.Admin) {
+                return ResponseUtil.response(400, Finals.MESSAGES_ERROR_NOT_CREATOR);
+            }
+        }
+
+        // 生成密钥
+        String key = Tools.getTextMd5(String.valueOf(intApiId) + System.currentTimeMillis());
+        while (apiMapper.checkApiKeyExist(key) > 0) {
+            key = Tools.getTextMd5(String.valueOf(intApiId) + System.currentTimeMillis());
+        }
+
+        // 重置密钥
+        apiMapper.resetApiKey(finalKey, key);
+
+        return ResponseUtil.success(key);
+    }
+
+    @Override
+    public Map<String, Object> logApi(String userKey, String key, ApiRequestLog apiRequestLog, HttpServletRequest request) {
+        // 检查用户密钥是否存在
+        if (userMapper.checkUserKeyExists(userKey) < 1) {
+            return ResponseUtil.error(Finals.MESSAGES_ERROR_KEY_NOT_FOUND);
+        }
+
+        ApiApp apiApp = apiMapper.getApiApp(apiRequestLog.getApp_id());
+
+        // 校验ApiId是否存在
+        if (apiApp == null) {
+            return ResponseUtil.error(Finals.MESSAGES_ERROR_API_NOT_FOUND);
+        }
+
+        if (key != null) {
+            ApiKey apiKey = apiMapper.getApiKey(key);
+            if (apiKey == null) {
+                return ResponseUtil.error(Finals.MESSAGES_ERROR_KEY_NOT_FOUND);
+            }
+            // 判断密钥类型
+            if (apiKey.getType() == 0) {
+                // 0 时间类型
+                // 检查是否过期
+                if (System.currentTimeMillis() > apiKey.getExpired()) {
+                    return ResponseUtil.error(Finals.MESSAGES_ERROR_KEY_EXPIRED);
+                }
+            } else {
+                // 1 计数类型
+                // 检查是否用完
+                if (apiKey.getCount() <= 0) {
+                    return ResponseUtil.error(Finals.MESSAGES_ERROR_KEY_COUNT_EXPIRED);
+                }
+                // 减少次数
+                apiMapper.reduceApiKeyCount(key);
+            }
+        }
+
+        String time = LocalDateTime.now().format(FORMATTER);
+        // 记录日志
+        if (apiRequestLog.getHeader().equals("")) {
+            apiRequestLog.setHeader(null);
+        }
+        if (apiRequestLog.getBody().equals("")) {
+            apiRequestLog.setBody(null);
+        }
+        apiLogManager.saveLogAsync(
+                        apiRequestLog.getApp_id(),
+                        apiRequestLog.getIp(),
+                        time,
+                        apiRequestLog.getHeader(),
+                        apiRequestLog.getBody()
+        );
         return ResponseUtil.success();
     }
 

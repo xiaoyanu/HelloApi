@@ -51,16 +51,11 @@ public class UserController {
     }
 
     // DeleteUser - 删除用户 - DELETE
-    @DeleteMapping("/")
+    @DeleteMapping({"/{userId}", "/"})
     @RequiresLogin(mode = Finals.Admin)
-    public Map<String, Object> DeleteUser(HttpServletRequest request) {
-        return userService.deleteUser("0", request);
-    }
-
-    @DeleteMapping("/{userId}")
-    @RequiresLogin(mode = Finals.Admin)
-    public Map<String, Object> DeleteUser(@PathVariable String userId, HttpServletRequest request) {
-        return userService.deleteUser(userId, request);
+    public Map<String, Object> DeleteUser(@PathVariable(required = false) String userId, HttpServletRequest request) {
+        String finalUserId = (userId == null) ? "0" : userId;
+        return userService.deleteUser(finalUserId, request);
     }
 
     // GetUserApiList - 获取用户API列表 - GET
@@ -70,4 +65,14 @@ public class UserController {
         return userService.getUserApiList(requestParam, request);
     }
 
+    // ResetUserKey - 重置用户密钥 - PUT
+    @PutMapping({"/key/", "/key/{userId}", "/key"})
+    @RequiresLogin()
+    public Map<String, Object> resetUserKey(
+            @PathVariable(required = false) String userId,
+            HttpServletRequest request
+    ) {
+        String finalUserId = (userId == null) ? "0" : userId;
+        return userService.resetUserKey(finalUserId, request);
+    }
 }

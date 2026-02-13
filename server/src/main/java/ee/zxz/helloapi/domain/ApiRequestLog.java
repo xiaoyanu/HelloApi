@@ -6,6 +6,8 @@ public class ApiRequestLog {
     private int app_id;
     private String ip;
     private LocalDateTime time;
+    private Object header;
+    private Object body;
 
     public int getApp_id() {
         return app_id;
@@ -29,5 +31,21 @@ public class ApiRequestLog {
 
     public void setTime(LocalDateTime time) {
         this.time = time;
+    }
+
+    public Object getHeader() {
+        return header;
+    }
+
+    public void setHeader(Object header) {
+        this.header = header;
+    }
+
+    public Object getBody() {
+        return body;
+    }
+
+    public void setBody(Object body) {
+        this.body = body;
     }
 }

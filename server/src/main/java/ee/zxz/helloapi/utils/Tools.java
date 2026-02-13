@@ -104,4 +104,20 @@ public class Tools {
         }
     }
 
+    /**
+     * 时间戳转换秒或毫秒
+     *
+     * @param timestamp 时间戳（毫秒或秒）
+     * @param type      要转换的类型：0毫秒，1秒
+     * @return 转换后的时间，失败返回0
+     */
+    public static long timeStampEx(long timestamp, int type) {
+        if (timestamp <= 0) return 0;
+        if (type == 0) {
+            return (timestamp <= 9999999999L) ? timestamp * 1000 : timestamp;
+        } else if (type == 1) {
+            return (timestamp > 9999999999L) ? timestamp / 1000 : timestamp;
+        }
+        return 0;
+    }
 }

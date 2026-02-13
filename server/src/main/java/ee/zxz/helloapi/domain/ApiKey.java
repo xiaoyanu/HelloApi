@@ -2,9 +2,10 @@ package ee.zxz.helloapi.domain;
 
 public class ApiKey {
     private int app_id;
-    private String keys;
+    private String key;
     private long created;
     private int type;
+    private long started;
     private long expired;
     private int count;
 
@@ -16,12 +17,12 @@ public class ApiKey {
         this.app_id = app_id;
     }
 
-    public String getKeys() {
-        return keys;
+    public String getKey() {
+        return key;
     }
 
-    public void setKeys(String keys) {
-        this.keys = keys;
+    public void setKey(String key) {
+        this.key = key;
     }
 
     public long getCreated() {
@@ -38,6 +39,14 @@ public class ApiKey {
 
     public void setType(int type) {
         this.type = type;
+    }
+
+    public long getStarted() {
+        return started;
+    }
+
+    public void setStarted(long started) {
+        this.started = started;
     }
 
     public long getExpired() {

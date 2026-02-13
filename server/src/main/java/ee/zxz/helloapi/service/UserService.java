@@ -26,4 +26,8 @@ public interface UserService {
 
     // 删除用户
     Map<String, Object> deleteUser(String userId, HttpServletRequest request);
+
+    // 重置用户密钥
+    Map<String, Object> resetUserKey(String userId, HttpServletRequest request);
+
 }

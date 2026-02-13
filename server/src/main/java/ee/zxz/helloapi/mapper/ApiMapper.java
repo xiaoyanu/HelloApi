@@ -1,6 +1,7 @@
 package ee.zxz.helloapi.mapper;
 
 import ee.zxz.helloapi.domain.ApiApp;
+import ee.zxz.helloapi.domain.ApiKey;
 import ee.zxz.helloapi.domain.ApiParam;
 import org.apache.ibatis.annotations.*;
 
@@ -148,4 +149,126 @@ public interface ApiMapper {
      */
     @Select("select * from api_apps where id = #{apiId}")
     ApiApp getApiApp(int apiId);
+
+    /**
+     * 创建API密钥
+     *
+     * @param apiId   API ID
+     * @param key     密钥
+     * @param created 创建时间
+     * @param type    密钥类型
+     * @param started 开始时间
+     * @param expired 过期时间
+     * @param count   调用次数
+     */
+    @Insert("insert into api_keys (`api_id`, `key`, `created` , `type`, `started`,`expired`,`count`) values (#{apiId}, #{key}, #{created}, #{type}, #{started}, #{expired}, #{count})")
+    void createApiKey(int apiId, String key, long created, int type, long started, long expired, int count);
+
+    /**
+     * 查询API密钥是否存在
+     *
+     * @param key 密钥
+     * @return 大于0表示存在
+     */
+    @Select("select count(*) from api_keys where `key` = #{key}")
+    int checkApiKeyExist(String key);
+
+    /**
+     * 减少API密钥调用次数
+     *
+     * @param key 密钥
+     */
+    @Update("update api_keys set count = count - 1 where `key` = #{key}")
+    void reduceApiKeyCount(String key);
+
+    /**
+     * 获取API密钥信息
+     *
+     * @param key 密钥
+     * @return ApiKey对象
+     */
+    @Select("select * from api_keys where `key` = #{key}")
+    ApiKey getApiKey(String key);
+
+    /**
+     * 获取API密钥列表
+     *
+     * @param userId 用户ID
+     * @return ApiKey列表
+     */
+    @Select("select * from api_keys where api_id in (select id from api_apps where user_id = #{userId})")
+    List<ApiKey> getApiKeyList(int userId);
+
+    /**
+     * 通过API密钥查询API应用ID
+     *
+     * @param key 密钥
+     * @return API应用ID
+     */
+    @Select("select api_id from api_keys where `key` = #{key}")
+    int getApiIdByKey(String key);
+
+    /**
+     * 更新API密钥
+     *
+     * @param key     密钥
+     * @param type    密钥类型
+     * @param started 开始时间
+     * @param expired 过期时间
+     * @param count   调用次数
+     */
+    @Update("update api_keys set `type` = #{type}, `started` = #{started}, `expired` = #{expired}, `count` = #{count} where `key` = #{key}")
+    void updateApiKey(String key, int type, long started, long expired, int count);
+
+    /**
+     * 删除API密钥
+     *
+     * @param key 密钥
+     */
+    @Delete("delete from api_keys where `key` = #{key}")
+    void deleteApiKey(String key);
+
+    /**
+     * 重置API密钥
+     *
+     * @param key 密钥
+     */
+    @Update("update api_keys set `key` = #{newKey} where `key` = #{key}")
+    void resetApiKey(String key, String newKey);
+
+    /**
+     * 插入API日志
+     *
+     * @param apiId  API ID
+     * @param ip     IP地址
+     * @param time   时间
+     * @param header 请求头
+     * @param body   请求体
+     */
+    @Insert("insert into api_request_logs (`api_id`,`ip`, `time`,`header`, `body`) values (#{apiId}, #{ip}, #{time}, #{header}, #{body})")
+    void insertApiLog(int apiId, String ip, String time, Object header, Object body);
+
+    /**
+     * 增加ApiId调用次数
+     *
+     * @param apiId API ID
+     */
+    @Insert("INSERT INTO `api_views` (`api_id`, `count`) VALUES (#{apiId}, 1) ON DUPLICATE KEY UPDATE `count` = `count` + 1")
+    void addApiCount(int apiId);
+
+    /**
+     * 删除API调用次数
+     *
+     * @param apiId API ID
+     */
+    @Delete("delete from api_views where api_id = #{apiId}")
+    void deleteApiCount(int apiId);
+
+    /**
+     * 删除API日志
+     *
+     * @param apiId API ID
+     */
+    @Delete("delete from api_request_logs where api_id = #{apiId}")
+    void deleteApiLog(int apiId);
 }
