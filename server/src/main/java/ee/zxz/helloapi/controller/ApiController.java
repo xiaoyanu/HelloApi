@@ -32,7 +32,7 @@ public class ApiController {
     }
 
     // UpdateApi - 更新API - PUT
-    @PutMapping({"/{apiId}", "/" })
+    @PutMapping({"/{apiId}", "/"})
     @RequiresLogin
     public Map<String, Object> UpdateApi(@PathVariable(required = false) String apiId, @RequestBody Map<String, Object> requestBody, HttpServletRequest request) {
         String finalApiID = (apiId == null) ? "0" : apiId;
@@ -40,7 +40,7 @@ public class ApiController {
     }
 
     // DeleteApi - 删除API - DELETE
-    @DeleteMapping({"/{apiId}", "/" })
+    @DeleteMapping({"/{apiId}", "/"})
     @RequiresLogin
     public Map<String, Object> DeleteApi(@PathVariable(required = false) String apiId, HttpServletRequest request) {
         String finalApiID = (apiId == null) ? "0" : apiId;
@@ -54,14 +54,14 @@ public class ApiController {
     }
 
     // GetApiApp - 获取Api接口详情 - GET
-    @GetMapping({"/{apiId}", "/" })
+    @GetMapping({"/{apiId}", "/"})
     public Map<String, Object> GetApiApp(@PathVariable(required = false) String apiId) {
         String finalApiID = (apiId == null) ? "0" : apiId;
         return apiService.getApiApp(finalApiID);
     }
 
     // DeleteApiParam - 删除API参数 - DELETE
-    @DeleteMapping({"/param/{apiID}", "/param/" })
+    @DeleteMapping({"/param/{apiID}", "/param/"})
     @RequiresLogin
     public Map<String, Object> DeleteApiParam(@PathVariable(required = false) String apiID, @RequestBody Map<String, String> requestBody, HttpServletRequest request) {
         String finalApiID = (apiID == null) ? "0" : apiID;
@@ -69,7 +69,7 @@ public class ApiController {
     }
 
     // CreateApiKey - 创建API密钥 - POST
-    @PostMapping({"/key/{api_id}", "/key/" })
+    @PostMapping({"/key/{api_id}", "/key/"})
     @RequiresLogin
     public Map<String, Object> CreateApiKey(@PathVariable(required = false) String api_id, @RequestBody Map<String, Object> requestBody, HttpServletRequest request) {
         String finalApiID = (api_id == null) ? "0" : api_id;
@@ -77,15 +77,15 @@ public class ApiController {
     }
 
     // GetUserApiKeyList - 获取用户API密钥列表 - GET
-    @GetMapping({"/key/list/", "/key/list/{user_id}" })
+    @GetMapping({"/key/list/", "/key/list/{user_id}"})
     @RequiresLogin
-    public Map<String, Object> GetUserApiKeyList(@PathVariable(required = false) String user_id, HttpServletRequest request) {
+    public Map<String, Object> GetUserApiKeyList(@PathVariable(required = false) String user_id, @RequestParam(required = false) Map<String, String> requestParam, HttpServletRequest request) {
         String finalUserId = (user_id == null) ? "0" : user_id;
-        return apiService.getUserApiKeyList(finalUserId, request);
+        return apiService.getUserApiKeyList(finalUserId, requestParam, request);
     }
 
     // UpdateApiKey - 更新API密钥 - PUT
-    @PutMapping({"/key/{key}", "/key/" })
+    @PutMapping({"/key/{key}", "/key/"})
     @RequiresLogin
     public Map<String, Object> UpdateApiKey(@PathVariable(required = false) String key, @RequestBody Map<String, Object> requestBody, HttpServletRequest request) {
         String finalKey = (key == null) ? "0" : key;
@@ -93,7 +93,7 @@ public class ApiController {
     }
 
     // GetApiKey - 获取API密钥 - GET
-    @GetMapping({"/key/{key}", "/key/" })
+    @GetMapping({"/key/{key}", "/key/"})
     @RequiresLogin
     public Map<String, Object> GetApiKey(@PathVariable(required = false) String key, HttpServletRequest request) {
         String finalKey = (key == null) ? "0" : key;
@@ -101,7 +101,7 @@ public class ApiController {
     }
 
     // DeleteApiKey - 删除API密钥 - DELETE
-    @DeleteMapping({"/key/{key}", "/key/" })
+    @DeleteMapping({"/key/{key}", "/key/"})
     @RequiresLogin
     public Map<String, Object> DeleteApiKey(@PathVariable(required = false) String key, HttpServletRequest request) {
         String finalKey = (key == null) ? "0" : key;
@@ -109,7 +109,7 @@ public class ApiController {
     }
 
     // ResetApiKey - 重置API密钥 - PUT
-    @PutMapping({"/key/reset/{key}", "/key/reset/" })
+    @PutMapping({"/key/reset/{key}", "/key/reset/"})
     @RequiresLogin
     public Map<String, Object> ResetApiKey(@PathVariable(required = false) String key, HttpServletRequest request) {
         String finalKey = (key == null) ? "0" : key;
@@ -117,7 +117,7 @@ public class ApiController {
     }
 
     // LogApi - 记录API日志/消耗等 - POST
-    @PostMapping({"/log/{userKey}/{key}", "/log/", "/log/{userKey}", "/log/{userKey}/" })
+    @PostMapping({"/log/{userKey}/{key}", "/log/", "/log/{userKey}", "/log/{userKey}/"})
     public Map<String, Object> LogApi(@PathVariable(required = false) String userKey, @PathVariable(required = false) String key, @RequestBody ApiRequestLog apiRequestLog, HttpServletRequest request) {
         return apiService.logApi(userKey, key, apiRequestLog, request);
     }

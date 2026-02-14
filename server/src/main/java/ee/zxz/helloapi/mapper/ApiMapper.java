@@ -194,10 +194,12 @@ public interface ApiMapper {
      * 获取API密钥列表
      *
      * @param userId 用户ID
+     * @param pageSize 每页数量
+     * @param offset   偏移量
      * @return ApiKey列表
      */
-    @Select("select * from api_keys where api_id in (select id from api_apps where user_id = #{userId})")
-    List<ApiKey> getApiKeyList(int userId);
+    @Select("select * from api_keys where api_id in (select id from api_apps where user_id = #{userId}) ORDER BY created DESC LIMIT #{pageSize} OFFSET #{offset}")
+    List<ApiKey> getApiKeyList(int userId, int pageSize, int offset);
 
     /**
      * 通过API密钥查询API应用ID

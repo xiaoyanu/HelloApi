@@ -32,7 +32,7 @@ public interface ApiService {
     Map<String, Object> createApiKey(String finalApiID, Map<String, Object> requestBody, HttpServletRequest request);
 
     // 获取API密钥列表
-    Map<String, Object> getUserApiKeyList(String userId, HttpServletRequest request);
+    Map<String, Object> getUserApiKeyList(String userId, Map<String, String> requestParam, HttpServletRequest request);
 
     // 更新API密钥
     Map<String, Object> updateApiKey(String finalKey, Map<String, Object> requestBody, HttpServletRequest request);

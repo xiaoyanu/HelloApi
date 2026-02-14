@@ -301,7 +301,7 @@ public class ApiServiceImpl implements ApiService {
     }
 
     @Override
-    public Map<String, Object> getUserApiKeyList(String userId, HttpServletRequest request) {
+    public Map<String, Object> getUserApiKeyList(String userId, Map<String, String> requestParam, HttpServletRequest request) {
         int intUserId = Tools.strToInt(userId);
         int tokenUserId = Tools.strToInt((String) request.getAttribute("tokenUserId"));
         if (tokenUserId != intUserId) {
@@ -316,7 +316,15 @@ public class ApiServiceImpl implements ApiService {
             return ResponseUtil.response(400, Finals.MESSAGES_ERROR_USER_NOT_FOUND);
         }
 
-        List<ApiKey> apiKeyList = apiMapper.getApiKeyList(intUserId);
+        int pageSize = Tools.strToInt(requestParam.get("pageSize"));
+        int page = Tools.strToInt(requestParam.get("page"));
+        if (pageSize < 1) {
+            pageSize = 30;
+        }
+        if (page < 1) {
+            page = 1;
+        }
+        List<ApiKey> apiKeyList = apiMapper.getApiKeyList(intUserId, pageSize, Tools.getPageOffset(page, pageSize));
         return ResponseUtil.success(apiKeyList);
     }
 
@@ -479,11 +487,11 @@ public class ApiServiceImpl implements ApiService {
             apiRequestLog.setBody(null);
         }
         apiLogManager.saveLogAsync(
-                        apiRequestLog.getApp_id(),
-                        apiRequestLog.getIp(),
-                        time,
-                        apiRequestLog.getHeader(),
-                        apiRequestLog.getBody()
+                apiRequestLog.getApp_id(),
+                apiRequestLog.getIp(),
+                time,
+                apiRequestLog.getHeader(),
+                apiRequestLog.getBody()
         );
         return ResponseUtil.success();
     }
