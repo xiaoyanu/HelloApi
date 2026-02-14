@@ -20,3 +20,7 @@ spring:
     password: 123456
     # 端口
     port: 3306
+
+  flyway:
+    enabled: true
+    baseline-on-migrate: true

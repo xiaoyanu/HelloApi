@@ -77,6 +77,12 @@
             <artifactId>captcha-spring-boot-starter</artifactId>
             <version>2.2.5</version>
         </dependency>
+
+        <!-- 自动创建数据库 -->
+        <dependency>
+            <groupId>org.flywaydb</groupId>
+            <artifactId>flyway-mysql</artifactId>
+        </dependency>
 	</dependencies>
 
 	<build>
