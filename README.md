@@ -1,8 +1,8 @@
 # 重构中，之前的版本请前往releases下载
- 新的重构版本将用Spring Boot 3 + Vue 3 实现
+ 新的重构版本将用Spring Boot 4 + Vue 3 实现
 
 # 系统要求
-- Java 17+
+- Java 22+
 - MySQL 5.7+
 
 # 简介
