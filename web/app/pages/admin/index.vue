@@ -1,10 +1,15 @@
 <script setup lang="ts">
-import Index from '~/pages/index/index.vue'
-const layout = 'home-page'
-
+const layout = 'admin-page'
 </script>
+
 <template>
+<div>
   <NuxtLayout :name="layout">
-    <index/>
+    
   </NuxtLayout>
+</div>
 </template>
+
+<style scoped>
+
+</style>
