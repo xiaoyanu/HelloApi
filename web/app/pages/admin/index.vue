@@ -5,7 +5,7 @@ const layout = 'admin-page'
 <template>
 <div>
   <NuxtLayout :name="layout">
-    
+    <slot></slot>
   </NuxtLayout>
 </div>
 </template>

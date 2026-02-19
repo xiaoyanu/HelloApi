@@ -11,7 +11,9 @@
       <a id="wt" href="https://wpa.qq.com/msgrd?v=3&site=qq&menu=yes&uin=1872786834">问题反馈</a>
     </div>
   </div>
+
   <slot></slot>
+
   <div id="footer">
     <p>&copy;2025 Hello API | 由<a style='color:blue' href='https://github.com/xiaoyanu/HelloAPI/'
                                    target='_blank'>HelloAPI</a>强力驱动
@@ -38,5 +40,136 @@
 </template>
 
 <style scoped>
+/* 顶部标题栏 */
+#head {
+  position: relative;
+  height: 64px;
+  line-height: 64px;
+  color: #61677C;
+  box-shadow: -5px -5px 20px #fff, 5px 5px 20px #d1d9e6;
+  background-color: #ecf0f3;
+  text-shadow: 1px 1px 0 #FFF;
+}
 
+#head span {
+  font-weight: 800;
+}
+
+#head #logo {
+  vertical-align: middle;
+  top: 50%;
+  width: 50px;
+  height: 50px;
+  margin-left: 20px;
+  margin-top: -10px;
+  border-radius: 10px;
+}
+
+#head img {
+  display: inline-block;
+}
+
+#head #title {
+  font-size: 24px;
+}
+
+#head #tj {
+  vertical-align: middle;
+  height: 60px;
+  margin-top: -10px;
+  margin-left: 50px;
+}
+
+#head-right {
+  height: 64px;
+  width: 150px;
+  float: right;
+}
+
+#head #wt {
+  display: inline-block;
+  border-radius: 8px;
+  background-color: #ecf0f3;
+  box-shadow: -5px -5px 20px #FFF, 5px 5px 20px #d1d9e6;
+  transition: all 0.2s ease-in-out;
+  width: 100px;
+  text-align: center;
+  height: 30px;
+  line-height: 30px;
+  font-weight: 600;
+}
+
+#head #wt:hover {
+  box-shadow: -2px -2px 5px #FFF, 2px 2px 5px #d1d9e6;
+}
+
+#head #wt:active {
+  box-shadow: inset 1px 1px 2px #d1d9e6, inset -1px -1px 2px #FFF;
+}
+
+/* 底部版权声名 */
+#footer {
+  margin-top: 15px;
+  background-color: #ecf0f3;
+  border-top: solid 1px #d1d9e6;
+  width: auto;
+}
+
+#footer p {
+  margin-top: 20px;
+  padding-bottom: 20px;
+  color: #61677C;
+  text-align: center;
+}
+
+/* 返回 */
+#xf {
+  position: fixed;
+  right: 0;
+  bottom: 0;
+  height: 100px;
+  width: 50px;
+}
+
+#xf a {
+  display: block;
+  height: 40px;
+  width: 40px;
+  border-radius: 8px;
+  background-color: #ecf0f3;
+  box-shadow: -5px -5px 20px #FFF, 5px 5px 20px #d1d9e6;
+  transition: all 0.2s ease-in-out;
+  margin-bottom: 10px;
+}
+
+#xf a:hover {
+  box-shadow: -2px -2px 5px #FFF, 2px 2px 5px #d1d9e6;
+}
+
+#xf a:active {
+  box-shadow: inset 1px 1px 2px #d1d9e6, inset -1px -1px 2px #FFF;
+}
+
+#xf a svg {
+  display: block;
+  margin: 0 auto;
+  padding-top: 5px;
+  width: 28px;
+  height: 28px;
+}
+
+/* 适配手机 */
+@media only screen and (max-width: 639px) {
+  #head #logo {
+    display: none;
+  }
+
+  #head #title {
+    display: none;
+  }
+
+  #head #tj {
+    height: 40px;
+  }
+}
 </style>

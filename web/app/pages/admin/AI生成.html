@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HelloAPI Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --el-color-primary: #409EFF;
+            --el-color-success: #67C23A;
+            --el-color-danger: #F56C6C;
+            --el-text-color-primary: #303133;
+            --el-text-color-regular: #606266;
+            --el-text-color-secondary: #909399;
+            --el-bg-color: #f5f7fa;
+            --el-border-color-light: #e4e7ed;
+            --sidebar-width: 220px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Helvetica Neue', Helvetica, 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', Arial, sans-serif;
+            background-color: var(--el-bg-color);
+            color: var(--el-text-color-primary);
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* 布局容器 */
+        .app-wrapper {
+            display: flex;
+            height: 100%;
+        }
+
+        /* 侧边栏 */
+        .sidebar {
+            width: var(--sidebar-width);
+            background-color: #fff;
+            border-right: 1px solid var(--el-border-color-light);
+            display: flex;
+            flex-direction: column;
+            flex-shrink: 0;
+        }
+
+        .logo-container {
+            height: 60px;
+            display: flex;
+            align-items: center;
+            padding-left: 20px;
+            font-size: 20px;
+            font-weight: bold;
+            color: #FF6A00; /* 品牌橙色 */
+        }
+        
+        .logo-icon {
+            display: inline-block;
+            background: linear-gradient(135deg, #FF9A5C, #FF6A00);
+            color: white;
+            padding: 2px 8px;
+            border-radius: 6px;
+            margin-right: 8px;
+            font-family: monospace;
+        }
+
+        .menu {
+            flex: 1;
+            list-style: none;
+            padding-top: 10px;
+        }
+
+        .menu-item {
+            height: 50px;
+            display: flex;
+            align-items: center;
+            padding-left: 25px;
+            cursor: pointer;
+            color: var(--el-text-color-regular);
+            transition: all 0.3s;
+            font-size: 14px;
+            border-right: 3px solid transparent;
+        }
+
+        .menu-item:hover {
+            background-color: #ecf5ff;
+        }
+
+        .menu-item.active {
+            color: var(--el-color-primary);
+            background-color: #ecf5ff;
+            border-right-color: var(--el-color-primary);
+        }
+
+        .menu-item i {
+            margin-right: 12px;
+            width: 16px;
+            text-align: center;
+        }
+
+        .sidebar-footer {
+            padding: 20px;
+            border-top: 1px solid var(--el-border-color-light);
+        }
+
+        .back-btn {
+            width: 100%;
+            padding: 8px;
+            background: #fff;
+            border: 1px solid #dcdfe6;
+            border-radius: 4px;
+            color: var(--el-color-primary);
+            cursor: pointer;
+            font-size: 13px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+            margin-bottom: 15px;
+        }
+
+        .back-btn:hover {
+            border-color: #c6e2ff;
+            background-color: #ecf5ff;
+        }
+
+        .powered-by {
+            font-size: 12px;
+            color: var(--el-text-color-secondary);
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        /* 主内容区 */
+        .main-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* 顶部 Header */
+        .header {
+            height: 60px;
+            background-color: #fff;
+            border-bottom: 1px solid var(--el-border-color-light);
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            padding: 0 20px;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            font-size: 14px;
+            color: var(--el-text-color-regular);
+        }
+
+        .avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 1px solid #dcdfe6;
+        }
+
+        /* 内容滚动区 */
+        .content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+        }
+
+        /* 统计卡片区 */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .card {
+            background: #fff;
+            border-radius: 8px;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+            border: 1px solid #ebeef5;
+        }
+
+        .stat-icon-wrapper {
+            width: 60px;
+            height: 60px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-right: 15px;
+        }
+
+        /* 纯色圆背景 */
+        .icon-solid {
+            background-color: var(--el-color-success);
+            border-radius: 50%;
+            color: white;
+            font-size: 24px;
+        }
+
+        /* 描边圆环背景 */
+        .icon-outline {
+            border: 2px solid var(--el-color-success);
+            border-radius: 50%;
+            color: var(--el-color-success);
+            font-size: 24px;
+        }
+
+        .stat-info h3 {
+            font-size: 14px;
+            color: var(--el-text-color-regular);
+            font-weight: normal;
+            margin-bottom: 8px;
+        }
+
+        .stat-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: var(--el-text-color-primary);
+        }
+
+        .trend {
+            font-size: 12px;
+            margin-top: 4px;
+        }
+        .trend.down { color: var(--el-color-danger); }
+        .trend.up { color: var(--el-color-success); }
+
+        /* 图表区 */
+        .charts-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .chart-card {
+            background: #fff;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+            border: 1px solid #ebeef5;
+        }
+
+        .chart-header {
+            font-size: 16px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            color: var(--el-text-color-primary);
+        }
+
+        .chart-container {
+            width: 100%;
+            height: 350px;
+        }
+
+    </style>
+</head>
+<body>
+
+<div class="app-wrapper">
+    <aside class="sidebar">
+        <div class="logo-container">
+            <span class="logo-icon">H</span> HelloAPI
+        </div>
+        <ul class="menu">
+            <li class="menu-item active">
+                <i class="fas fa-home"></i> 首页
+            </li>
+            <li class="menu-item">
+                <i class="fas fa-rocket"></i> API 管理
+            </li>
+            <li class="menu-item">
+                <i class="fas fa-key"></i> APIKey 管理
+            </li>
+            <li class="menu-item">
+                <i class="fas fa-id-card"></i> 我的信息
+            </li>
+            <li class="menu-item">
+                <i class="fas fa-chart-bar"></i> 数据概括
+            </li>
+            <li class="menu-item">
+                <i class="fas fa-users"></i> 用户管理
+            </li>
+            <li class="menu-item">
+                <i class="fas fa-book"></i> 使用文档
+            </li>
+        </ul>
+        <div class="sidebar-footer">
+            <button class="back-btn">
+                <i class="fas fa-undo"></i> 返回首页
+            </button>
+            <div class="powered-by">
+                <i class="fab fa-github"></i> Powered By 周星星
+            </div>
+        </div>
+    </aside>
+
+    <main class="main-container">
+        <header class="header">
+            <div class="user-info">
+                <span>Hi, 周星星</span>
+                <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Felix" alt="Avatar" class="avatar">
+                <i class="fas fa-sign-out-alt" style="cursor: pointer; color: #909399;"></i>
+            </div>
+        </header>
+
+        <div class="content">
+            <div class="stats-grid">
+                <div class="card">
+                    <div class="stat-icon-wrapper icon-solid">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3>用户数量</h3>
+                        <div class="stat-value">1,000</div>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="stat-icon-wrapper icon-outline">
+                        <i class="fas fa-chart-pie"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3>累计调用</h3>
+                        <div class="stat-value">500.23k</div>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="stat-icon-wrapper icon-outline">
+                        <i class="fas fa-chart-pie"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3>今日调用</h3>
+                        <div class="stat-value">5,823</div>
+                        <div class="trend down">↓ 较昨日 -100</div>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="stat-icon-wrapper icon-outline">
+                        <i class="fas fa-chart-pie"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3>本周调用</h3>
+                        <div class="stat-value">20.3k</div>
+                        <div class="trend up">↑ 较上周 +1.2k</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="charts-grid">
+                <div class="chart-card">
+                    <div class="chart-header">近7天调用统计</div>
+                    <div id="chart1" class="chart-container"></div>
+                </div>
+                <div class="chart-card">
+                    <div class="chart-header">今日热门接口</div>
+                    <div id="chart2" class="chart-container"></div>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+
+<script>
+    // 通用图表配置函数
+    function getChartOption() {
+        return {
+            tooltip: {
+                trigger: 'axis',
+                backgroundColor: 'rgba(255, 255, 255, 0.9)',
+                padding: [10, 15],
+                textStyle: {
+                    color: '#333'
+                },
+                extraCssText: 'box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); border-radius: 4px;'
+            },
+            grid: {
+                left: '3%',
+                right: '4%',
+                bottom: '3%',
+                top: '15%',
+                containLabel: true
+            },
+            xAxis: {
+                type: 'category',
+                boundaryGap: false,
+                data: ['2026-02-06', '2026-02-07', '2026-02-08', '2026-02-09', '2026-02-10', '2026-02-11', '2026-02-12'],
+                axisLine: { show: false },
+                axisTick: { show: false },
+                axisLabel: { color: '#909399', margin: 15 }
+            },
+            yAxis: {
+                type: 'value',
+                axisLabel: { color: '#909399' },
+                splitLine: {
+                    lineStyle: {
+                        color: '#ebeef5',
+                        type: 'dashed'
+                    }
+                }
+            },
+            series: [
+                {
+                    name: '调用量',
+                    type: 'line',
+                    smooth: true, // 平滑曲线
+                    symbol: 'circle',
+                    symbolSize: 8,
+                    showSymbol: true,
+                    // 数据点
+                    data: [620140, 567464, 636415, 867719, 723448, 715055, 443467],
+                    itemStyle: {
+                        color: '#409EFF',
+                        borderWidth: 2,
+                        borderColor: '#fff'
+                    },
+                    lineStyle: {
+                        width: 3,
+                        color: '#409EFF'
+                    },
+                    // 区域渐变填充
+                    areaStyle: {
+                        color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                            { offset: 0, color: 'rgba(64, 158, 255, 0.3)' },
+                            { offset: 1, color: 'rgba(64, 158, 255, 0.05)' }
+                        ])
+                    },
+                    // 线上方的数值标签
+                    label: {
+                        show: true,
+                        position: 'top',
+                        color: '#1f2d3d',
+                        fontWeight: 'bold',
+                        formatter: function(params) {
+                            return params.value.toLocaleString();
+                        }
+                    }
+                }
+            ]
+        };
+    }
+
+    // 初始化图表 1
+    const chart1 = echarts.init(document.getElementById('chart1'));
+    chart1.setOption(getChartOption());
+
+    // 初始化图表 2 (为了演示，使用了相同的数据，实际开发中请替换数据)
+    const chart2 = echarts.init(document.getElementById('chart2'));
+    chart2.setOption(getChartOption());
+
+    // 窗口大小改变时重绘图表
+    window.addEventListener('resize', () => {
+        chart1.resize();
+        chart2.resize();
+    });
+</script>
+
+</body>
+</html>
