@@ -1,8 +1,11 @@
 <script setup lang="ts">
 import {HelloAPIConfig} from '@/config/config'
 import bannerBox from '@/components/banner.vue'
+import '@/assets/css/IndexStyle.css'
 </script>
 <template>
+
+  <div style="height: 100vh;background-color: #ecf0f3;">
   <div id="head" class="flex items-center justify-between h-16 leading-16 text-[#61677C] bg-[#ecf0f3]">
     <div class="flex items-center justify-between ml-5">
       <img class="h-12.5 w-12.5 rounded-[10px]" src="@/assets/images/logo.png" alt="logo">
@@ -18,6 +21,15 @@ import bannerBox from '@/components/banner.vue'
     </div>
   </div>
   <bannerBox title="Hello API"/>
+  <div id="main">
+    <router-view/>
+  </div>
+  <div id="footer" class="mt-3.75 ">
+    <p>
+      {{ HelloAPIConfig.website.footer }}
+    </p>
+  </div>
+  </div>
 </template>
 <style scoped lang="scss">
 a {
