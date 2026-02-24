@@ -1,34 +1,34 @@
 <script setup lang="ts">
 import {HelloAPIConfig} from '@/config/config'
 import bannerBox from '@/components/banner.vue'
-import '@/assets/css/IndexStyle.css'
+import {getNowYear} from "@/utils/more.ts";
+
 </script>
 <template>
+  <div class="bg-[#ecf0f3] w-full min-h-screen">
+    <div id="head" class="flex items-center justify-between h-16 leading-16 text-[#61677C] bg-[#ecf0f3]">
+      <div class="flex items-center justify-between ml-5">
+        <img class="h-12.5 w-12.5 rounded-[10px]" src="@/assets/images/logo.png" alt="logo">
+        <a class="text-[24px]" :href="`//${HelloAPIConfig.domain}`">Hello API</a>
+        <img class="h-15 ml-12.5" src="https://api.zxz.ee/api/api_count/" alt="统计">
+      </div>
+      <div id="center">
+        🔍搜索框
+      </div>
+      <div class="mr-12.5">
+        <a id="wt" class="h-7.5 leading-7.5 w-25 inline-block text-center font-semibold rounded-lg bg-[#ecf0f3]"
+           href="https://wpa.qq.com/msgrd?v=3&amp;site=qq&amp;menu=yes&amp;uin=1872786834">问题反馈</a>
+      </div>
+    </div>
 
-  <div style="height: 100vh;background-color: #ecf0f3;">
-  <div id="head" class="flex items-center justify-between h-16 leading-16 text-[#61677C] bg-[#ecf0f3]">
-    <div class="flex items-center justify-between ml-5">
-      <img class="h-12.5 w-12.5 rounded-[10px]" src="@/assets/images/logo.png" alt="logo">
-      <a class="text-[24px]" :href="`//${HelloAPIConfig.domain}`">Hello API</a>
-      <img class="h-15 ml-12.5" src="https://api.zxz.ee/api/api_count/" alt="统计">
-    </div>
-    <div id="center">
-      🔍搜索框
-    </div>
-    <div class="mr-12.5">
-      <a id="wt" class="h-7.5 leading-7.5 w-25 inline-block text-center font-semibold rounded-lg bg-[#ecf0f3]"
-         href="https://wpa.qq.com/msgrd?v=3&amp;site=qq&amp;menu=yes&amp;uin=1872786834">问题反馈</a>
-    </div>
-  </div>
-  <bannerBox title="Hello API"/>
-  <div id="main">
+    <bannerBox title="Hello API"/>
     <router-view/>
-  </div>
-  <div id="footer" class="mt-3.75 ">
-    <p>
-      {{ HelloAPIConfig.website.footer }}
-    </p>
-  </div>
+    <div id="footer" class="mt-3.75 h-20 leading-20 text-[#61677C]">
+      <p class="text-center">
+        &copy; {{ getNowYear() }} All rights reserved.&nbsp;&nbsp;|&nbsp;&nbsp;<span
+          v-html="HelloAPIConfig.website.footer"></span>
+      </p>
+    </div>
   </div>
 </template>
 <style scoped lang="scss">
@@ -51,4 +51,11 @@ a {
   box-shadow: -2px -2px 5px #FFF, 2px 2px 5px #d1d9e6;
 }
 
+#footer {
+  border-top: solid 1px #d1d9e6;
+
+  :deep() a {
+    color: #ff627c;
+  }
+}
 </style>

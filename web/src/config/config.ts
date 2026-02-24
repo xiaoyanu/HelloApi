@@ -1,4 +1,3 @@
-import {getNowYear} from '@/utils/more'
 // 默认配置
 const HelloAPIConfig = {
 
@@ -10,7 +9,7 @@ const HelloAPIConfig = {
 
     // 网站配置
     website: {
-        footer: `© ${new Date().getFullYear()} All rights reserved. | Powered By HelloAPI`,
+        footer: `Powered by <a href="https://github.com/xiaoyanu/HelloAPI" target="_blank">HelloAPI</a>`,
     }
 }
 
