@@ -4,6 +4,7 @@
 @font-face {
     font-family: "hm";
     /*src: url(https://npm.elemecdn.com/velor2012_handsome_asset@9.0.2-1.1/HarmonyOS_Sans_SC_Medium.subset.woff2) format("truetype");*/
+    /*src: url(https://npm.elemecdn.com/helloapi_assets@0.0.1/fonts/HarmonyOS_Sans_SC_Medium.subset.woff2) format("truetype");*/
     src: url(@/assets/fonts/HarmonyOS_Sans_SC_Medium.subset.woff2) format("truetype");
 }
 

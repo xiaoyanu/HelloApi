@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NODE_API - 登录与注册</title>
+  <style>
+    /* ================= 基础重置与变量 ================= */
+    :root {
+      --zinc-50: #fafafa;
+      --zinc-100: #f4f4f5;
+      --zinc-200: #e4e4e7;
+      --zinc-300: #d4d4d8;
+      --zinc-400: #a1a1aa;
+      --zinc-500: #71717a;
+      --zinc-700: #3f3f46;
+      --zinc-900: #18181b;
+      --font-sans: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: var(--font-sans); background-color: #ffffff; color: var(--zinc-900); -webkit-font-smoothing: antialiased; }
+    a { text-decoration: none; color: inherit; }
+    button { cursor: pointer; font-family: inherit; }
+
+    /* ================= 整体布局 ================= */
+    .layout-container { display: flex; min-height: 100vh; width: 100%; }
+
+    /* ================= 左侧：介绍区 ================= */
+    .left-panel {
+      display: none; /* 移动端隐藏 */
+      width: 50%;
+      background-color: var(--zinc-50);
+      position: relative;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      border-right: 1px solid var(--zinc-200);
+    }
+    @media (min-width: 1024px) { .left-panel { display: flex; } }
+
+    .grid-bg {
+      position: absolute; inset: 0; z-index: 0; opacity: 0.5;
+      background-image: linear-gradient(var(--zinc-200) 1px, transparent 1px), linear-gradient(90deg, var(--zinc-200) 1px, transparent 1px);
+      background-size: 40px 40px;
+    }
+    .gradient-mask { position: absolute; top: 0; left: 0; width: 100%; height: 500px; background: linear-gradient(to bottom, #ffffff, transparent); pointer-events: none; z-index: 1; }
+    
+    .left-content { position: relative; z-index: 10; padding: 0 64px; max-width: 672px; }
+    
+    .logo-area { display: flex; align-items: center; gap: 12px; margin-bottom: 32px; }
+    .logo-icon { width: 40px; height: 40px; background: var(--zinc-900); border-radius: 12px; display: flex; align-items: center; justify-content: center; box-shadow: 0 10px 15px -3px rgba(228, 228, 231, 0.8); }
+    .logo-icon div { width: 20px; height: 20px; background: white; transform: rotate(45deg); }
+    .logo-text { font-weight: bold; font-size: 20px; letter-spacing: -0.05em; }
+
+    .main-title { font-size: 48px; font-weight: 800; letter-spacing: -0.05em; line-height: 1.1; margin-bottom: 24px; }
+    .main-desc { color: var(--zinc-500); font-size: 18px; line-height: 1.6; font-weight: 300; max-width: 450px; }
+
+    .stats-area { margin-top: 48px; display: flex; align-items: center; gap: 32px; }
+    .stat-item { display: flex; flex-direction: column; }
+    .stat-value { font-family: monospace; font-size: 24px; font-weight: bold; }
+    .stat-label { color: var(--zinc-400); font-size: 12px; text-transform: uppercase; letter-spacing: 0.1em; font-weight: 600; margin-top: 4px; }
+    .stat-divider { width: 1px; height: 40px; background: var(--zinc-200); }
+
+    /* ================= 右侧：表单区 ================= */
+    .right-panel { width: 100%; display: flex; align-items: center; justify-content: center; padding: 32px; background: white; }
+    @media (min-width: 1024px) { .right-panel { width: 50%; padding: 64px; } }
+    @media (max-width: 640px) { .right-panel { padding: 32px 24px; } }
+
+    .form-container-inner { width: 100%; max-width: 400px; }
+    
+    .form-header { margin-bottom: 40px; }
+    .form-title { font-size: 30px; font-weight: bold; letter-spacing: -0.025em; }
+    .form-subtitle { margin-top: 12px; color: var(--zinc-500); font-size: 14px; }
+
+    /* 表单输入框样式 */
+    .input-group { margin-bottom: 16px; }
+    .input-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
+    .input-label { font-size: 12px; font-weight: bold; color: var(--zinc-500); text-transform: uppercase; letter-spacing: 0.05em; margin-left: 4px; }
+    .forgot-pwd { font-size: 12px; color: var(--zinc-400); transition: color 0.2s; }
+    .forgot-pwd:hover { color: var(--zinc-900); }
+    
+    .custom-input { width: 100%; height: 40px; padding: 8px 12px; border: 1px solid var(--zinc-200); border-radius: 10px; font-size: 14px; transition: all 0.2s; outline: none; background: #ffffff; }
+    .custom-input::placeholder { color: var(--zinc-400); }
+    .custom-input:focus { border-color: var(--zinc-900); box-shadow: 0 0 0 4px rgba(24, 24, 27, 0.05); }
+
+    .checkbox-group { display: flex; align-items: center; padding-top: 8px; margin-bottom: 16px; gap: 8px; }
+    .custom-checkbox { width: 16px; height: 16px; cursor: pointer; accent-color: var(--zinc-900); }
+    .checkbox-label { font-size: 14px; color: var(--zinc-500); cursor: pointer; }
+
+    .primary-btn { width: 100%; height: 48px; background: var(--zinc-900); color: white; border: none; border-radius: 12px; font-size: 16px; font-weight: bold; margin-top: 24px; box-shadow: 0 20px 25px -5px rgba(228, 228, 231, 0.5); transition: background 0.2s; }
+    .primary-btn:hover { background: #000; }
+
+    /* ================= 动画与 Grid 重叠技巧 ================= */
+    .form-grid-container { display: grid; grid-template-columns: 1fr; position: relative; }
+    .form-grid-item {
+      grid-area: 1 / 1 / 2 / 2;
+      transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+      opacity: 0;
+      pointer-events: none;
+      transform: translateY(10px);
+      visibility: hidden;
+    }
+    .form-grid-item.active { opacity: 1; pointer-events: auto; transform: translateY(0); visibility: visible; }
+    .form-grid-item.leaving { transform: translateY(-10px); } /* 模拟离开向上滑动的效果 */
+
+    /* ================= 第三方登录区 ================= */
+    .oauth-section { margin-top: 32px; }
+    .divider-wrapper { position: relative; text-align: center; }
+    .divider-line { position: absolute; inset: 0; display: flex; align-items: center; }
+    .divider-line::before { content: ""; width: 100%; border-top: 1px solid var(--zinc-100); }
+    .divider-text { position: relative; font-size: 12px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--zinc-400); background: white; padding: 0 16px; display: inline-block; }
+
+    .github-btn { width: 100%; height: 44px; margin-top: 24px; display: flex; align-items: center; justify-content: center; gap: 8px; background: white; border: 1px solid var(--zinc-200); border-radius: 12px; transition: all 0.2s; }
+    .github-btn:hover { background: var(--zinc-50); border-color: var(--zinc-300); }
+    .github-btn svg { width: 20px; height: 20px; color: var(--zinc-900); transition: transform 0.2s; }
+    .github-btn:hover svg { transform: scale(1.1); }
+    .github-text { font-size: 14px; font-weight: 600; color: var(--zinc-700); }
+
+    /* ================= 底部切换 ================= */
+    .footer-toggle { margin-top: 40px; border-top: 1px solid var(--zinc-100); padding-top: 32px; text-align: center; font-size: 14px; color: var(--zinc-500); }
+    .toggle-btn { background: none; border: none; font-size: 14px; font-weight: bold; color: var(--zinc-900); margin-left: 4px; transition: all 0.2s; text-decoration: none; }
+    .toggle-btn:hover { text-decoration: underline; text-underline-offset: 4px; }
+  </style>
+</head>
+<body>
+
+  <div class="layout-container">
+    
+    <div class="left-panel">
+      <div class="grid-bg"></div>
+      <div class="gradient-mask"></div>
+
+      <div class="left-content">
+        <div class="logo-area">
+          <div class="logo-icon"><div></div></div>
+          <span class="logo-text">NODE_API</span>
+        </div>
+        
+        <h1 class="main-title">构建、部署<br/>并扩展您的接口。</h1>
+        <p class="main-desc">专为开发者设计的 API 基础设施。稳定、快速，且具备企业级安全保障。</p>
+        
+        <div class="stats-area">
+          <div class="stat-item">
+            <span class="stat-value">99.9%</span>
+            <span class="stat-label">可用性保证</span>
+          </div>
+          <div class="stat-divider"></div>
+          <div class="stat-item">
+            <span class="stat-value">&lt;30ms</span>
+            <span class="stat-label">平均延迟</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="right-panel">
+      <div class="form-container-inner">
+        
+        <div class="form-header">
+          <h2 class="form-title" id="page-title">欢迎回来</h2>
+          <p class="form-subtitle" id="page-desc">请登录您的开发者账号以继续。</p>
+        </div>
+
+        <div class="form-grid-container">
+          
+          <div id="login-form-wrap" class="form-grid-item active">
+            <form onsubmit="event.preventDefault();">
+              <div class="input-group">
+                <div class="input-header"><label class="input-label">身份标识</label></div>
+                <input type="text" placeholder="name@company.com" class="custom-input" />
+              </div>
+
+              <div class="input-group">
+                <div class="input-header">
+                  <label class="input-label">安全密码</label>
+                  <a href="#" class="forgot-pwd">忘记密码?</a>
+                </div>
+                <input type="password" placeholder="••••••••" class="custom-input" />
+              </div>
+
+              <div class="checkbox-group">
+                <input type="checkbox" id="remember" class="custom-checkbox" />
+                <label for="remember" class="checkbox-label">保持 30 天登录</label>
+              </div>
+
+              <button type="submit" class="primary-btn">登 录</button>
+            </form>
+          </div>
+
+          <div id="register-form-wrap" class="form-grid-item">
+            <form onsubmit="event.preventDefault();">
+              <div class="input-group">
+                <div class="input-header"><label class="input-label">身份标识</label></div>
+                <input type="text" placeholder="name@company.com" class="custom-input" />
+              </div>
+
+              <div class="input-group">
+                <div class="input-header"><label class="input-label">安全密码</label></div>
+                <input type="password" placeholder="••••••••" class="custom-input" />
+              </div>
+
+              <div class="input-group">
+                <div class="input-header"><label class="input-label">确认密码</label></div>
+                <input type="password" placeholder="••••••••" class="custom-input" />
+              </div>
+
+              <button type="submit" class="primary-btn">注 册</button>
+            </form>
+          </div>
+
+        </div>
+
+        <div class="oauth-section">
+          <div class="divider-wrapper">
+            <div class="divider-line"></div>
+            <span class="divider-text">或者通过</span>
+          </div>
+          <button class="github-btn">
+            <svg viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.041-1.416-4.041-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+            </svg>
+            <span class="github-text">使用 GitHub 继续</span>
+          </button>
+        </div>
+
+        <div class="footer-toggle">
+          <span id="toggle-prefix">还没有账号？</span>
+          <button class="toggle-btn" id="toggle-btn" onclick="toggleForm()">立即创建</button>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let isLogin = true;
+
+    function toggleForm() {
+      isLogin = !isLogin;
+      
+      const loginForm = document.getElementById('login-form-wrap');
+      const registerForm = document.getElementById('register-form-wrap');
+      const pageTitle = document.getElementById('page-title');
+      const pageDesc = document.getElementById('page-desc');
+      const togglePrefix = document.getElementById('toggle-prefix');
+      const toggleBtn = document.getElementById('toggle-btn');
+
+      // 文本切换
+      pageTitle.innerText = isLogin ? '欢迎回来' : '创建新账户';
+      pageDesc.innerText = isLogin ? '请登录您的开发者账号以继续。' : '只需几秒钟即可开启您的 API 旅程。';
+      togglePrefix.innerText = isLogin ? '还没有账号？' : '已有账号？';
+      toggleBtn.innerText = isLogin ? '立即创建' : '返回登录';
+
+      // 动画切换逻辑
+      if (isLogin) {
+        registerForm.classList.remove('active');
+        registerForm.classList.add('leaving'); // 触发向上离开的动画
+        loginForm.classList.remove('leaving');
+        loginForm.classList.add('active');
+      } else {
+        loginForm.classList.remove('active');
+        loginForm.classList.add('leaving');
+        registerForm.classList.remove('leaving');
+        registerForm.classList.add('active');
+      }
+    }
+  </script>
+</body>
+</html>

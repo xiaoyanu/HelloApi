@@ -90,7 +90,7 @@ const handleNav = (path: string) => {
         <header class="header">
           <div class="user-info">
             <span>Hi, 周星星</span>
-            <img :src="`https://gravatar.com/avatar/${getGravatarHash('1872786834@qq.com')}?s=200&d=wavatar`"
+            <img :src="`https://gravatar.com/avatar/${getGravatarHash('1872786834@qq.com')}?s=100&d=wavatar`"
                  alt="Avatar"
                  class="avatar">
             <el-tooltip content="退出登录" placement="bottom-end">
