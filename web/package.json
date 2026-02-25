@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "@element-plus/icons-vue": "^2.3.2",
+    "@phosphor-icons/vue": "^2.2.1",
     "@tailwindcss/vite": "^4.2.1",
     "axios": "^1.13.5",
     "element-plus": "^2.13.2",
@@ -23,10 +24,13 @@
     "vue-router": "^5.0.2"
   },
   "devDependencies": {
+    "@iconify-json/ph": "^1.2.2",
     "@tsconfig/node24": "^24.0.4",
+    "@types/crypto-js": "^4.2.2",
     "@types/node": "^24.10.13",
     "@vitejs/plugin-vue": "^6.0.4",
     "@vue/tsconfig": "^0.8.1",
+    "crypto-js": "^4.2.0",
     "npm-run-all2": "^8.0.4",
     "typescript": "~5.9.3",
     "unplugin-auto-import": "^21.0.0",

@@ -9,6 +9,11 @@ const HelloAPIConfig = {
 
     // 网站配置
     website: {
+        index: {
+            // 前台每页显示数量，影响范围：首页、搜索结果
+            pageSize: 12,
+        },
+        // 页脚信息
         footer: `Powered by <a href="https://github.com/xiaoyanu/HelloAPI" target="_blank">HelloAPI</a>`,
     }
 }

@@ -1,9 +1,13 @@
 <script setup lang="ts">
+const checkID = (id: number) => {
+  window.open("/info/" + id)
+}
 </script>
 <template>
+  <banner>Hello API</banner>
   <div class="grid grid-cols-[repeat(auto-fill,325px)] justify-center gap-8 mt-8 mb-8 text-[#61677C]">
-    <div id="box" class="flex flex-col justify-between rounded-lg bg-[#ecf0f3] w-81.25 h-40 p-[20px] font-semibold"
-         v-for="item in 5"
+    <div class="box flex flex-col justify-between rounded-lg bg-[#ecf0f3] w-81.25 h-40 p-5 font-semibold"
+         v-for="item in 50"
          :key="item">
       <div>
         <div class="flex justify-between items-center text-[20px]">
@@ -18,14 +22,15 @@
         </div>
       </div>
       <div class="flex items-center justify-end h-10">
-        <div id="btn" class="rounded-lg bg-[#ecf0f3] w-20 leading-9.5 text-center relative">查看</div>
+        <div @click="checkID(item)" class="btn rounded-lg bg-[#ecf0f3] w-20 leading-9.5 text-center relative">查看</div>
       </div>
     </div>
   </div>
 </template>
 
 <style scoped lang="scss">
-#box {
+.box {
+  user-select: none;
   box-shadow: -5px -5px 20px #FFF, 5px 5px 20px #d1d9e6;
   transition: all 0.2s ease-in-out;
 
@@ -39,17 +44,21 @@
   }
 
 
-  #btn {
+  .btn {
     box-shadow: -5px -5px 20px #FFF, 5px 5px 20px #d1d9e6;
     transition: all 0.2s ease-in-out;
   }
 
-  #btn:hover {
+  .btn:hover {
     box-shadow: -2px -2px 5px #FFF, 2px 2px 5px #d1d9e6;
+  }
+
+  .btn:active {
+    box-shadow: inset 1px 1px 2px #d1d9e6, inset -1px -1px 2px #FFF;
   }
 }
 
-#box:hover {
+.box:hover {
   box-shadow: -2px -2px 5px #FFF, 2px 2px 5px #d1d9e6;
 }
 
@@ -59,5 +68,13 @@
 
 .tag-buy {
   background-color: #ff8400;
+}
+
+.tag-error {
+  background-color: #9e9e9e;
+}
+
+.tag-danger {
+  background-color: #ff4d4f;
 }
 </style>
