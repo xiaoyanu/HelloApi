@@ -1,4 +1,5 @@
 import {MD5} from 'crypto-js'
+const formatter = new Intl.NumberFormat('en-US');
 
 /**
  * 获取当前年份
@@ -27,4 +28,30 @@ export const getSearchNullMessage = () => {
 export const getGravatarHash = (email: string): string => {
     const cleanEmail = email.trim().toLowerCase();
     return MD5(cleanEmail).toString();
+};
+
+/**
+ * 格式化数字，支持亿级单位，万级单位，千级单位，保留两位小数
+ * @param num 要格式化的数字
+ * @returns 格式化后的字符串
+ */
+export const formatNumber = (num: number): string => {
+    if (num === 0) return '0';
+    const isNegative = num < 0;
+    const absNum = isNegative ? -num : num;
+    let result: string;
+    if (absNum >= 1e8) {
+        const yi = absNum / 1e8;
+        result = yi % 1 === 0
+            ? `${yi}亿`
+            : `${Math.floor(absNum / 1e6) / 100}亿＋`;
+    } else if (absNum >= 1e4) {
+        const wan = absNum / 1e4;
+        result = wan % 1 === 0
+            ? `${wan}万`
+            : `${Math.floor(absNum / 100) / 100}万＋`;
+    } else {
+        result = formatter.format(absNum);
+    }
+    return isNegative ? `-${result}` : result;
 };

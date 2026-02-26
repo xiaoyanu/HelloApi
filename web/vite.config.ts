@@ -29,4 +29,20 @@ export default defineConfig({
             '@': fileURLToPath(new URL('./src', import.meta.url))
         },
     },
+    build: {
+        rollupOptions: {
+            output: {
+                manualChunks(id) {
+                    // 将 echarts 相关的包单独打包成一个 chunk
+                    if (id.includes('node_modules/echarts')) {
+                        return 'echarts';
+                    }
+                    // 将 vue 相关的包单独打包成一个 chunk
+                    if (id.includes('node_modules/vue')) {
+                        return 'vue-vendor';
+                    }
+                }
+            },
+        }
+    }
 })

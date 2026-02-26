@@ -12,6 +12,8 @@ export {}
 declare module 'vue' {
   export interface GlobalComponents {
     Banner: typeof import('./src/components/banner.vue')['default']
+    BaseChart: typeof import('./src/components/BaseChart.vue')['default']
+    ChartSkeleton: typeof import('./src/components/ChartSkeleton.vue')['default']
     ElButton: typeof import('element-plus/es')['ElButton']
     ElForm: typeof import('element-plus/es')['ElForm']
     ElFormItem: typeof import('element-plus/es')['ElFormItem']
