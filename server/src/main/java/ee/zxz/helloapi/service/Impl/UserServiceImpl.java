@@ -55,6 +55,7 @@ public class UserServiceImpl implements UserService {
         String name = requestBody.get("name");
         String password = requestBody.get("password");
         String code = requestBody.get("code");
+        String mail = requestBody.get("mail");
 
 
         // 参数校验
@@ -93,7 +94,12 @@ public class UserServiceImpl implements UserService {
         if (code.length() != 4) {
             return ResponseUtil.response(400, "验证码长度必须为4个字符");
         }
-
+        if (mail == null || mail.trim().isEmpty()) {
+            return ResponseUtil.response(400, "邮箱不能为空");
+        }
+        if (!mail.matches("^[a-zA-Z0-9_.-]+@[a-zA-Z0-9-]+(\\.[a-zA-Z0-9-]+)*\\.[a-zA-Z0-9]{2,6}$")) {
+            return ResponseUtil.response(400, "邮箱格式错误");
+        }
 
         // 3. 验证码校验
         if (!CaptchaJakartaUtil.ver(code, request)) {
@@ -108,7 +114,13 @@ public class UserServiceImpl implements UserService {
             }
 
             String md5Password = Tools.getTextMd5(password);
-            int result = userMapper.register(name, md5Password, name, 0);
+            int result;
+            if (userMapper.getUserCount() < 1) {
+                // 第一个注册用户为管理员
+                result = userMapper.register(name, md5Password, name, 1, mail);
+            } else {
+                result = userMapper.register(name, md5Password, name, 0, mail);
+            }
 
             if (result <= 0) {
                 return ResponseUtil.response(500, "注册失败，数据库插入失败");
@@ -190,6 +202,7 @@ public class UserServiceImpl implements UserService {
         info.put("name", user.getName());
         info.put("nick", user.getNick());
         info.put("mode", user.getMode());
+        info.put("mail", user.getMail());
         return ResponseUtil.response(200, "登陆成功", data);
     }
 
@@ -218,6 +231,7 @@ public class UserServiceImpl implements UserService {
         data.put("name", user.getName());
         data.put("nick", user.getNick());
         data.put("mode", user.getMode());
+        data.put("mail", user.getMail());
 
         return ResponseUtil.response(200, "获取成功", data);
     }

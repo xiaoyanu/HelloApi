@@ -19,9 +19,9 @@ const search = () => {
   <div class="bg-[#ecf0f3] w-full min-h-screen">
     <div id="head" class="flex items-center justify-between h-16 leading-16 text-[#61677C] bg-[#ecf0f3]">
       <div class="flex items-center ml-5 w-100">
-        <img class="h-12.5 w-12.5 rounded-[10px]" src="@/assets/images/logo.png" alt="logo">
+        <img class="h-12.5 w-12.5 rounded-[10px]" src="@/assets/images/logo.png" draggable="false" alt="logo">
         <a class="text-[24px]" href="/">Hello API</a>
-        <img class="h-15 ml-12.5" src="https://api.zxz.ee/api/api_count/" alt="统计">
+        <img class="h-15 ml-12.5" src="https://api.zxz.ee/api/api_count/" draggable="false" alt="统计">
       </div>
       <div id="center" class="flex items-center justify-between">
         <input v-model="keywords" class="w-60 p-2 h-8 text-[#61677c] text-[14px] bg-[#ecf0f3] rounded-lg" type="text"

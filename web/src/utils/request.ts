@@ -1,6 +1,7 @@
 import axios from 'axios'
 import {HelloAPIConfig} from '@/config/config'
-import router from '@/router'
+import {useUserStore} from "@/stores";
+import router from "@/router"
 
 const instance = axios.create({
     // URL 基础地址
@@ -14,11 +15,12 @@ const instance = axios.create({
 // 请求拦截器
 instance.interceptors.request.use(
     (config) => {
+        const userStore = useUserStore()
+
         // 如果登录了则携带token
-        // const userStore = useUserStore()
-        // if (userStore.token) {
-        //     config.headers.Authorization = 'Bearer ' + userStore.token
-        // }
+        if (userStore.token) {
+            config.headers.Authorization = 'Bearer ' + userStore.token
+        }
         return config
     },
     (err) => {
@@ -30,6 +32,7 @@ instance.interceptors.request.use(
 instance.interceptors.response.use(
     (res) => {
         // HTTP状态码为2XX时
+        const userStore = useUserStore()
 
         // code 200 原封不动返回
         if (res.data.code === 200) {
@@ -37,7 +40,18 @@ instance.interceptors.response.use(
         }
 
         // code 401 登录过期/无效
-
+        if (res.data.code === 401) {
+            // 移除token和user信息
+            userStore.removeAll()
+            const currentPath = router.currentRoute.value.path
+            if (currentPath.startsWith('/admin')) {
+                // 提示登录过期
+                ElMessage.error('登录过期，请重新登录')
+                // 跳转到登录页
+                void router.push({name: 'AdminLogin'})
+            }
+            return Promise.reject(res.data.msg || '登录过期')
+        }
 
         // code 非200 提示错误信息，返回响应
         ElMessage.error(res.data.msg || '服务异常')

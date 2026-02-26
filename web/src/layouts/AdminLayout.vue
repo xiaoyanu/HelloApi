@@ -9,13 +9,16 @@ import {
   PhPresentationChart,
   PhUsers,
   PhBookBookmark,
-  PhSignOut
+  PhSignOut,
+  PhSlidersHorizontal
 } from '@phosphor-icons/vue'
 import {getGravatarHash} from "@/utils/more.ts";
 import {useRoute, useRouter} from "vue-router";
+import {useUserStore} from "@/stores";
 
 const route = useRoute()
 const router = useRouter()
+const userStore = useUserStore()
 const menus = [
   {label: '首页', path: '/admin', icon: PhHouse},
   {label: 'API 管理', path: '/admin/api', icon: PhRocketLaunch},
@@ -23,10 +26,17 @@ const menus = [
   {label: '我的信息', path: '/admin/user', icon: PhIdentificationCard},
   {label: '数据概括', path: '/admin/stat', icon: PhPresentationChart},
   {label: '用户管理', path: '/admin/manage', icon: PhUsers},
+  {label: '全局设置', path: '/admin/setting', icon: PhSlidersHorizontal},
   {label: '使用文档', path: '/admin/doc', icon: PhBookBookmark},
 ]
 const handleNav = (path: string) => {
   router.push(path)
+}
+
+const logout = () => {
+  userStore.removeAll()
+  router.push('/admin/login')
+  ElMessage.info('已退出登录')
 }
 
 </script>
@@ -43,7 +53,7 @@ const handleNav = (path: string) => {
             justify-center
             text-[28px]
             font-bold">
-          <img class="w-9" src="@/assets/images/logo.png" alt="logo">
+          <img class="w-9" src="@/assets/images/logo.png" alt="logo" draggable="false">
           HelloAPI
         </div>
         <ul class="select-none flex-1 list-none pt-2.5">
@@ -61,7 +71,7 @@ const handleNav = (path: string) => {
               border-r-[3px] border-transparent
               hover:bg-[#ecf5ff]
               "
-              :class="{ 'text-[#409EFF] bg-[#ecf5ff] border-r-[#409EFF]': route.path === item.path }"
+              :class="{ 'active': route.path === item.path }"
               @click="handleNav(item.path)"
           >
             <component :is="item.icon" :size="18" weight="duotone" class="mr-3"/>
@@ -80,7 +90,7 @@ const handleNav = (path: string) => {
             <PhArrowCounterClockwise size="15"/>
             返回首页
           </button>
-          <div class="powered-by">
+          <div class="text-[12px] text-[#909399] flex items-center justify-center gap-1.25">
             <PhGithubLogo size="15" weight="duotone"/>
             Powered By 周星星
           </div>
@@ -89,12 +99,14 @@ const handleNav = (path: string) => {
       <main class="main-container">
         <header class="header">
           <div class="user-info">
-            <span>Hi, 周星星</span>
-            <img :src="`https://gravatar.com/avatar/${getGravatarHash('1872786834@qq.com')}?s=100&d=wavatar`"
-                 alt="Avatar"
-                 class="avatar">
+            <span>Hi, {{ userStore.user.nick }}</span>
+            <img
+                :src="`https://cn.cravatar.com/avatar/${getGravatarHash(userStore.user.mail || 'HelloAPI')}?s=100&d=wavatar`"
+                alt="Avatar"
+                class="avatar w-10 h-10 rounded-full">
             <el-tooltip content="退出登录" placement="bottom-end">
-              <PhSignOut size="18" color="#909399" weight="duotone" style="cursor: pointer;"/>
+              <PhSignOut @click="logout" size="18" weight="duotone"
+                         class="text-[#909399] hover:text-red-400 cursor-pointer"/>
             </el-tooltip>
           </div>
         </header>
@@ -106,15 +118,15 @@ const handleNav = (path: string) => {
   </div>
 </template>
 <style scoped lang="scss">
-.powered-by {
-  font-size: 12px;
-  color: #909399;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 5px;
+.active {
+  color: #409EFF;
+  background-color: #ecf5ff;
+  border-right-color: #409EFF
 }
 
+.avatar {
+  border: 1px solid #dcdfe6;
+}
 
 .main-container {
   flex: 1;
@@ -137,14 +149,6 @@ const handleNav = (path: string) => {
       gap: 15px;
       font-size: 14px;
       color: #606266;
-
-      .avatar {
-        width: 40px;
-        height: 40px;
-        border-radius: 50%;
-        object-fit: cover;
-        border: 1px solid #dcdfe6;
-      }
     }
   }
 }

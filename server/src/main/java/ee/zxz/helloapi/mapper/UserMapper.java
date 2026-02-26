@@ -31,8 +31,8 @@ public interface UserMapper {
      * @param mode     模式 0-普通用户 1-管理员
      * @return 返回插入条数大于0则为成功
      */
-    @Insert("INSERT INTO `users` (`name`, `password`,`nick`,`mode`) VALUES (#{name}, #{password},#{nick},#{mode})")
-    int register(String name, String password, String nick, int mode);
+    @Insert("INSERT INTO `users` (`name`, `password`,`nick`,`mode`,`mail`) VALUES (#{name}, #{password},#{nick},#{mode},#{mail})")
+    int register(String name, String password, String nick, int mode, String mail);
 
 
     /**
@@ -126,4 +126,12 @@ public interface UserMapper {
      */
     @Insert("INSERT INTO `user_keys` (`user_id`, `key`,`created`) VALUES (#{userId}, #{key},#{created}) ON DUPLICATE KEY UPDATE `key` = #{key},`created` = #{created}")
     void resetUserKey(int userId, String key, long created);
+
+    /**
+     * GetUserCount - 获取用户数量
+     *
+     * @return 返回用户数量
+     */
+     @Select("SELECT COUNT(*) FROM `users`")
+    int getUserCount();
 }
