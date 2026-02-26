@@ -19,7 +19,7 @@ public interface UserMapper {
      * @param name 用户名
      * @return 返回条数大于0则为存在
      */
-    @Select("SELECT COUNT(*) FROM `users` WHERE `name` = #{name}")
+    @Select("SELECT COUNT(*) FROM `helloapi_users` WHERE `name` = #{name}")
     int checkUsernameExists(String name);
 
     /**
@@ -31,7 +31,7 @@ public interface UserMapper {
      * @param mode     模式 0-普通用户 1-管理员
      * @return 返回插入条数大于0则为成功
      */
-    @Insert("INSERT INTO `users` (`name`, `password`,`nick`,`mode`,`mail`) VALUES (#{name}, #{password},#{nick},#{mode},#{mail})")
+    @Insert("INSERT INTO `helloapi_users` (`name`, `password`,`nick`,`mode`,`mail`) VALUES (#{name}, #{password},#{nick},#{mode},#{mail})")
     int register(String name, String password, String nick, int mode, String mail);
 
 
@@ -42,7 +42,7 @@ public interface UserMapper {
      * @param password 密码，需要先转为MD5再提交
      * @return 登录成功后返回用户信息，否则返回null
      */
-    @Select("SELECT * FROM `users` WHERE `name` = #{name} AND `password` = #{password}")
+    @Select("SELECT * FROM `helloapi_users` WHERE `name` = #{name} AND `password` = #{password}")
     User login(String name, String password);
 
     /**
@@ -51,7 +51,7 @@ public interface UserMapper {
      * @param id 用户ID
      * @return 返回用户信息，否则返回null
      */
-    @Select("SELECT * FROM `users` WHERE `id` = #{id}")
+    @Select("SELECT * FROM `helloapi_users` WHERE `id` = #{id}")
     User getUserInfo(int id);
 
     /**
@@ -60,7 +60,7 @@ public interface UserMapper {
      * @param userId 用户ID
      * @return 返回用户密钥，否则返回null
      */
-    @Select("SELECT * FROM `user_keys` WHERE `user_id` = #{userId}")
+    @Select("SELECT * FROM `helloapi_user_keys` WHERE `user_id` = #{userId}")
     UserKey getUserKey(int userId);
 
     /**
@@ -69,7 +69,7 @@ public interface UserMapper {
      * @param key    密钥
      * @return 返回条数大于0则为密钥存在
      */
-    @Select("SELECT COUNT(*) FROM `user_keys` WHERE `key` = #{key}")
+    @Select("SELECT COUNT(*) FROM `helloapi_user_keys` WHERE `key` = #{key}")
     int checkUserKeyExists(String key);
 
     /**
@@ -77,7 +77,7 @@ public interface UserMapper {
      *
      * @param userId 用户ID
      */
-    @Delete("DELETE FROM `users` WHERE `id` = #{userId}")
+    @Delete("DELETE FROM `helloapi_users` WHERE `id` = #{userId}")
     void deleteUser(int userId);
 
     /**
@@ -85,7 +85,7 @@ public interface UserMapper {
      *
      * @param userId 用户ID
      */
-    @Delete("DELETE FROM `user_keys` WHERE `user_id` = #{userId}")
+    @Delete("DELETE FROM `helloapi_user_keys` WHERE `user_id` = #{userId}")
     void deleteUserKey(int userId);
 
     /**
@@ -94,7 +94,7 @@ public interface UserMapper {
      * @param userId 用户ID
      * @return 返回条数大于0则为存在
      */
-    @Select("SELECT COUNT(*) FROM `users` WHERE `id` = #{userId}")
+    @Select("SELECT COUNT(*) FROM `helloapi_users` WHERE `id` = #{userId}")
     int checkUserIdExists(int userId);
 
     /**
@@ -105,7 +105,7 @@ public interface UserMapper {
      * @param offset   偏移量
      * @return 返回用户API列表，否则返回null
      */
-    @Select("SELECT * FROM `api_apps` WHERE `user_id` = #{userId} LIMIT #{pageSize} OFFSET #{offset}")
+    @Select("SELECT * FROM `helloapi_api_apps` WHERE `user_id` = #{userId} LIMIT #{pageSize} OFFSET #{offset}")
     List<ApiApp> getUserApiList(int userId, int pageSize, int offset);
 
     /**
@@ -114,7 +114,7 @@ public interface UserMapper {
      * @param userId 用户ID
      * @return 返回用户API列表，否则返回null
      */
-    @Select("SELECT * FROM `api_apps` WHERE `user_id` = #{userId}")
+    @Select("SELECT * FROM `helloapi_api_apps` WHERE `user_id` = #{userId}")
     List<ApiApp> getUserApiListAll(int userId);
 
     /**
@@ -124,7 +124,7 @@ public interface UserMapper {
      * @param key    密钥
      * @param created 创建时间
      */
-    @Insert("INSERT INTO `user_keys` (`user_id`, `key`,`created`) VALUES (#{userId}, #{key},#{created}) ON DUPLICATE KEY UPDATE `key` = #{key},`created` = #{created}")
+    @Insert("INSERT INTO `helloapi_user_keys` (`user_id`, `key`,`created`) VALUES (#{userId}, #{key},#{created}) ON DUPLICATE KEY UPDATE `key` = #{key},`created` = #{created}")
     void resetUserKey(int userId, String key, long created);
 
     /**
@@ -132,6 +132,6 @@ public interface UserMapper {
      *
      * @return 返回用户数量
      */
-     @Select("SELECT COUNT(*) FROM `users`")
+     @Select("SELECT COUNT(*) FROM `helloapi_users`")
     int getUserCount();
 }

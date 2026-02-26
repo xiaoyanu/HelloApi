@@ -17,7 +17,7 @@ public interface ApiMapper {
      * @param offset   偏移量 = (page - 1) * pageSize
      * @return ApiApp列表
      */
-    @Select("select * from api_apps ORDER BY created DESC LIMIT #{pageSize} OFFSET #{offset}")
+    @Select("select * from helloapi_api_apps ORDER BY created DESC LIMIT #{pageSize} OFFSET #{offset}")
     List<ApiApp> getApiList(int pageSize, int offset);
 
     /**
@@ -26,7 +26,7 @@ public interface ApiMapper {
      * @param apiId API ID
      * @return ApiParam列表
      */
-    @Select("select * from api_params where api_id = #{apiId}")
+    @Select("select * from helloapi_api_params where api_id = #{apiId}")
     List<ApiParam> getApiParam(int apiId);
 
 
@@ -36,7 +36,7 @@ public interface ApiMapper {
      * @param apiApp ApiApp对象
      * @return 插入成功的行数
      */
-    @Insert("insert into api_apps (title,smallTitle,status,type,url,sendtype,returnType,returnContent,created,user_id) values (#{title}, #{smallTitle}, #{status}, #{type}, #{url}, #{sendType}, #{returnType}, #{returnContent}, #{created}, #{user_id})")
+    @Insert("insert into helloapi_api_apps (title,smallTitle,status,type,url,sendtype,returnType,returnContent,created,user_id) values (#{title}, #{smallTitle}, #{status}, #{type}, #{url}, #{sendType}, #{returnType}, #{returnContent}, #{created}, #{user_id})")
     @Options(useGeneratedKeys = true, keyProperty = "id")
     int createApiApp(ApiApp apiApp);
 
@@ -46,7 +46,7 @@ public interface ApiMapper {
      * @param apiParam ApiParam对象
      * @return 插入成功的行数
      */
-    @Insert("insert into api_params (api_id, name, required, type, msg) values (#{api_id}, #{name}, #{required}, #{type}, #{msg})")
+    @Insert("insert into helloapi_api_params (api_id, name, required, type, msg) values (#{api_id}, #{name}, #{required}, #{type}, #{msg})")
     int createApiParam(ApiParam apiParam);
 
     /**
@@ -55,7 +55,7 @@ public interface ApiMapper {
      * @param apiId API ID
      * @return 大于0表示存在
      */
-    @Select("select count(*) from api_apps where id = #{apiId}")
+    @Select("select count(*) from helloapi_api_apps where id = #{apiId}")
     int checkApiExist(int apiId);
 
     /**
@@ -65,7 +65,7 @@ public interface ApiMapper {
      * @param userId 用户ID
      * @return 大于0表示是创建人
      */
-    @Select("select count(*) from api_apps where id = #{apiId} and user_id = #{userId}")
+    @Select("select count(*) from helloapi_api_apps where id = #{apiId} and user_id = #{userId}")
     int checkApiCreator(int apiId, int userId);
 
     /**
@@ -74,7 +74,7 @@ public interface ApiMapper {
      * @param apiApp ApiApp对象
      * @return 更新成功的行数
      */
-    @Update("update api_apps set title = #{title}, smallTitle = #{smallTitle}, status = #{status}, type = #{type}, url = #{url}, sendType = #{sendType}, returnType = #{returnType}, returnContent = #{returnContent} where id = #{id}")
+    @Update("update helloapi_api_apps set title = #{title}, smallTitle = #{smallTitle}, status = #{status}, type = #{type}, url = #{url}, sendType = #{sendType}, returnType = #{returnType}, returnContent = #{returnContent} where id = #{id}")
     int updateApiApp(ApiApp apiApp);
 
     /**
@@ -83,7 +83,7 @@ public interface ApiMapper {
      * @param apiParam ApiParam对象
      * @return 更新成功的行数
      */
-    @Update("update api_params set name = #{name}, required = #{required}, type = #{type}, msg = #{msg} where api_id = #{api_id}")
+    @Update("update helloapi_api_params set name = #{name}, required = #{required}, type = #{type}, msg = #{msg} where api_id = #{api_id}")
     int updateApiParam(ApiParam apiParam);
 
     /**
@@ -92,7 +92,7 @@ public interface ApiMapper {
      * @param apiParam ApiParam对象
      * @return 大于0表示存在
      */
-    @Select("select count(*) from api_params where api_id = #{api_id} and name = #{name}")
+    @Select("select count(*) from helloapi_api_params where api_id = #{api_id} and name = #{name}")
     int checkApiParamExistObj(ApiParam apiParam);
 
     /**
@@ -102,7 +102,7 @@ public interface ApiMapper {
      * @param name  参数名
      * @return 大于0表示存在
      */
-    @Select("select count(*) from api_params where api_id = #{apiId} and name = #{name}")
+    @Select("select count(*) from helloapi_api_params where api_id = #{apiId} and name = #{name}")
     int checkApiParamExist(int apiId, String name);
 
     /**
@@ -111,7 +111,7 @@ public interface ApiMapper {
      * @param apiId API ID
      * @param name  参数名
      */
-    @Delete("delete from api_params where api_id = #{apiId} and name = #{name}")
+    @Delete("delete from helloapi_api_params where api_id = #{apiId} and name = #{name}")
     void deleteApiParam(int apiId, String name);
 
     /**
@@ -119,7 +119,7 @@ public interface ApiMapper {
      *
      * @param apiId API ID
      */
-    @Delete("delete from api_params where api_id = #{apiId}")
+    @Delete("delete from helloapi_api_params where api_id = #{apiId}")
     void deleteApiParamAll(int apiId);
 
     /**
@@ -127,7 +127,7 @@ public interface ApiMapper {
      *
      * @param apiId API ID
      */
-    @Delete("delete from api_apps where id = #{apiId}")
+    @Delete("delete from helloapi_api_apps where id = #{apiId}")
     void deleteApiApp(int apiId);
 
     /**
@@ -138,7 +138,7 @@ public interface ApiMapper {
      * @param offset   偏移量
      * @return ApiApp列表
      */
-    @Select("select * from api_apps where  (`title` LIKE CONCAT('%',#{keyword},'%') OR `smalltitle` LIKE CONCAT('%',#{keyword},'%')) ORDER BY created DESC LIMIT #{pageSize} OFFSET #{offset}")
+    @Select("select * from helloapi_api_apps where  (`title` LIKE CONCAT('%',#{keyword},'%') OR `smalltitle` LIKE CONCAT('%',#{keyword},'%')) ORDER BY created DESC LIMIT #{pageSize} OFFSET #{offset}")
     List<ApiApp> searchApiList(String keyword, int pageSize, int offset);
 
     /**
@@ -147,7 +147,7 @@ public interface ApiMapper {
      * @param apiId API ID
      * @return ApiApp对象
      */
-    @Select("select * from api_apps where id = #{apiId}")
+    @Select("select * from helloapi_api_apps where id = #{apiId}")
     ApiApp getApiApp(int apiId);
 
     /**
@@ -161,7 +161,7 @@ public interface ApiMapper {
      * @param expired 过期时间
      * @param count   调用次数
      */
-    @Insert("insert into api_keys (`api_id`, `key`, `created` , `type`, `started`,`expired`,`count`) values (#{apiId}, #{key}, #{created}, #{type}, #{started}, #{expired}, #{count})")
+    @Insert("insert into helloapi_api_keys (`api_id`, `key`, `created` , `type`, `started`,`expired`,`count`) values (#{apiId}, #{key}, #{created}, #{type}, #{started}, #{expired}, #{count})")
     void createApiKey(int apiId, String key, long created, int type, long started, long expired, int count);
 
     /**
@@ -170,7 +170,7 @@ public interface ApiMapper {
      * @param key 密钥
      * @return 大于0表示存在
      */
-    @Select("select count(*) from api_keys where `key` = #{key}")
+    @Select("select count(*) from helloapi_api_keys where `key` = #{key}")
     int checkApiKeyExist(String key);
 
     /**
@@ -178,7 +178,7 @@ public interface ApiMapper {
      *
      * @param key 密钥
      */
-    @Update("update api_keys set count = count - 1 where `key` = #{key}")
+    @Update("update helloapi_api_keys set count = count - 1 where `key` = #{key}")
     void reduceApiKeyCount(String key);
 
     /**
@@ -187,7 +187,7 @@ public interface ApiMapper {
      * @param key 密钥
      * @return ApiKey对象
      */
-    @Select("select * from api_keys where `key` = #{key}")
+    @Select("select * from helloapi_api_keys where `key` = #{key}")
     ApiKey getApiKey(String key);
 
     /**
@@ -198,7 +198,7 @@ public interface ApiMapper {
      * @param offset   偏移量
      * @return ApiKey列表
      */
-    @Select("select * from api_keys where api_id in (select id from api_apps where user_id = #{userId}) ORDER BY created DESC LIMIT #{pageSize} OFFSET #{offset}")
+    @Select("select * from helloapi_api_keys where api_id in (select id from api_apps where user_id = #{userId}) ORDER BY created DESC LIMIT #{pageSize} OFFSET #{offset}")
     List<ApiKey> getApiKeyList(int userId, int pageSize, int offset);
 
     /**
@@ -207,7 +207,7 @@ public interface ApiMapper {
      * @param key 密钥
      * @return API应用ID
      */
-    @Select("select api_id from api_keys where `key` = #{key}")
+    @Select("select api_id from helloapi_api_keys where `key` = #{key}")
     int getApiIdByKey(String key);
 
     /**
@@ -219,7 +219,7 @@ public interface ApiMapper {
      * @param expired 过期时间
      * @param count   调用次数
      */
-    @Update("update api_keys set `type` = #{type}, `started` = #{started}, `expired` = #{expired}, `count` = #{count} where `key` = #{key}")
+    @Update("update helloapi_api_keys set `type` = #{type}, `started` = #{started}, `expired` = #{expired}, `count` = #{count} where `key` = #{key}")
     void updateApiKey(String key, int type, long started, long expired, int count);
 
     /**
@@ -227,7 +227,7 @@ public interface ApiMapper {
      *
      * @param key 密钥
      */
-    @Delete("delete from api_keys where `key` = #{key}")
+    @Delete("delete from helloapi_api_keys where `key` = #{key}")
     void deleteApiKey(String key);
 
     /**
@@ -235,7 +235,7 @@ public interface ApiMapper {
      *
      * @param key 密钥
      */
-    @Update("update api_keys set `key` = #{newKey} where `key` = #{key}")
+    @Update("update helloapi_api_keys set `key` = #{newKey} where `key` = #{key}")
     void resetApiKey(String key, String newKey);
 
     /**
@@ -247,7 +247,7 @@ public interface ApiMapper {
      * @param header 请求头
      * @param body   请求体
      */
-    @Insert("insert into api_request_logs (`api_id`,`ip`, `time`,`header`, `body`) values (#{apiId}, #{ip}, #{time}, #{header}, #{body})")
+    @Insert("insert into helloapi_api_request_logs (`api_id`,`ip`, `time`,`header`, `body`) values (#{apiId}, #{ip}, #{time}, #{header}, #{body})")
     void insertApiLog(int apiId, String ip, String time, Object header, Object body);
 
     /**
@@ -255,7 +255,7 @@ public interface ApiMapper {
      *
      * @param apiId API ID
      */
-    @Insert("INSERT INTO `api_views` (`api_id`, `count`) VALUES (#{apiId}, 1) ON DUPLICATE KEY UPDATE `count` = `count` + 1")
+    @Insert("INSERT INTO `helloapi_api_views` (`api_id`, `count`) VALUES (#{apiId}, 1) ON DUPLICATE KEY UPDATE `count` = `count` + 1")
     void addApiCount(int apiId);
 
     /**
@@ -263,7 +263,7 @@ public interface ApiMapper {
      *
      * @param apiId API ID
      */
-    @Delete("delete from api_views where api_id = #{apiId}")
+    @Delete("delete from helloapi_api_views where api_id = #{apiId}")
     void deleteApiCount(int apiId);
 
     /**
@@ -271,6 +271,6 @@ public interface ApiMapper {
      *
      * @param apiId API ID
      */
-    @Delete("delete from api_request_logs where api_id = #{apiId}")
+    @Delete("delete from helloapi_api_request_logs where api_id = #{apiId}")
     void deleteApiLog(int apiId);
 }

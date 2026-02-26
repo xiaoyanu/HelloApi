@@ -1,11 +1,27 @@
-SET NAMES utf8mb4;
-SET FOREIGN_KEY_CHECKS = 0;
+-- Flyway Initial Setup
+-- Description: Initialize the API management system tables
 
 -- ----------------------------
--- Table structure for api_apps
+-- Table structure for helloapi_users
 -- ----------------------------
-DROP TABLE IF EXISTS `api_apps`;
-CREATE TABLE `api_apps`
+CREATE TABLE `helloapi_users`
+(
+    `id`       int(10)      NOT NULL AUTO_INCREMENT COMMENT '用户唯一ID',
+    `name`     varchar(255) NOT NULL COMMENT '用户名',
+    `password` varchar(255) NOT NULL COMMENT '密码',
+    `nick`     varchar(255) NOT NULL COMMENT '用户昵称',
+    `mode`     int(2)       NOT NULL COMMENT '用户类型0为普通，1为管理员',
+    `mail`     varchar(255) DEFAULT NULL COMMENT '邮箱',
+    PRIMARY KEY (`id`)
+) ENGINE = InnoDB
+  AUTO_INCREMENT = 1
+  DEFAULT CHARACTER SET = utf8mb4
+  COLLATE = utf8mb4_unicode_ci;
+
+-- ----------------------------
+-- Table structure for helloapi_api_apps
+-- ----------------------------
+CREATE TABLE `helloapi_api_apps`
 (
     `id`            int(10)      NOT NULL AUTO_INCREMENT COMMENT '唯一ID',
     `title`         varchar(255) NOT NULL COMMENT '接口名',
@@ -20,14 +36,14 @@ CREATE TABLE `api_apps`
     `user_id`       int(10)      NOT NULL COMMENT '这个接口的用户',
     PRIMARY KEY (`id`)
 ) ENGINE = InnoDB
-  DEFAULT CHARSET = utf8mb4
+  AUTO_INCREMENT = 1
+  DEFAULT CHARACTER SET = utf8mb4
   COLLATE = utf8mb4_unicode_ci;
 
 -- ----------------------------
--- Table structure for api_keys
+-- Table structure for helloapi_api_keys
 -- ----------------------------
-DROP TABLE IF EXISTS `api_keys`;
-CREATE TABLE `api_keys`
+CREATE TABLE `helloapi_api_keys`
 (
     `api_id`  int(10)      NOT NULL COMMENT '对应的API的ID',
     `key`     varchar(255) NOT NULL COMMENT 'api密钥',
@@ -38,14 +54,13 @@ CREATE TABLE `api_keys`
     `count`   bigint(13)   NOT NULL COMMENT '可用次数',
     PRIMARY KEY (`key`)
 ) ENGINE = InnoDB
-  DEFAULT CHARSET = utf8mb4
+  DEFAULT CHARACTER SET = utf8mb4
   COLLATE = utf8mb4_unicode_ci;
 
 -- ----------------------------
--- Table structure for api_params
+-- Table structure for helloapi_api_params
 -- ----------------------------
-DROP TABLE IF EXISTS `api_params`;
-CREATE TABLE `api_params`
+CREATE TABLE `helloapi_api_params`
 (
     `api_id`   int(10)      NOT NULL COMMENT '对应的Api唯一ID',
     `name`     varchar(255) NOT NULL COMMENT '参数名',
@@ -53,14 +68,13 @@ CREATE TABLE `api_params`
     `type`     varchar(255) NOT NULL COMMENT '参数类型',
     `msg`      varchar(255) NOT NULL COMMENT '描述'
 ) ENGINE = InnoDB
-  DEFAULT CHARSET = utf8mb4
+  DEFAULT CHARACTER SET = utf8mb4
   COLLATE = utf8mb4_unicode_ci;
 
 -- ----------------------------
--- Table structure for api_request_logs
+-- Table structure for helloapi_api_request_logs
 -- ----------------------------
-DROP TABLE IF EXISTS `api_request_logs`;
-CREATE TABLE `api_request_logs`
+CREATE TABLE `helloapi_api_request_logs`
 (
     `api_id` int(10) NOT NULL COMMENT '对应的API的ID',
     `ip`     varchar(255) DEFAULT NULL COMMENT '请求IP',
@@ -69,51 +83,42 @@ CREATE TABLE `api_request_logs`
     `body`   json         DEFAULT NULL COMMENT '请求参数',
     INDEX `idx_api_id` (`api_id`)
 ) ENGINE = InnoDB
-  DEFAULT CHARSET = utf8mb4
+  DEFAULT CHARACTER SET = utf8mb4
   COLLATE = utf8mb4_unicode_ci;
 
 -- ----------------------------
--- Table structure for api_views
+-- Table structure for helloapi_api_views
 -- ----------------------------
-DROP TABLE IF EXISTS `api_views`;
-CREATE TABLE `api_views`
+CREATE TABLE `helloapi_api_views`
 (
     `api_id` int(10)    NOT NULL,
     `count`  bigint(13) NOT NULL,
     PRIMARY KEY (`api_id`)
 ) ENGINE = InnoDB
-  DEFAULT CHARSET = utf8mb4
+  DEFAULT CHARACTER SET = utf8mb4
   COLLATE = utf8mb4_unicode_ci;
 
 -- ----------------------------
--- Table structure for user_keys
+-- Table structure for helloapi_settings
 -- ----------------------------
-DROP TABLE IF EXISTS `user_keys`;
-CREATE TABLE `user_keys`
+CREATE TABLE `helloapi_settings`
+(
+    `key`   varchar(255) NOT NULL,
+    `value` varchar(255) NOT NULL,
+    PRIMARY KEY (`key`)
+) ENGINE = InnoDB
+  DEFAULT CHARACTER SET = utf8mb4
+  COLLATE = utf8mb4_unicode_ci;
+
+-- ----------------------------
+-- Table structure for helloapi_user_keys
+-- ----------------------------
+CREATE TABLE `helloapi_user_keys`
 (
     `user_id` int(10)      NOT NULL COMMENT '对应的用户id',
     `key`     varchar(255) NOT NULL COMMENT '用户接口key',
     `created` bigint(13)   NOT NULL COMMENT '创建时间',
     PRIMARY KEY (`user_id`)
 ) ENGINE = InnoDB
-  DEFAULT CHARSET = utf8mb4
+  DEFAULT CHARACTER SET = utf8mb4
   COLLATE = utf8mb4_unicode_ci;
-
--- ----------------------------
--- Table structure for users
--- ----------------------------
-DROP TABLE IF EXISTS `users`;
-CREATE TABLE `users`
-(
-    `id`       int(10)      NOT NULL AUTO_INCREMENT COMMENT '用户唯一ID',
-    `name`     varchar(255) NOT NULL COMMENT '用户名',
-    `password` varchar(255) NOT NULL COMMENT '密码',
-    `nick`     varchar(255) NOT NULL COMMENT '用户昵称',
-    `mode`     int(2)       NOT NULL COMMENT '用户类型0为普通，1为管理员',
-    `mail`     varchar(255) DEFAULT NULL COMMENT '邮箱',
-    PRIMARY KEY (`id`)
-) ENGINE = InnoDB
-  DEFAULT CHARSET = utf8mb4
-  COLLATE = utf8mb4_unicode_ci;
-
-SET FOREIGN_KEY_CHECKS = 1;

@@ -107,7 +107,6 @@ router.beforeEach((to) => {
             return '/admin/login';
         }
 
-        console.log(path)
         if (path == '/admin/manage' || path == '/admin/setting' || path == '/admin') {
             void userStore.refreshUser()
         }
