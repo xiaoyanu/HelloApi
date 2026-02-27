@@ -21,6 +21,14 @@ public interface ApiMapper {
     List<ApiApp> getApiList(int pageSize, int offset);
 
     /**
+     * 获取所有API列表（总数）
+     *
+     * @return 所有API总数
+     */
+    @Select("select count(*) from helloapi_api_apps ")
+    int getApiListAllCount();
+
+    /**
      * 获取API参数列表
      *
      * @param apiId API ID
@@ -142,6 +150,15 @@ public interface ApiMapper {
     List<ApiApp> searchApiList(String keyword, int pageSize, int offset);
 
     /**
+     * 搜索Api接口总数
+     *
+     * @param keyword  搜索关键词
+     * @return 搜索到的Api接口总数
+     */
+    @Select("select count(*) from helloapi_api_apps where  (`title` LIKE CONCAT('%',#{keyword},'%') OR `smalltitle` LIKE CONCAT('%',#{keyword},'%'))")
+    int searchApiListCount(String keyword);
+
+    /**
      * 获取Api接口详情
      *
      * @param apiId API ID
@@ -198,8 +215,17 @@ public interface ApiMapper {
      * @param offset   偏移量
      * @return ApiKey列表
      */
-    @Select("select * from helloapi_api_keys where api_id in (select id from api_apps where user_id = #{userId}) ORDER BY created DESC LIMIT #{pageSize} OFFSET #{offset}")
+    @Select("select * from helloapi_api_keys where api_id in (select id from helloapi_api_apps where user_id = #{userId}) ORDER BY created DESC LIMIT #{pageSize} OFFSET #{offset}")
     List<ApiKey> getApiKeyList(int userId, int pageSize, int offset);
+
+    /**
+     * 获取API密钥列表总数
+     *
+     * @param userId 用户ID
+     * @return API密钥列表总数
+     */
+    @Select("select count(*) from helloapi_api_keys where api_id in (select id from helloapi_api_apps where user_id = #{userId})")
+    int getApiKeyListAllCount(int userId);
 
     /**
      * 通过API密钥查询API应用ID

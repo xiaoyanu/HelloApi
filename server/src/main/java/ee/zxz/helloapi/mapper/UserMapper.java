@@ -118,6 +118,15 @@ public interface UserMapper {
     List<ApiApp> getUserApiListAll(int userId);
 
     /**
+     * GetUserApiListAllCount - 获取用户API总数量
+     *
+     * @param userId 用户ID
+     * @return 返回用户API总数量
+     */
+    @Select("SELECT COUNT(*) FROM `helloapi_api_apps` WHERE `user_id` = #{userId}")
+    int getUserApiListAllCount(int userId);
+
+    /**
      * ResetUserKey - 重置用户密钥
      *
      * @param userId 用户ID

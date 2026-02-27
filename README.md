@@ -2,7 +2,7 @@
  新的重构版本将用Spring Boot 4 + Vue 3 + Vite实现
 
 # 系统要求
-- Java 22+
+- Java 21+
 - MySQL 5.7+
 
 # 简介

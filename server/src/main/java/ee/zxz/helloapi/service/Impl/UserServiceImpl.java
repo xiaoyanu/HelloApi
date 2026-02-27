@@ -318,7 +318,10 @@ public class UserServiceImpl implements UserService {
         }
 
         // 获取用户API列表
-        List<Map<String, Object>> resultList = new ArrayList<>();
+        Map<String, Object> resultMap = new LinkedHashMap<>();
+        List<Map<String, Object>> apiInfoList = new ArrayList<>();
+        // 获取用户API总数量
+        int total = userMapper.getUserApiListAllCount(userId);
         for (ApiApp apiApp : userMapper.getUserApiList(userId, pageSize, Tools.getPageOffset(page, pageSize))) {
             Map<String, Object> map = new LinkedHashMap<>();
             map.put("id", apiApp.getId());
@@ -328,9 +331,12 @@ public class UserServiceImpl implements UserService {
             map.put("created", apiApp.getCreated());
             map.put("user_id", apiApp.getUser_id());
             map.put("view_status", apiApp.getView_status());
-            resultList.add(map);
+            apiInfoList.add(map);
         }
-        return ResponseUtil.response(200, "获取成功", resultList);
+        resultMap.put("total", total);
+        resultMap.put("list", apiInfoList);
+
+        return ResponseUtil.response(200, "获取成功", resultMap);
     }
 
     @Override

@@ -31,6 +31,22 @@ public class ApiServiceImpl implements ApiService {
         this.userMapper = userMapper;
     }
 
+    /**
+     * 格式化API应用列表，适用于首页获取列表、搜索列表
+     *
+     * @param list   用来存放结果的变量
+     * @param apiApp API应用对象
+     */
+    private void formatApiAppList(List<Map<String, Object>> list, ApiApp apiApp) {
+        Map<String, Object> map = new LinkedHashMap<>();
+        map.put("id", apiApp.getId());
+        map.put("title", apiApp.getTitle());
+        map.put("smallTitle", apiApp.getSmallTitle());
+        map.put("status", apiApp.getStatus());
+        map.put("type", apiApp.getType());
+        list.add(map);
+    }
+
     @Resource
     private ApiLogManager apiLogManager;
 
@@ -44,17 +60,15 @@ public class ApiServiceImpl implements ApiService {
         if (page < 1) {
             page = 1;
         }
+        Map<String, Object> response = new LinkedHashMap<>();
         List<Map<String, Object>> list = new ArrayList<>();
+        int total = apiMapper.getApiListAllCount();
         for (ApiApp apiApp : apiMapper.getApiList(pageSize, Tools.getPageOffset(page, pageSize))) {
-            Map<String, Object> map = new LinkedHashMap<>();
-            map.put("id", apiApp.getId());
-            map.put("title", apiApp.getTitle());
-            map.put("smallTitle", apiApp.getSmallTitle());
-            map.put("status", apiApp.getStatus());
-            map.put("type", apiApp.getType());
-            list.add(map);
+            formatApiAppList(list, apiApp);
         }
-        return ResponseUtil.response(200, "获取成功", list);
+        response.put("total", total);
+        response.put("list", list);
+        return ResponseUtil.response(200, "获取成功", response);
     }
 
     @Override
@@ -200,9 +214,17 @@ public class ApiServiceImpl implements ApiService {
             pageSize = 30;
         }
 
-        List<ApiApp> apiAppList = apiMapper.searchApiList(keyword, pageSize, Tools.getPageOffset(page, pageSize));
-        return ResponseUtil.success(apiAppList);
+        Map<String, Object> response = new LinkedHashMap<>();
+        List<Map<String, Object>> list = new ArrayList<>();
+        int total = apiMapper.searchApiListCount(keyword);
+        for (ApiApp apiApp : apiMapper.searchApiList(keyword, pageSize, Tools.getPageOffset(page, pageSize))) {
+            formatApiAppList(list, apiApp);
+        }
+        response.put("total", total);
+        response.put("list", list);
+        return ResponseUtil.success(response);
     }
+
 
     @Override
     public Map<String, Object> getApiApp(String apiId) {
@@ -338,8 +360,12 @@ public class ApiServiceImpl implements ApiService {
         if (page < 1) {
             page = 1;
         }
+        int total = apiMapper.getApiKeyListAllCount(intUserId);
         List<ApiKey> apiKeyList = apiMapper.getApiKeyList(intUserId, pageSize, Tools.getPageOffset(page, pageSize));
-        return ResponseUtil.success(apiKeyList);
+        Map<String, Object> result = new LinkedHashMap<>();
+        result.put("total", total);
+        result.put("list", apiKeyList);
+        return ResponseUtil.success(result);
     }
 
     @Override

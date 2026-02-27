@@ -2,14 +2,22 @@
 import {Plus, Delete, Edit, Close} from "@element-plus/icons-vue";
 import {GetUserAppList} from "@/api/user.ts";
 import {onMounted, ref} from "vue";
-import type {AppList, App} from "@/types/module/user.ts";
+import type {AppList, App, Pagination} from "@/types";
 import type {FormRules} from "element-plus";
 import {dayjs} from "element-plus";
 import {CreateApi} from "@/api/api.ts";
 import {useUserStore} from "@/stores";
+import {HelloAPIConfig} from "@/config/config.ts";
 
 const userStore = useUserStore();
 const tableData = ref<AppList[]>();
+
+// 分页
+const paging = ref<Pagination>({
+  page: 1,
+  pageSize: HelloAPIConfig.website.admin.pageSize,
+  total: 0,
+})
 
 // 抽屉
 const showDrawer = ref(false)
@@ -51,14 +59,18 @@ const removeParam = (index: number) => {
 
 // 获取用户发布的API接口列表
 const getTableData = async () => {
-  const res = await GetUserAppList();
+  const res = await GetUserAppList(0, paging.value.page, paging.value.pageSize);
   if (res.data.code == 200) {
-    tableData.value = res.data.data;
+    tableData.value = res.data.data.list;
+    paging.value.total = res.data.data.total
   }
 }
 
-// 表单校验
-
+// 分页改变时触发
+function handleNewPageChange(page: number) {
+  paging.value.page = page
+  getTableData()
+}
 
 // 重置formData
 const resetFormData = () => {
@@ -156,7 +168,7 @@ onMounted(() => {
               :href="'/info/' + row.title"
               target="_blank"
               type="primary"
-              :underline="false"
+              underline="never"
           >
             {{ row.title }}
           </el-link>
@@ -203,8 +215,11 @@ onMounted(() => {
     </el-table>
     <div class="flex items-center justify-center mt-6">
       <el-pagination
+          :current-page="paging.page"
+          :page-size="paging.pageSize"
           layout="prev, pager, next"
-          :total="50"
+          :total="paging.total"
+          @current-change="handleNewPageChange"
       />
     </div>
 
