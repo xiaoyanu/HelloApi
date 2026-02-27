@@ -1,5 +1,7 @@
--- Flyway Initial Setup
--- Description: Initialize the API management system tables
+-- V1__Initial_Setup.sql
+-- Description: Initialize HelloAPI database schema
+
+SET FOREIGN_KEY_CHECKS = 0;
 
 -- ----------------------------
 -- Table structure for helloapi_users
@@ -15,7 +17,7 @@ CREATE TABLE `helloapi_users`
     PRIMARY KEY (`id`)
 ) ENGINE = InnoDB
   AUTO_INCREMENT = 1
-  DEFAULT CHARACTER SET = utf8mb4
+  DEFAULT CHARSET = utf8mb4
   COLLATE = utf8mb4_unicode_ci;
 
 -- ----------------------------
@@ -29,15 +31,16 @@ CREATE TABLE `helloapi_api_apps`
     `status`        int(2)       NOT NULL COMMENT '状态，正常0，异常1，维护2',
     `type`          int(2)       NOT NULL COMMENT '接口类型，免费0，付费1',
     `url`           varchar(255) NOT NULL COMMENT '请求地址',
-    `sendType`      int(2)       NOT NULL COMMENT '请求类型，0GET、1POST',
+    `sendType`      int(2)       NOT NULL COMMENT '请求类型，0GET、1POST、2PUT、3DELETE',
     `returnType`    varchar(255) NOT NULL COMMENT '返回类型',
     `returnContent` longtext     NOT NULL COMMENT '返回内容',
     `created`       bigint(13)   NOT NULL COMMENT '创建时间，时间戳',
     `user_id`       int(10)      NOT NULL COMMENT '这个接口的用户',
+    `view_status`   int(2)       NOT NULL COMMENT '展示状态，0正常，1拒绝，2审核',
     PRIMARY KEY (`id`)
 ) ENGINE = InnoDB
   AUTO_INCREMENT = 1
-  DEFAULT CHARACTER SET = utf8mb4
+  DEFAULT CHARSET = utf8mb4
   COLLATE = utf8mb4_unicode_ci;
 
 -- ----------------------------
@@ -54,7 +57,7 @@ CREATE TABLE `helloapi_api_keys`
     `count`   bigint(13)   NOT NULL COMMENT '可用次数',
     PRIMARY KEY (`key`)
 ) ENGINE = InnoDB
-  DEFAULT CHARACTER SET = utf8mb4
+  DEFAULT CHARSET = utf8mb4
   COLLATE = utf8mb4_unicode_ci;
 
 -- ----------------------------
@@ -68,7 +71,7 @@ CREATE TABLE `helloapi_api_params`
     `type`     varchar(255) NOT NULL COMMENT '参数类型',
     `msg`      varchar(255) NOT NULL COMMENT '描述'
 ) ENGINE = InnoDB
-  DEFAULT CHARACTER SET = utf8mb4
+  DEFAULT CHARSET = utf8mb4
   COLLATE = utf8mb4_unicode_ci;
 
 -- ----------------------------
@@ -76,14 +79,14 @@ CREATE TABLE `helloapi_api_params`
 -- ----------------------------
 CREATE TABLE `helloapi_api_request_logs`
 (
-    `api_id` int(10) NOT NULL COMMENT '对应的API的ID',
+    `api_id` int(10) NOT NULL COMMENT '对应的API detour ID',
     `ip`     varchar(255) DEFAULT NULL COMMENT '请求IP',
     `time`   datetime     DEFAULT CURRENT_TIMESTAMP COMMENT '日期时间',
     `header` json         DEFAULT NULL COMMENT '请求头',
     `body`   json         DEFAULT NULL COMMENT '请求参数',
     INDEX `idx_api_id` (`api_id`)
 ) ENGINE = InnoDB
-  DEFAULT CHARACTER SET = utf8mb4
+  DEFAULT CHARSET = utf8mb4
   COLLATE = utf8mb4_unicode_ci;
 
 -- ----------------------------
@@ -95,7 +98,7 @@ CREATE TABLE `helloapi_api_views`
     `count`  bigint(13) NOT NULL,
     PRIMARY KEY (`api_id`)
 ) ENGINE = InnoDB
-  DEFAULT CHARACTER SET = utf8mb4
+  DEFAULT CHARSET = utf8mb4
   COLLATE = utf8mb4_unicode_ci;
 
 -- ----------------------------
@@ -107,7 +110,7 @@ CREATE TABLE `helloapi_settings`
     `value` varchar(255) NOT NULL,
     PRIMARY KEY (`key`)
 ) ENGINE = InnoDB
-  DEFAULT CHARACTER SET = utf8mb4
+  DEFAULT CHARSET = utf8mb4
   COLLATE = utf8mb4_unicode_ci;
 
 -- ----------------------------
@@ -120,5 +123,7 @@ CREATE TABLE `helloapi_user_keys`
     `created` bigint(13)   NOT NULL COMMENT '创建时间',
     PRIMARY KEY (`user_id`)
 ) ENGINE = InnoDB
-  DEFAULT CHARACTER SET = utf8mb4
+  DEFAULT CHARSET = utf8mb4
   COLLATE = utf8mb4_unicode_ci;
+
+SET FOREIGN_KEY_CHECKS = 1;

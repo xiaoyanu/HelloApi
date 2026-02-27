@@ -65,6 +65,13 @@ public class ApiServiceImpl implements ApiService {
             if (userMapper.checkUserIdExists(user_id) < 1) {
                 return ResponseUtil.response(401, Finals.MESSAGES_ERROR_USER_NOT_FOUND);
             }
+            if (apiApp.getView_status() != 2) {
+                // 检测是不是管理员
+                int userMode = (int) request.getAttribute("userMode");
+                if (userMode != Finals.Admin) {
+                    return ResponseUtil.response(400, Finals.MESSAGES_ERROR_NOT_ADMIN);
+                }
+            }
             getRequestApiApp(requestBody, apiApp, user_id);
             Object param = requestBody.get("params");
             List<ApiParam> params = JSON.parseArray(JSON.toJSONString(param), ApiParam.class);
@@ -98,14 +105,21 @@ public class ApiServiceImpl implements ApiService {
             if (userMapper.checkUserIdExists(userId) < 1) {
                 return ResponseUtil.response(401, Finals.MESSAGES_ERROR_USER_NOT_FOUND);
             }
+            int userMode = (int) request.getAttribute("userMode");
             if (apiMapper.checkApiCreator(intApiId, userId) < 1) {
-                int userMode = (int) request.getAttribute("userMode");
                 if (userMode != Finals.Admin) {
                     return ResponseUtil.response(400, Finals.MESSAGES_ERROR_NOT_CREATOR);
                 }
             }
 
             ApiApp apiApp = new ApiApp();
+            // 校验审核状态
+            if (apiApp.getView_status() != 2) {
+                // 检测是不是管理员
+                if (userMode != Finals.Admin) {
+                    return ResponseUtil.response(400, Finals.MESSAGES_ERROR_NOT_ADMIN);
+                }
+            }
             apiApp.setId(intApiId);
             getRequestApiApp(requestBody, apiApp, userId);
             Object param = requestBody.get("params");

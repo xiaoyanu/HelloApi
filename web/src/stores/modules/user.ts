@@ -1,14 +1,9 @@
 import {defineStore} from 'pinia'
 import {ref} from 'vue'
 import {GetUserInfo} from "@/api/user.ts";
+import type {User} from "@/types";
 
-interface User {
-    id?: number;
-    mode?: number;
-    name?: string;
-    mail?: string;
-    nick?: string;
-}
+
 
 // 用户模块
 export const useUserStore = defineStore(

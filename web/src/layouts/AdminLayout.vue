@@ -23,7 +23,7 @@ const menus = [
   {label: '首页', path: '/admin', icon: PhHouse},
   {label: 'API 管理', path: '/admin/api', icon: PhRocketLaunch},
   {label: 'APIKey 管理', path: '/admin/key', icon: PhKey},
-  {label: '我的信息', path: '/admin/user', icon: PhIdentificationCard},
+  {label: '我的信息', path: '/admin/module', icon: PhIdentificationCard},
   {label: '数据概括', path: '/admin/stat', icon: PhPresentationChart},
   {label: '用户管理', path: '/admin/manage', icon: PhUsers},
   {label: '全局设置', path: '/admin/setting', icon: PhSlidersHorizontal},
@@ -110,7 +110,7 @@ const logout = () => {
             </el-tooltip>
           </div>
         </header>
-        <div class="p-5">
+        <div class="p-10">
           <router-view/>
         </div>
       </main>

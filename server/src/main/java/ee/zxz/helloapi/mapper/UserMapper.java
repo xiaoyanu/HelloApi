@@ -105,7 +105,7 @@ public interface UserMapper {
      * @param offset   偏移量
      * @return 返回用户API列表，否则返回null
      */
-    @Select("SELECT * FROM `helloapi_api_apps` WHERE `user_id` = #{userId} LIMIT #{pageSize} OFFSET #{offset}")
+    @Select("SELECT * FROM `helloapi_api_apps` WHERE `user_id` = #{userId} ORDER BY created DESC LIMIT #{pageSize} OFFSET #{offset} ")
     List<ApiApp> getUserApiList(int userId, int pageSize, int offset);
 
     /**

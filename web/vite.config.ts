@@ -33,13 +33,26 @@ export default defineConfig({
         rollupOptions: {
             output: {
                 manualChunks(id) {
-                    // 将 echarts 相关的包单独打包成一个 chunk
+                    // 将包单独打包
+
+                    // echarts 相关的包
                     if (id.includes('node_modules/echarts')) {
                         return 'echarts';
                     }
-                    // 将 vue 相关的包单独打包成一个 chunk
-                    if (id.includes('node_modules/vue')) {
-                        return 'vue-vendor';
+
+                    // vue 相关的包
+                    // if (id.includes('node_modules/vue')) {
+                    //     return 'vue-vendor';
+                    // }
+
+                    // element-plus 相关的包
+                    if (id.includes('node_modules/element-plus')) {
+                        return 'element-plus';
+                    }
+
+                    // v-md-editor 相关的包
+                    if (id.includes('node_modules/@kangc')) {
+                        return 'v-md-editor';
                     }
                 }
             },

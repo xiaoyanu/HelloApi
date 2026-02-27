@@ -4,14 +4,18 @@ public class ApiApp {
     private int id;
     private String title;
     private String smallTitle;
+    // 正常0，异常1，维护2
     private int status;
     private int type;
     private String url;
+    // 请求类型，0GET、1POST、2PUT、3DELETE
     private int sendType;
     private String returnType;
     private String returnContent;
     private long created;
     private int user_id;
+    // 展示状态，0正常，1拒绝，2审核
+    private int view_status;
 
     public int getId() {
         return id;
@@ -99,5 +103,13 @@ public class ApiApp {
 
     public void setUser_id(int user_id) {
         this.user_id = user_id;
+    }
+
+    public int getView_status() {
+        return view_status;
+    }
+
+    public void setView_status(int view_status) {
+        this.view_status = view_status;
     }
 }

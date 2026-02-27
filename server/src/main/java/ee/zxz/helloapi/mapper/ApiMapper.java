@@ -36,7 +36,7 @@ public interface ApiMapper {
      * @param apiApp ApiApp对象
      * @return 插入成功的行数
      */
-    @Insert("insert into helloapi_api_apps (title,smallTitle,status,type,url,sendtype,returnType,returnContent,created,user_id) values (#{title}, #{smallTitle}, #{status}, #{type}, #{url}, #{sendType}, #{returnType}, #{returnContent}, #{created}, #{user_id})")
+    @Insert("insert into helloapi_api_apps (title,smallTitle,status,type,url,sendtype,returnType,returnContent,created,user_id,view_status) values (#{title}, #{smallTitle}, #{status}, #{type}, #{url}, #{sendType}, #{returnType}, #{returnContent}, #{created}, #{user_id},#{view_status})")
     @Options(useGeneratedKeys = true, keyProperty = "id")
     int createApiApp(ApiApp apiApp);
 
@@ -193,7 +193,7 @@ public interface ApiMapper {
     /**
      * 获取API密钥列表
      *
-     * @param userId 用户ID
+     * @param userId   用户ID
      * @param pageSize 每页数量
      * @param offset   偏移量
      * @return ApiKey列表

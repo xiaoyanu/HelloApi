@@ -14,3 +14,13 @@ export const Login = (form: object): any => request.post(apiUrl + '/Login', form
 
 // 用户信息
 export const GetUserInfo = (): any => request.get(apiUrl + '/')
+
+// 用户接口列表
+export const GetUserAppList =
+    (userid: number = 0, page: number = 1, pageSize: number = 30): any => request.get(apiUrl + '/AppList', {
+        params: {
+            ...(userid != 0 && {id: userid}),
+            page: page,
+            pageSize: pageSize,
+        }
+    })

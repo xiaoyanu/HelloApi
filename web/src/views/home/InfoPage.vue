@@ -67,8 +67,7 @@ const copyAddress = () => {
     <div class="pt-3.75">
       <div class="text-[20px] border-l-[5px] border-[#61677C] pl-1 mb-2">返回示例</div>
       <div id="response">
-        哇哇哇哇哇哇哇哇哇哇哇哇哇哇哇哇哇哇哇哇哇哇哇哇哇哇哇哇哇哇哇哇哇哇哇哇哇哇哇哇<br>哇哇哇哇哇哇哇哇哇哇哇哇哇哇哇哇哇哇哇哇哇哇哇哇哇哇哇哇哇哇哇哇哇哇哇哇哇哇哇哇
-        <br>
+        <m-d-view :text="`# 你好`" />
       </div>
     </div>
   </div>

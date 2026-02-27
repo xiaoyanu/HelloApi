@@ -327,6 +327,7 @@ public class UserServiceImpl implements UserService {
             map.put("status", apiApp.getStatus());
             map.put("created", apiApp.getCreated());
             map.put("user_id", apiApp.getUser_id());
+            map.put("view_status", apiApp.getView_status());
             resultList.add(map);
         }
         return ResponseUtil.response(200, "获取成功", resultList);

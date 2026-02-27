@@ -49,7 +49,7 @@ const router = createRouter({
                 },
                 {
                     name: 'AdminUser',
-                    path: 'user', // 用户个人资料页面 /admin/user
+                    path: 'user', // 用户个人资料页面 /admin/module
                     component: () => import('@/views/admin/UserPage.vue')
                 },
                 {
