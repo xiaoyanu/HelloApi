@@ -2,7 +2,7 @@
 import {Plus, Delete, Edit, Close, Search, Refresh} from "@element-plus/icons-vue";
 import {GetUserAppList, GetApiInfo, CreateApi, UpdateApi, UserAppListSearch, DeleteApi} from "@/api";
 import {onMounted, ref} from "vue";
-import type {AppList, App, Pagination, selectForm} from "@/types";
+import type {AppList, App, Pagination, selectFormApi} from "@/types";
 import type {FormRules} from "element-plus";
 import {dayjs} from "element-plus";
 import {useUserStore} from "@/stores";
@@ -13,7 +13,7 @@ const tableData = ref<AppList[]>();
 const nowTableType = ref()
 
 // 搜索筛选表单
-const searchForm = ref<selectForm>({
+const searchForm = ref<selectFormApi>({
   keywords: '',
   type: -1, // -1 代表不限，0 免费，1 收费
   status: -1, // -1 代表不限，0 正常，1 异常，2 维护
@@ -256,11 +256,14 @@ const onDrawerClose = () => {
 }
 
 const handleDelete = (id: number) => {
-  ElMessageBox.confirm('确定要删除吗？删除后将无法恢复', '提示', {
-    confirmButtonText: '确定',
-    cancelButtonText: '取消',
-    type: 'warning',
-  }).then(async () => {
+  ElMessageBox.confirm('确定要删除吗？删除后将无法恢复！<br /><strong>所有相关的 APIKey、调用记录等也将被删除</strong>', '提示',
+      {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning',
+        dangerouslyUseHTMLString: true,
+      }
+  ).then(async () => {
     const res = await DeleteApi(id)
     if (res.data.code == 200) {
       reloadTable()
@@ -287,8 +290,8 @@ onMounted(() => {
 <template>
   <div class="rounded-lg bg-white p-6 shadow-sm">
     <div class="flex items-center justify-between">
-      <h2 class="text-lg font-medium">管理API接口</h2>
-      <el-button :icon="Plus" type="primary" @click="openDrawer('create')">发布API</el-button>
+      <h2 class="text-lg font-medium">API 管理</h2>
+      <el-button :icon="Plus" type="primary" @click="openDrawer('create')">发布 API</el-button>
     </div>
     <hr class="border-[#E5E5E5] m-6"/>
     <div class="pl-2">
@@ -296,14 +299,14 @@ onMounted(() => {
         <el-form-item>
           <el-input
               v-model="searchForm.keywords"
-              placeholder="接口名称"
+              placeholder="Api ID / 关键字"
               @keyup.enter="handleSearch"
           />
         </el-form-item>
 
         <el-form-item label="接口类型">
           <el-select v-model="searchForm.type" placeholder="请选择">
-            <el-option :value="-1" label="全部"/>
+            <el-option :value="-1" label="不限"/>
             <el-option :value="0" label="免费">
               <el-tag size="small" type="success">免费</el-tag>
             </el-option>
@@ -315,7 +318,7 @@ onMounted(() => {
 
         <el-form-item label="接口状态">
           <el-select v-model="searchForm.status" placeholder="请选择">
-            <el-option :value="-1" label="全部"/>
+            <el-option :value="-1" label="不限"/>
             <el-option :value="0" label="正常">
               <el-tag size="small" type="success">正常</el-tag>
             </el-option>
@@ -332,7 +335,7 @@ onMounted(() => {
 
         <el-form-item label="审核状态">
           <el-select v-model="searchForm.view_status" placeholder="请选择">
-            <el-option :value="-1" label="全部"/>
+            <el-option :value="-1" label="不限"/>
             <el-option :value="0" label="通过">
               <el-tag size="small" type="success">通过</el-tag>
             </el-option>
@@ -351,10 +354,18 @@ onMounted(() => {
           <el-button :icon="Search" plain type="primary" @click="handleSearch">查询</el-button>
           <el-button :icon="Refresh" @click="resetSearch">重置</el-button>
         </el-form-item>
+        <el-form-item>
+          <el-tag size="large" type="info">当前条件共 {{ paging.total }} 条数据</el-tag>
+        </el-form-item>
       </el-form>
     </div>
     <el-table :data="tableData" class="w-full">
-      <el-table-column label="接口名称">
+      <el-table-column label="Api ID">
+        <template #default="{row}">
+          {{ row.id }}
+        </template>
+      </el-table-column>
+      <el-table-column label="接口名称" minWidth="250">
         <template #default="{row}">
           <el-link
               :href="'/info/' + row.id"
@@ -373,7 +384,7 @@ onMounted(() => {
           </el-tag>
         </template>
       </el-table-column>
-      <el-table-column label="创建日期">
+      <el-table-column label="创建日期" minWidth="150">
         <template #default="{ row }">
           {{ dayjs(row.created).format('YYYY年MM月DD日 HH:mm') }}
         </template>
@@ -523,7 +534,7 @@ onMounted(() => {
         </el-form>
         <div class="flex justify-center">
           <el-button class="w-50" size="large" type="primary" @click="nowRow ? submitFormUpdate() : submitFormCreate()">
-            {{ nowRow ? '编辑' : '发布' }}API
+            {{ nowRow ? '编辑' : '发布' }} API
           </el-button>
         </div>
       </div>

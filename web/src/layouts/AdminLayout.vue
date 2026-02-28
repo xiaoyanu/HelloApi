@@ -1,4 +1,4 @@
-<script setup lang="ts">
+<script lang="ts" setup>
 import {
   PhGithubLogo,
   PhArrowCounterClockwise,
@@ -15,6 +15,7 @@ import {
 import {getGravatarHash} from "@/utils/more.ts";
 import {useRoute, useRouter} from "vue-router";
 import {useUserStore} from "@/stores";
+import {HelloAPIConfig} from "@/config/config.ts";
 
 const route = useRoute()
 const router = useRouter()
@@ -39,12 +40,23 @@ const logout = () => {
   ElMessage.info('已退出登录')
 }
 
+const watermark = (): string => {
+  if (HelloAPIConfig.website.admin.watermark.view) {
+    if (HelloAPIConfig.website.admin.watermark.content.length > 0) {
+      return HelloAPIConfig.website.admin.watermark.content
+    } else {
+      return userStore.user.nick || ''
+    }
+  }
+  return ''
+}
 </script>
 <template>
-  <div class="bg-[#F5F7FA] w-full min-h-screen ">
-    <div class="flex h-screen">
-      <aside class="flex flex-col shrink-0 w-55 bg-white border-r border-solid border-[#E4E7ED]">
-        <div class="
+  <el-watermark :content="watermark()">
+    <div class="bg-[#F5F7FA] w-full min-h-screen ">
+      <div class="flex h-screen">
+        <aside class="flex flex-col shrink-0 w-55 bg-white border-r border-solid border-[#E4E7ED]">
+          <div class="
             bg-linear-to-l from-[#ff4e50] to-[#f9d423]
             bg-clip-text
             text-transparent
@@ -53,14 +65,15 @@ const logout = () => {
             justify-center
             text-[28px]
             font-bold">
-          <img class="w-9" src="@/assets/images/logo.png" alt="logo" draggable="false">
-          HelloAPI
-        </div>
-        <ul class="select-none flex-1 list-none pt-2.5">
-          <li
-              v-for="item in menus"
-              :key="item.path"
-              class="
+            <img alt="logo" class="w-9" draggable="false" src="@/assets/images/logo.png">
+            HelloAPI
+          </div>
+          <ul class="select-none flex-1 list-none pt-2.5">
+            <li
+                v-for="item in menus"
+                :key="item.path"
+                :class="{ 'active': route.path === item.path }"
+                class="
               h-12.5
               flex items-center
               pl-6.25
@@ -71,15 +84,14 @@ const logout = () => {
               border-r-[3px] border-transparent
               hover:bg-[#ecf5ff]
               "
-              :class="{ 'active': route.path === item.path }"
-              @click="handleNav(item.path)"
-          >
-            <component :is="item.icon" :size="18" weight="duotone" class="mr-3"/>
-            {{ item.label }}
-          </li>
-        </ul>
-        <div class="p-5 border-t border-[#E4E7ED] border-solid">
-          <button class="
+                @click="handleNav(item.path)"
+            >
+              <component :is="item.icon" :size="18" class="mr-3" weight="duotone"/>
+              {{ item.label }}
+            </li>
+          </ul>
+          <div class="p-5 border-t border-[#E4E7ED] border-solid">
+            <button class="
           w-full p-2 bg-white
           border border-[#dcdfe6] rounded-sm
           text-[#409eff] cursor-pointer text-[13px]
@@ -87,37 +99,38 @@ const logout = () => {
           hover:border-[#c6e2ff]
           hover:bg-[#ecf5ff]
           " @click="router.push('/')">
-            <PhArrowCounterClockwise size="15"/>
-            返回首页
-          </button>
-          <div class="text-[12px] text-[#909399] flex items-center justify-center gap-1.25">
-            <PhGithubLogo size="15" weight="duotone"/>
-            Powered By 周星星
+              <PhArrowCounterClockwise size="15"/>
+              返回首页
+            </button>
+            <div class="text-[12px] text-[#909399] flex items-center justify-center gap-1.25">
+              <PhGithubLogo size="15" weight="duotone"/>
+              Powered By 周星星
+            </div>
           </div>
-        </div>
-      </aside>
-      <main class="main-container">
-        <header class="header">
-          <div class="user-info">
-            <span>Hi, {{ userStore.user.nick }}</span>
-            <img
-                :src="`https://cn.cravatar.com/avatar/${getGravatarHash(userStore.user.mail || 'HelloAPI')}?s=100&d=wavatar`"
-                alt="Avatar"
-                class="avatar w-10 h-10 rounded-full">
-            <el-tooltip content="退出登录" placement="bottom-end">
-              <PhSignOut @click="logout" size="18" weight="duotone"
-                         class="text-[#909399] hover:text-red-400 cursor-pointer"/>
-            </el-tooltip>
+        </aside>
+        <main class="main-container">
+          <header class="header">
+            <div class="user-info">
+              <span>Hi, {{ userStore.user.nick }}</span>
+              <img
+                  :src="`https://cn.cravatar.com/avatar/${getGravatarHash(userStore.user.mail || 'HelloAPI')}?s=100&d=wavatar`"
+                  alt="Avatar"
+                  class="avatar w-10 h-10 rounded-full">
+              <el-tooltip content="退出登录" placement="bottom-end">
+                <PhSignOut class="text-[#909399] hover:text-red-400 cursor-pointer" size="18" weight="duotone"
+                           @click="logout"/>
+              </el-tooltip>
+            </div>
+          </header>
+          <div class="p-10">
+            <router-view/>
           </div>
-        </header>
-        <div class="p-10">
-          <router-view/>
-        </div>
-      </main>
+        </main>
+      </div>
     </div>
-  </div>
+  </el-watermark>
 </template>
-<style scoped lang="scss">
+<style lang="scss" scoped>
 .active {
   color: #409EFF;
   background-color: #ecf5ff;

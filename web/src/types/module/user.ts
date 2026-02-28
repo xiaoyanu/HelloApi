@@ -54,10 +54,30 @@ export interface User {
     nick?: string;
 }
 
-// 用于筛选条件
-export type selectForm = {
+// 用于筛选条件API接口
+export type selectFormApi = {
     keywords: string;
     type: number;
     status: number;
     view_status: number;
+}
+
+// 用于筛选条件APIKey
+export type selectFormApiKey = {
+    keywords: string;
+    type: number;
+    status: number;
+    view_status: number;
+}
+
+// APIKey
+export type APIKey = {
+    apiId: number;
+    key: string;
+    created: number;
+    type: number;
+    started: number | Array<Date>;
+    expired: number;
+    count: number;
+    desc: string;
 }
