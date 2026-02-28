@@ -30,4 +30,6 @@ public interface UserService {
     // 重置用户密钥
     Map<String, Object> resetUserKey(String userId, HttpServletRequest request);
 
+    // 用户API列表搜索
+    Map<String, Object> userApiListSearch(Map<String, String> requestParam, HttpServletRequest request);
 }

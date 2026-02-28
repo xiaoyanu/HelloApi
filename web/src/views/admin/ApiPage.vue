@@ -1,16 +1,49 @@
-<script setup lang="ts">
-import {Plus, Delete, Edit, Close} from "@element-plus/icons-vue";
-import {GetUserAppList} from "@/api/user.ts";
+<script lang="ts" setup>
+import {Plus, Delete, Edit, Close, Search, Refresh} from "@element-plus/icons-vue";
+import {GetUserAppList, GetApiInfo, CreateApi, UpdateApi, UserAppListSearch, DeleteApi} from "@/api";
 import {onMounted, ref} from "vue";
-import type {AppList, App, Pagination} from "@/types";
+import type {AppList, App, Pagination, selectForm} from "@/types";
 import type {FormRules} from "element-plus";
 import {dayjs} from "element-plus";
-import {CreateApi} from "@/api/api.ts";
 import {useUserStore} from "@/stores";
 import {HelloAPIConfig} from "@/config/config.ts";
 
 const userStore = useUserStore();
 const tableData = ref<AppList[]>();
+const nowTableType = ref()
+
+// 搜索筛选表单
+const searchForm = ref<selectForm>({
+  keywords: '',
+  type: -1, // -1 代表不限，0 免费，1 收费
+  status: -1, // -1 代表不限，0 正常，1 异常，2 维护
+  view_status: -1 // -1 代表不限，0 通过，1 拒绝，2 审核中
+})
+
+// 搜索
+const handleSearch = async () => {
+  if (nowTableType.value != 'listSearch') {
+    nowTableType.value = 'listSearch'
+    paging.value.page = 1
+  }
+  const res = await UserAppListSearch(searchForm.value, paging.value.pageSize, paging.value.page);
+  if (res.data.code == 200) {
+    tableData.value = res.data.data.list;
+    paging.value.total = res.data.data.total
+  }
+}
+
+// 重置搜索
+const resetSearch = () => {
+  searchForm.value = {
+    keywords: '',
+    type: -1, // -1 代表不限，0 免费，1 收费
+    status: -1, // -1 代表不限，0 正常，1 异常，2 维护
+    view_status: -1 // -1 代表不限，0 通过，1 拒绝，2 审核中
+  };
+  nowTableType.value = 'list'
+  handleSearch()
+}
 
 // 分页
 const paging = ref<Pagination>({
@@ -21,11 +54,10 @@ const paging = ref<Pagination>({
 
 // 抽屉
 const showDrawer = ref(false)
-const drawerType = ref()
 const drawerTitle = ref()
 const resizable = ref(true) // 是否可调整大小
 const drawerSize = ref('80%') // 抽屉大小
-const newRow = ref()
+const nowRow = ref()
 
 // 提交表单
 const formRef = ref()
@@ -59,6 +91,10 @@ const removeParam = (index: number) => {
 
 // 获取用户发布的API接口列表
 const getTableData = async () => {
+  if (nowTableType.value != 'list') {
+    nowTableType.value = 'list'
+    paging.value.page = 1
+  }
   const res = await GetUserAppList(0, paging.value.page, paging.value.pageSize);
   if (res.data.code == 200) {
     tableData.value = res.data.data.list;
@@ -69,7 +105,7 @@ const getTableData = async () => {
 // 分页改变时触发
 function handleNewPageChange(page: number) {
   paging.value.page = page
-  getTableData()
+  reloadTable()
 }
 
 // 重置formData
@@ -91,16 +127,15 @@ const resetFormData = () => {
 // 打开抽屉
 const openDrawer = (type: string, row?: object) => {
   resetFormData()
-  drawerType.value = type
-  if (drawerType.value === 'edit') {
-    newRow.value = row
+  if (type === 'edit') {
+    nowRow.value = row
   }
   drawerTitle.value = type === 'create' ? '发布接口' : '编辑接口'
   showDrawer.value = true
 }
 
-// 发布插件
-const submitForm = async () => {
+// 发布接口
+const submitFormCreate = async () => {
   // 校验表单
   const isValid = await formRef.value?.validate().catch(() => false);
   if (isValid) {
@@ -115,6 +150,31 @@ const submitForm = async () => {
       showDrawer.value = false
     }
   }
+}
+
+// 更新接口
+const submitFormUpdate = () => {
+  ElMessageBox.confirm('确定要编辑并发布吗？编辑后需要重新审核', '提示', {
+    confirmButtonText: '确定',
+    cancelButtonText: '取消',
+    type: 'warning',
+  }).then(async () => {
+    // 校验表单
+    const isValid = await formRef.value?.validate().catch(() => false);
+    if (isValid) {
+      // 提交表单
+      if (userStore.user.mode || 0 > 0) {
+        formData.value.view_status = 0
+      }
+      const res = await UpdateApi(nowRow.value.id, formData.value)
+      if (res.data.code == 200) {
+        reloadTable()
+        ElMessage.success('更新成功')
+        showDrawer.value = false
+      }
+    }
+  }).catch(() => {
+  })
 }
 
 // 表单校验
@@ -148,8 +208,78 @@ const rules: FormRules = {
   ],
   returnContent: [
     {required: true, message: '请输入返回示例内容', trigger: 'change'}
+  ],
+  params: [
+    {
+      validator: (_: any, value: any, callback: any) => {
+        // 如果没有参数，直接通过校验
+        if (!value || value.length === 0) {
+          callback()
+          return
+        }
+        // 遍历检查数组中每一项的内容
+        for (let i = 0; i < value.length; i++) {
+          const param = value[i]
+          if (!param.name || !param.name.trim()) {
+            return callback(new Error(`第 ${i + 1} 行请求参数的 "参数名" 不能为空`))
+          }
+          if (param.required === undefined || param.required === null) {
+            return callback(new Error(`请选择第 ${i + 1} 行请求参数的 "是否必填"`))
+          }
+          if (!param.type || !param.type.trim()) {
+            return callback(new Error(`第 ${i + 1} 行请求参数的 "类型" 不能为空`))
+          }
+          if (!param.msg || !param.msg.trim()) {
+            return callback(new Error(`第 ${i + 1} 行请求参数的 "描述" 不能为空`))
+          }
+        }
+        // 全部通过
+        callback()
+      }, trigger: ['blur', 'change']
+    }
   ]
 }
+
+const onDrawerLoadOver = async () => {
+  if (nowRow.value?.id) {
+    const res = await GetApiInfo(nowRow.value.id)
+    if (res.data.code == 200) {
+      formData.value = res.data.data
+      formData.value.view_status = 2
+    }
+  }
+}
+
+const onDrawerClose = () => {
+  resetFormData()
+  nowRow.value = undefined;
+}
+
+const handleDelete = (id: number) => {
+  ElMessageBox.confirm('确定要删除吗？删除后将无法恢复', '提示', {
+    confirmButtonText: '确定',
+    cancelButtonText: '取消',
+    type: 'warning',
+  }).then(async () => {
+    const res = await DeleteApi(id)
+    if (res.data.code == 200) {
+      reloadTable()
+      ElMessage.success('删除成功')
+    }
+  }).catch(() => {
+  })
+}
+
+// 根据当前表格类型判断是刷新搜索结果还是全部数据
+const reloadTable = () => {
+  if (nowTableType.value == 'listSearch') {
+    handleSearch()
+  } else {
+    getTableData()
+  }
+}
+
+
 onMounted(() => {
   getTableData();
 })
@@ -158,14 +288,76 @@ onMounted(() => {
   <div class="rounded-lg bg-white p-6 shadow-sm">
     <div class="flex items-center justify-between">
       <h2 class="text-lg font-medium">管理API接口</h2>
-      <el-button type="primary" :icon="Plus" @click="openDrawer('create')">发布API</el-button>
+      <el-button :icon="Plus" type="primary" @click="openDrawer('create')">发布API</el-button>
     </div>
     <hr class="border-[#E5E5E5] m-6"/>
+    <div class="pl-2">
+      <el-form :inline="true" :model="searchForm" class="searchForm">
+        <el-form-item>
+          <el-input
+              v-model="searchForm.keywords"
+              placeholder="接口名称"
+              @keyup.enter="handleSearch"
+          />
+        </el-form-item>
+
+        <el-form-item label="接口类型">
+          <el-select v-model="searchForm.type" placeholder="请选择">
+            <el-option :value="-1" label="全部"/>
+            <el-option :value="0" label="免费">
+              <el-tag size="small" type="success">免费</el-tag>
+            </el-option>
+            <el-option :value="1" label="收费">
+              <el-tag size="small" type="warning">收费</el-tag>
+            </el-option>
+          </el-select>
+        </el-form-item>
+
+        <el-form-item label="接口状态">
+          <el-select v-model="searchForm.status" placeholder="请选择">
+            <el-option :value="-1" label="全部"/>
+            <el-option :value="0" label="正常">
+              <el-tag size="small" type="success">正常</el-tag>
+            </el-option>
+
+            <el-option :value="1" label="异常">
+              <el-tag size="small" type="danger">异常</el-tag>
+            </el-option>
+
+            <el-option :value="2" label="维护">
+              <el-tag size="small" type="info">维护</el-tag>
+            </el-option>
+          </el-select>
+        </el-form-item>
+
+        <el-form-item label="审核状态">
+          <el-select v-model="searchForm.view_status" placeholder="请选择">
+            <el-option :value="-1" label="全部"/>
+            <el-option :value="0" label="通过">
+              <el-tag size="small" type="success">通过</el-tag>
+            </el-option>
+
+            <el-option :value="1" label="拒绝">
+              <el-tag size="small" type="danger">拒绝</el-tag>
+            </el-option>
+
+            <el-option :value="2" label="审核中">
+              <el-tag size="small" type="warning">审核中</el-tag>
+            </el-option>
+          </el-select>
+        </el-form-item>
+
+        <el-form-item>
+          <el-button :icon="Search" plain type="primary" @click="handleSearch">查询</el-button>
+          <el-button :icon="Refresh" @click="resetSearch">重置</el-button>
+        </el-form-item>
+      </el-form>
+    </div>
     <el-table :data="tableData" class="w-full">
       <el-table-column label="接口名称">
         <template #default="{row}">
           <el-link
-              :href="'/info/' + row.title"
+              :href="'/info/' + row.id"
               target="_blank"
               type="primary"
               underline="never"
@@ -193,6 +385,13 @@ onMounted(() => {
           </el-tag>
         </template>
       </el-table-column>
+      <el-table-column label="审核状态">
+        <template #default="{ row }">
+          <el-tag :type="row.view_status === 2 ? 'warning' : row.view_status === 1 ? 'danger' : 'success'">
+            {{ row.view_status === 2 ? '审核中' : row.view_status === 1 ? '拒绝' : '通过' }}
+          </el-tag>
+        </template>
+      </el-table-column>
       <el-table-column label="操作" width="120">
         <template #default="{ row }">
           <el-button
@@ -200,53 +399,55 @@ onMounted(() => {
               circle
               plain
               type="primary"
+              @click="openDrawer('edit', row)"
           ></el-button>
           <el-button
               :icon="Delete"
               circle
               plain
               type="danger"
+              @click="handleDelete(row.id)"
           ></el-button>
         </template>
       </el-table-column>
       <template #empty>
-        <el-empty style="user-select: none" description="没有发布过API接口"/>
+        <el-empty description="空空的什么也没有＞﹏＜" style="user-select: none"/>
       </template>
     </el-table>
     <div class="flex items-center justify-center mt-6">
       <el-pagination
           :current-page="paging.page"
           :page-size="paging.pageSize"
-          layout="prev, pager, next"
           :total="paging.total"
+          layout="prev, pager, next"
           @current-change="handleNewPageChange"
       />
     </div>
 
-
-    <!-- 抽屉 -->
     <el-drawer
-        class="rounded-tl-[20px] rounded-tr-[20px] m-auto custom-btt-drawer"
         v-model="showDrawer"
-        :title="drawerTitle"
-        direction="btt"
-        :size="drawerSize"
-        :resizable="resizable"
         :destroy-on-close="true"
+        :resizable="resizable"
+        :size="drawerSize"
+        :title="drawerTitle"
+        class="rounded-tl-[20px] rounded-tr-[20px] m-auto custom-btt-drawer"
+        direction="btt"
+        @closed="onDrawerClose"
+        @open="onDrawerLoadOver"
     >
       <div class="m-auto max-w-[90%]">
-        <el-form :model="formData" :rules="rules" ref="formRef">
+        <el-form ref="formRef" :model="formData" :rules="rules">
           <el-form-item label="接口类型" prop="type">
             <el-radio-group v-model="formData.type">
-              <el-radio-button label="免费" :value="0"/>
-              <el-radio-button label="收费" :value="1"/>
+              <el-radio-button :value="0" label="免费"/>
+              <el-radio-button :value="1" label="收费"/>
             </el-radio-group>
           </el-form-item>
           <el-form-item label="接口状态" prop="status">
             <el-radio-group v-model="formData.status">
-              <el-radio-button label="正常" :value="0"/>
-              <el-radio-button label="异常" :value="1"/>
-              <el-radio-button label="维护" :value="2"/>
+              <el-radio-button :value="0" label="正常"/>
+              <el-radio-button :value="1" label="异常"/>
+              <el-radio-button :value="2" label="维护"/>
             </el-radio-group>
           </el-form-item>
           <el-form-item label="接口名称" prop="title">
@@ -260,19 +461,19 @@ onMounted(() => {
           </el-form-item>
           <el-form-item label="请求方式" prop="sendType">
             <el-radio-group v-model="formData.sendType">
-              <el-radio-button label="Get" :value="0"/>
-              <el-radio-button label="Post" :value="1"/>
-              <el-radio-button label="Put" :value="2"/>
-              <el-radio-button label="Delete" :value="3"/>
+              <el-radio-button :value="0" label="Get"/>
+              <el-radio-button :value="1" label="Post"/>
+              <el-radio-button :value="2" label="Put"/>
+              <el-radio-button :value="3" label="Delete"/>
             </el-radio-group>
           </el-form-item>
           <el-form-item label="返回类型" prop="returnType">
             <el-input v-model="formData.returnType" placeholder="请输入返回类型，例如：Json / Text / Image"/>
           </el-form-item>
 
-          <el-form-item label="请求参数">
+          <el-form-item label="请求参数" prop="params">
             <div class="rounded-sm overflow-hidden border border-[#DCDFE6] w-full">
-              <el-table class="table-4px-border" :data="formData.params" style="width: 100%">
+              <el-table :data="formData.params" class="table-4px-border" style="width: 100%">
                 <el-table-column label="参数名" width="180">
                   <template #default="{row}">
                     <el-input v-model="row.name" placeholder="参数名"/>
@@ -281,8 +482,8 @@ onMounted(() => {
                 <el-table-column label="必填" width="85">
                   <template #default="{row}">
                     <el-select v-model="row.required">
-                      <el-option label="否" :value="0"/>
-                      <el-option label="是" :value="1"/>
+                      <el-option :value="0" label="否"/>
+                      <el-option :value="1" label="是"/>
                     </el-select>
                   </template>
                 </el-table-column>
@@ -293,16 +494,16 @@ onMounted(() => {
                 </el-table-column>
                 <el-table-column label="描述">
                   <template #default="{row}">
-                    <el-input type="textarea" autosize v-model="row.msg" placeholder="参数描述"/>
+                    <el-input v-model="row.msg" autosize placeholder="参数描述" type="textarea"/>
                   </template>
                 </el-table-column>
-                <el-table-column label="操作" width="70" align="center">
+                <el-table-column align="center" label="操作" width="70">
                   <template #default="scope">
                     <el-button
-                        type="danger"
                         :icon="Close"
                         circle
                         size="small"
+                        type="danger"
                         @click="removeParam(scope.$index)"
                     />
                   </template>
@@ -312,7 +513,7 @@ onMounted(() => {
                 </template>
               </el-table>
             </div>
-            <el-button type="primary" plain @click="addParam" style="margin-top: 10px;">
+            <el-button plain style="margin-top: 4px;" type="primary" @click="addParam">
               添加参数
             </el-button>
           </el-form-item>
@@ -321,8 +522,8 @@ onMounted(() => {
           </el-form-item>
         </el-form>
         <div class="flex justify-center">
-          <el-button type="primary" size="large" class="w-50" @click="submitForm">
-            提交
+          <el-button class="w-50" size="large" type="primary" @click="nowRow ? submitFormUpdate() : submitFormCreate()">
+            {{ nowRow ? '编辑' : '发布' }}API
           </el-button>
         </div>
       </div>
@@ -342,7 +543,15 @@ onMounted(() => {
 
 /* 移除表格 hover 时的背景颜色变化 */
 :deep(.el-table--enable-row-hover .el-table__row:hover > td.el-table__cell) {
-  background-color: transparent !important;
+  background-color: transparent;
+}
+
+:deep(.searchForm .el-input) {
+  --el-input-width: 150px;
+}
+
+:deep(.searchForm .el-select) {
+  --el-select-width: 100px;
 }
 
 @media (max-width: 768px) {

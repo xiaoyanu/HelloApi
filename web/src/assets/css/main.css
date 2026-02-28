@@ -15,6 +15,7 @@
     /*src: url(https://npm.onmicrosoft.cn/helloapi_assets@0.0.1/fonts/HarmonyOS_Sans_SC_Medium.subset.woff2) format("truetype");*/
     /*src: url(https://cdn.bili33.top/npm/helloapi_assets@0.0.1/fonts/HarmonyOS_Sans_SC_Medium.subset.woff2) format("truetype");*/
     src: url(@/assets/fonts/HarmonyOS_Sans_SC_Medium.subset.woff2) format("truetype");
+    font-display: swap;
 }
 
 * {

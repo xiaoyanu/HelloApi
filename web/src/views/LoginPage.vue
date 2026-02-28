@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import {ref, watch, onMounted} from 'vue'
-import {GetCaptchaUrl, Login, Register} from "@/api/user";
+import {GetCaptchaUrl, Login, Register} from "@/api";
 import {useUserStore} from "@/stores";
 import {useRouter} from "vue-router";
 import type {FormRules} from "element-plus";

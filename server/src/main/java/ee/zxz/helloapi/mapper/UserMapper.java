@@ -66,7 +66,7 @@ public interface UserMapper {
     /**
      * CheckUserKeyExists - 检查用户密钥是否存在
      *
-     * @param key    密钥
+     * @param key 密钥
      * @return 返回条数大于0则为密钥存在
      */
     @Select("SELECT COUNT(*) FROM `helloapi_user_keys` WHERE `key` = #{key}")
@@ -129,8 +129,8 @@ public interface UserMapper {
     /**
      * ResetUserKey - 重置用户密钥
      *
-     * @param userId 用户ID
-     * @param key    密钥
+     * @param userId  用户ID
+     * @param key     密钥
      * @param created 创建时间
      */
     @Insert("INSERT INTO `helloapi_user_keys` (`user_id`, `key`,`created`) VALUES (#{userId}, #{key},#{created}) ON DUPLICATE KEY UPDATE `key` = #{key},`created` = #{created}")
@@ -141,6 +141,35 @@ public interface UserMapper {
      *
      * @return 返回用户数量
      */
-     @Select("SELECT COUNT(*) FROM `helloapi_users`")
+    @Select("SELECT COUNT(*) FROM `helloapi_users`")
     int getUserCount();
+
+    /**
+     * GetUserListSearch - 获取用户列表(搜索)
+     *
+     * @param userId      用户ID
+     * @param keyword     搜索关键词
+     * @param type        类型 0免费 1付费 -1表示不筛选
+     * @param status      状态 0正常 1异常 2维护 -1表示不筛选
+     * @param view_status 视图状态 0通过 1拒绝 2审核中 -1表示不筛选
+     * @param pageSize    每页数量
+     * @param offset      偏移量
+     * @return 返回用户列表，否则返回null
+     */
+    @Select("SELECT * FROM `helloapi_api_apps` WHERE `user_id` = #{userId} AND (#{keyword} IS NULL OR #{keyword} = '' OR `title` LIKE CONCAT('%', #{keyword}, '%') OR `smallTitle` LIKE CONCAT('%', #{keyword}, '%')) AND (#{type} = -1 OR `type` = #{type}) AND (#{status} = -1 OR `status` = #{status}) AND (#{view_status} = -1 OR `view_status` = #{view_status}) ORDER BY created DESC LIMIT #{pageSize} OFFSET #{offset}")
+    List<ApiApp> getUserListSearch(int userId, String keyword, int type, int status, int view_status, int pageSize, int offset);
+
+    /**
+     * GetUserListSearchCount - 获取用户列表(搜索)总数量
+     *
+     * @param userId      用户ID
+     * @param keyword     搜索关键词
+     * @param type        类型 0免费 1付费 -1表示不筛选
+     * @param status      状态 0正常 1异常 2维护 -1表示不筛选
+     * @param view_status 视图状态 0通过 1拒绝 2审核中 -1表示不筛选
+     * @return 返回用户列表(搜索)总数量
+     */
+    @Select("SELECT COUNT(*) FROM `helloapi_api_apps` WHERE `user_id` = #{userId} AND (#{keyword} IS NULL OR #{keyword} = '' OR `title` LIKE CONCAT('%', #{keyword}, '%') OR `smallTitle` LIKE CONCAT('%', #{keyword}, '%')) AND (#{type} = -1 OR `type` = #{type}) AND (#{status} = -1 OR `status` = #{status}) AND (#{view_status} = -1 OR `view_status` = #{view_status})")
+    int getUserListSearchCount(int userId, String keyword, int type, int status, int view_status);
+
 }

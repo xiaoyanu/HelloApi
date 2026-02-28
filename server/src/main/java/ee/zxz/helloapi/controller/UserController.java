@@ -65,6 +65,13 @@ public class UserController {
         return userService.getUserApiList(requestParam, request);
     }
 
+    // UserApiListSearch - 用户API列表搜索 - GET
+    @GetMapping("/AppList/Search")
+    @RequiresLogin
+    public Map<String, Object> UserApiListSearch(@RequestParam(required = false) Map<String, String> requestParam, HttpServletRequest request) {
+        return userService.userApiListSearch(requestParam, request);
+    }
+
     // ResetUserKey - 重置用户密钥 - PUT
     @PutMapping({"/key/", "/key/{userId}", "/key"})
     @RequiresLogin()

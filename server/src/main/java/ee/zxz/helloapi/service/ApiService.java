@@ -25,9 +25,6 @@ public interface ApiService {
     // 获取API应用详情
     Map<String, Object> getApiApp(String apiId);
 
-    // 删除API参数
-    Map<String, Object> deleteApiParam(String apiID, Map<String, String> requestBody, HttpServletRequest request);
-
     // 创建API密钥
     Map<String, Object> createApiKey(String finalApiID, Map<String, Object> requestBody, HttpServletRequest request);
 

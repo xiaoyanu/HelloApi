@@ -1,5 +1,6 @@
-import request from '@/utils/request'
+import request from '@/utils/request.ts'
 import {HelloAPIConfig} from "@/config/config.ts";
+import type {selectForm} from "@/types";
 
 const apiUrl = '/api/v1/user'
 
@@ -22,5 +23,18 @@ export const GetUserAppList =
             ...(userid != 0 && {id: userid}),
             page: page,
             pageSize: pageSize,
+        }
+    })
+
+// 用户接口列表搜索
+export const UserAppListSearch = (form: selectForm, pageSize: number, page: number): any =>
+    request.get(apiUrl + '/AppList/Search', {
+        params: {
+            keywords: form.keywords,
+            type: form.type,
+            status: form.status,
+            view_status: form.view_status,
+            pageSize: pageSize,
+            page: page,
         }
     })

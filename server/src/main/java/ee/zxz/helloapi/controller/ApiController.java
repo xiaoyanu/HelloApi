@@ -60,14 +60,6 @@ public class ApiController {
         return apiService.getApiApp(finalApiID);
     }
 
-    // DeleteApiParam - 删除API参数 - DELETE
-    @DeleteMapping({"/param/{apiID}", "/param/"})
-    @RequiresLogin
-    public Map<String, Object> DeleteApiParam(@PathVariable(required = false) String apiID, @RequestBody Map<String, String> requestBody, HttpServletRequest request) {
-        String finalApiID = (apiID == null) ? "0" : apiID;
-        return apiService.deleteApiParam(finalApiID, requestBody, request);
-    }
-
     // CreateApiKey - 创建API密钥 - POST
     @PostMapping({"/key/{api_id}", "/key/"})
     @RequiresLogin

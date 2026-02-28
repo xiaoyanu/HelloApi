@@ -104,25 +104,6 @@ public interface ApiMapper {
     int checkApiParamExistObj(ApiParam apiParam);
 
     /**
-     * API参数是否存在
-     *
-     * @param apiId API ID
-     * @param name  参数名
-     * @return 大于0表示存在
-     */
-    @Select("select count(*) from helloapi_api_params where api_id = #{apiId} and name = #{name}")
-    int checkApiParamExist(int apiId, String name);
-
-    /**
-     * 删除API参数
-     *
-     * @param apiId API ID
-     * @param name  参数名
-     */
-    @Delete("delete from helloapi_api_params where api_id = #{apiId} and name = #{name}")
-    void deleteApiParam(int apiId, String name);
-
-    /**
      * 删除API所有参数
      *
      * @param apiId API ID

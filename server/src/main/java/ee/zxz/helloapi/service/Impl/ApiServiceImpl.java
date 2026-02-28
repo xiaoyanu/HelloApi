@@ -76,9 +76,11 @@ public class ApiServiceImpl implements ApiService {
         try {
             ApiApp apiApp = new ApiApp();
             int user_id = (int) request.getAttribute("userId");
+            getRequestApiApp(requestBody, apiApp, user_id);
             if (userMapper.checkUserIdExists(user_id) < 1) {
                 return ResponseUtil.response(401, Finals.MESSAGES_ERROR_USER_NOT_FOUND);
             }
+            // 检查审核状态
             if (apiApp.getView_status() != 2) {
                 // 检测是不是管理员
                 int userMode = (int) request.getAttribute("userMode");
@@ -86,10 +88,28 @@ public class ApiServiceImpl implements ApiService {
                     return ResponseUtil.response(400, Finals.MESSAGES_ERROR_NOT_ADMIN);
                 }
             }
-            getRequestApiApp(requestBody, apiApp, user_id);
             Object param = requestBody.get("params");
             List<ApiParam> params = JSON.parseArray(JSON.toJSONString(param), ApiParam.class);
             List<ApiParam> uniqueParams = Tools.deleteDuplicatesList(params, ApiParam::getName);
+
+            // 校验参数
+            if (!uniqueParams.isEmpty()) {
+                for (int i = 0; i < uniqueParams.size(); i++) {
+                    ApiParam p = uniqueParams.get(i);
+                    if (p.getName() == null || p.getName().trim().isEmpty()) {
+                        return ResponseUtil.response(400, "第 " + (i + 1) + " 行参数的参数名不能为空");
+                    }
+                    if (p.getRequired() != 0 && p.getRequired() != 1) {
+                        return ResponseUtil.response(400, "第 " + (i + 1) + " 行参数的必填项不能为空");
+                    }
+                    if (p.getType() == null || p.getType().trim().isEmpty()) {
+                        return ResponseUtil.response(400, "第 " + (i + 1) + " 行参数的类型不能为空");
+                    }
+                    if (p.getMsg() == null || p.getMsg().trim().isEmpty()) {
+                        return ResponseUtil.response(400, "第 " + (i + 1) + " 行参数的描述不能为空");
+                    }
+                }
+            }
             // 创建应用
             if (apiMapper.createApiApp(apiApp) > 0) {
                 for (ApiParam apiParam : uniqueParams) {
@@ -127,6 +147,7 @@ public class ApiServiceImpl implements ApiService {
             }
 
             ApiApp apiApp = new ApiApp();
+            getRequestApiApp(requestBody, apiApp, userId);
             // 校验审核状态
             if (apiApp.getView_status() != 2) {
                 // 检测是不是管理员
@@ -135,10 +156,31 @@ public class ApiServiceImpl implements ApiService {
                 }
             }
             apiApp.setId(intApiId);
-            getRequestApiApp(requestBody, apiApp, userId);
             Object param = requestBody.get("params");
             List<ApiParam> params = JSON.parseArray(JSON.toJSONString(param), ApiParam.class);
             List<ApiParam> uniqueParams = Tools.deleteDuplicatesList(params, ApiParam::getName);
+            // 校验参数
+            if (!uniqueParams.isEmpty()) {
+                for (int i = 0; i < uniqueParams.size(); i++) {
+                    ApiParam p = uniqueParams.get(i);
+                    if (p.getName() == null || p.getName().trim().isEmpty()) {
+                        return ResponseUtil.response(400, "第 " + (i + 1) + " 行参数的参数名不能为空");
+                    }
+                    if (p.getRequired() != 0 && p.getRequired() != 1) {
+                        return ResponseUtil.response(400, "第 " + (i + 1) + " 行参数的必填项不能为空");
+                    }
+                    if (p.getType() == null || p.getType().trim().isEmpty()) {
+                        return ResponseUtil.response(400, "第 " + (i + 1) + " 行参数的类型不能为空");
+                    }
+                    if (p.getMsg() == null || p.getMsg().trim().isEmpty()) {
+                        return ResponseUtil.response(400, "第 " + (i + 1) + " 行参数的描述不能为空");
+                    }
+                }
+            }
+
+            // 删除所有参数
+            apiMapper.deleteApiParamAll(intApiId);
+
             // 更新应用
             if (apiMapper.updateApiApp(apiApp) > 0) {
                 for (ApiParam apiParam : uniqueParams) {
@@ -201,7 +243,7 @@ public class ApiServiceImpl implements ApiService {
 
     @Override
     public Map<String, Object> searchApiList(Map<String, String> requestParam) {
-        String keyword = requestParam.get("keyword");
+        String keyword = requestParam.get("keywords");
         if (keyword == null || keyword.isEmpty()) {
             return ResponseUtil.response(400, Finals.MESSAGES_ERROR_PARAM);
         }
@@ -224,7 +266,6 @@ public class ApiServiceImpl implements ApiService {
         response.put("list", list);
         return ResponseUtil.success(response);
     }
-
 
     @Override
     public Map<String, Object> getApiApp(String apiId) {
@@ -255,38 +296,6 @@ public class ApiServiceImpl implements ApiService {
         }
         map.put("params", paramList);
         return ResponseUtil.success(map);
-    }
-
-    @Override
-    public Map<String, Object> deleteApiParam(String apiId, Map<String, String> requestBody, HttpServletRequest request) {
-        int intApiId = Tools.strToInt(apiId);
-        String name = requestBody.get("name").trim();
-        if (name.isEmpty()) {
-            return ResponseUtil.response(400, Finals.MESSAGES_ERROR_PARAM);
-        }
-        // 检查API是否存在
-        if (apiMapper.checkApiExist(intApiId) < 1) {
-            return ResponseUtil.response(400, Finals.MESSAGES_ERROR_API_NOT_FOUND);
-        }
-        // 检查是否是创建人或管理员
-        int userId = (int) request.getAttribute("userId");
-        if (userMapper.checkUserIdExists(userId) < 1) {
-            return ResponseUtil.response(401, Finals.MESSAGES_ERROR_USER_NOT_FOUND);
-        }
-        if (apiMapper.checkApiCreator(intApiId, userId) < 1) {
-            int userMode = (int) request.getAttribute("userMode");
-            if (userMode != Finals.Admin) {
-                return ResponseUtil.response(400, Finals.MESSAGES_ERROR_NOT_CREATOR);
-            }
-        }
-
-
-        if (apiMapper.checkApiParamExist(intApiId, name) < 1) {
-            return ResponseUtil.response(400, Finals.MESSAGES_ERROR_PARAM_NOT_FOUND);
-        }
-        apiMapper.deleteApiParam(intApiId, name);
-
-        return ResponseUtil.success();
     }
 
     @Override
@@ -551,6 +560,7 @@ public class ApiServiceImpl implements ApiService {
         apiApp.setSendType((Integer) requestBody.get("sendType"));
         apiApp.setReturnType((String) requestBody.get("returnType"));
         apiApp.setReturnContent((String) requestBody.get("returnContent"));
+        apiApp.setView_status((Integer) requestBody.get("view_status"));
         apiApp.setUser_id(userId);
         apiApp.setCreated(System.currentTimeMillis());
     }

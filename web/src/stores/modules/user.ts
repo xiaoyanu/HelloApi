@@ -1,6 +1,6 @@
 import {defineStore} from 'pinia'
 import {ref} from 'vue'
-import {GetUserInfo} from "@/api/user.ts";
+import {GetUserInfo} from "@/api";
 import type {User} from "@/types";
 
 

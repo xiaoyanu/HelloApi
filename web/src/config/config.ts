@@ -15,7 +15,7 @@ const HelloAPIConfig = {
         },
         admin: {
             // 每页显示数量，影响范围：后台页面
-            pageSize: 20,
+            pageSize: 10,
         },
         // 页脚信息
         footer: `Powered by <a href="https://github.com/xiaoyanu/HelloAPI" target="_blank">HelloAPI</a>`,

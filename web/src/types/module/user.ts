@@ -53,3 +53,11 @@ export interface User {
     mail?: string;
     nick?: string;
 }
+
+// 用于筛选条件
+export type selectForm = {
+    keywords: string;
+    type: number;
+    status: number;
+    view_status: number;
+}

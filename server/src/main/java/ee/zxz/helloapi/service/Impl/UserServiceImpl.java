@@ -360,4 +360,52 @@ public class UserServiceImpl implements UserService {
         userMapper.resetUserKey(intUserId, key, System.currentTimeMillis());
         return ResponseUtil.success(key);
     }
+
+    @Override
+    public Map<String, Object> userApiListSearch(Map<String, String> requestParam, HttpServletRequest request) {
+        int userId = (int) request.getAttribute("userId");
+        // 如果携带了ID，则验证是不是管理员，只有管理才可以带ID
+        if (requestParam.get("id") != null && !requestParam.get("id").trim().isEmpty()) {
+            if ((int) request.getAttribute("userMode") != Finals.Admin) {
+                return ResponseUtil.response(403, Finals.MESSAGES_ERROR_NOT_ADMIN);
+            }
+            userId = Tools.strToInt(requestParam.get("id"));
+            if (userMapper.checkUserIdExists(userId) < 1) {
+                return ResponseUtil.response(400, Finals.MESSAGES_ERROR_USER_NOT_FOUND);
+            }
+        }
+        String keyword = requestParam.get("keywords");
+        // status，view_status，type 他们的-1表示不筛选
+        int type = Tools.strToInt(requestParam.get("type"));
+        int status = Tools.strToInt(requestParam.get("status"));
+        int view_status = Tools.strToInt(requestParam.get("view_status"));
+        int pageSize = Tools.strToInt(requestParam.get("pageSize"));
+        int page = Tools.strToInt(requestParam.get("page"));
+        if (pageSize < 1) {
+            pageSize = 30;
+        }
+        if (page < 1) {
+            page = 1;
+        }
+
+        Map<String, Object> resultMap = new LinkedHashMap<>();
+        List<Map<String, Object>> apiInfoList = new ArrayList<>();
+        // 获取用户API总数量
+        int total = userMapper.getUserListSearchCount(userId, keyword, type, status, view_status);
+        // 获取用户API列表
+        for (ApiApp apiApp : userMapper.getUserListSearch(userId, keyword, type, status, view_status, pageSize, Tools.getPageOffset(page, pageSize))) {
+            Map<String, Object> map = new LinkedHashMap<>();
+            map.put("id", apiApp.getId());
+            map.put("title", apiApp.getTitle());
+            map.put("type", apiApp.getType());
+            map.put("status", apiApp.getStatus());
+            map.put("created", apiApp.getCreated());
+            map.put("user_id", apiApp.getUser_id());
+            map.put("view_status", apiApp.getView_status());
+            apiInfoList.add(map);
+        }
+        resultMap.put("total", total);
+        resultMap.put("list", apiInfoList);
+        return ResponseUtil.response(200, "获取成功", resultMap);
+    }
 }

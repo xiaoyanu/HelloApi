@@ -66,7 +66,7 @@ const copyAddress = () => {
     </div>
     <div class="pt-3.75">
       <div class="text-[20px] border-l-[5px] border-[#61677C] pl-1 mb-2">返回示例</div>
-      <div id="response">
+      <div id="response" >
         <m-d-view :text="`# 你好`" />
       </div>
     </div>
@@ -139,6 +139,7 @@ const copyAddress = () => {
     border: solid 1px #d1d9e6;
     width: 100%;
     padding: 10px;
+    user-select: text;
   }
 }
 

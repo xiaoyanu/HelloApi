@@ -1,10 +1,5 @@
 <script setup>
-import VMdPreview from '@kangc/v-md-editor/lib/preview';
-import '@kangc/v-md-editor/lib/style/preview.css';
-import vuepressTheme from '@kangc/v-md-editor/lib/theme/vuepress.js';
-import '@kangc/v-md-editor/lib/theme/style/vuepress.css';
-
-VMdPreview.use(vuepressTheme);
+import VMdEditor from '@kangc/v-md-editor';
 defineProps(
     {
       text: {
@@ -15,6 +10,10 @@ defineProps(
 )
 </script>
 <template>
-  <v-md-preview :text="text">
-  </v-md-preview>
+  <v-md-editor :model-value="text" mode="preview" />
 </template>
+<style scoped>
+:deep(.vuepress-markdown-body) {
+  background-color: #ECF0F3;
+}
+</style>
