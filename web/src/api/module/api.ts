@@ -43,4 +43,13 @@ export const GetUserApiKeyList =
         })
 
 // 创建API密钥
-export const CreateApiKey = (form: APIKey): any => request.post(apiUrl + '/key/' + form.apiId, form)
+export const CreateApiKey = (form: APIKey): any => request.post(apiUrl + '/key/' + form.api_id, form)
+
+// 获取API密钥详细信息
+export const GetApiKeyInfo = (key: string): any => request.get(apiUrl + '/key/' + key)
+
+// 更新API密钥
+export const UpdateApiKey = (key: string, form: APIKey): any => request.put(apiUrl + '/key/' + key, form)
+
+// 删除API密钥
+export const DeleteApiKey = (key: string): any => request.delete(apiUrl + '/key/' + key)

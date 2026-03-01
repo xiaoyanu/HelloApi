@@ -4,9 +4,9 @@ import {GetUserAppList, GetApiInfo, CreateApi, UpdateApi, UserAppListSearch, Del
 import {onMounted, ref} from "vue";
 import type {AppList, App, Pagination, SelectFormApi} from "@/types";
 import type {FormRules} from "element-plus";
-import {dayjs} from "element-plus";
 import {useUserStore} from "@/stores";
 import {HelloAPIConfig} from "@/config/config.ts";
+import {formatNativeDate} from "@/utils/more.ts";
 
 const userStore = useUserStore();
 const tableData = ref<AppList[]>();
@@ -28,8 +28,12 @@ const handleSearch = async () => {
   }
   const res = await UserAppListSearch(searchForm.value, paging.value.pageSize, paging.value.page);
   if (res.data.code == 200) {
-    tableData.value = res.data.data.list;
+    const rawList = res.data.data.list;
     paging.value.total = res.data.data.total
+    tableData.value = rawList.map((item: any) => ({
+      ...item,
+      createdText: formatNativeDate(item.created),
+    }));
   }
 }
 
@@ -97,8 +101,12 @@ const getTableData = async () => {
   }
   const res = await GetUserAppList(0, paging.value.page, paging.value.pageSize);
   if (res.data.code == 200) {
-    tableData.value = res.data.data.list;
+    const rawList = res.data.data.list;
     paging.value.total = res.data.data.total
+    tableData.value = rawList.map((item: any) => ({
+      ...item,
+      createdText: formatNativeDate(item.created),
+    }));
   }
 }
 
@@ -169,7 +177,7 @@ const submitFormUpdate = () => {
       const res = await UpdateApi(nowRow.value.id, formData.value)
       if (res.data.code == 200) {
         reloadTable()
-        ElMessage.success('更新成功')
+        ElMessage.success('编辑成功')
         showDrawer.value = false
       }
     }
@@ -386,7 +394,7 @@ onMounted(() => {
       </el-table-column>
       <el-table-column label="创建日期" minWidth="150">
         <template #default="{ row }">
-          {{ dayjs(row.created).format('YYYY年MM月DD日 HH:mm') }}
+          {{ row.createdText }}
         </template>
       </el-table-column>
       <el-table-column label="状态">

@@ -158,9 +158,10 @@ public interface ApiMapper {
      * @param started 开始时间
      * @param expired 过期时间
      * @param count   调用次数
+     * @param desc    密钥描述
      */
-    @Insert("insert into helloapi_api_keys (`api_id`, `key` , `type`, `started`,`expired`,`count`) values (#{apiId}, #{key}, #{type}, #{started}, #{expired}, #{count})")
-    void createApiKey(int apiId, String key, int type, LocalDateTime started, LocalDateTime expired, int count);
+    @Insert("insert into helloapi_api_keys (`api_id`, `key` , `type`, `started`,`expired`,`count`,`desc`) values (#{apiId}, #{key}, #{type}, #{started}, #{expired}, #{count}, #{desc})")
+    void createApiKey(int apiId, String key, int type, LocalDateTime started, LocalDateTime expired, int count, String desc);
 
     /**
      * 查询API密钥是否存在
@@ -225,9 +226,10 @@ public interface ApiMapper {
      * @param started 开始时间
      * @param expired 过期时间
      * @param count   调用次数
+     * @param desc    密钥描述
      */
-    @Update("update helloapi_api_keys set `type` = #{type}, `started` = #{started}, `expired` = #{expired}, `count` = #{count} where `key` = #{key}")
-    void updateApiKey(String key, int type, LocalDateTime started, LocalDateTime expired, int count);
+    @Update("update helloapi_api_keys set `type` = #{type}, `started` = #{started}, `expired` = #{expired}, `count` = #{count}, `desc` = #{desc} where `key` = #{key}")
+    void updateApiKey(String key, int type, LocalDateTime started, LocalDateTime expired, int count, String desc);
 
     /**
      * 删除API密钥

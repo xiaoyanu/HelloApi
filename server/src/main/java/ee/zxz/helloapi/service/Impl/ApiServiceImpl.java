@@ -312,20 +312,34 @@ public class ApiServiceImpl implements ApiService {
         }
 
         int type = (int) requestBody.get("type");
-        LocalDateTime started, expired;
-        try {
-            started = LocalDateTime.parse((String) requestBody.get("started"));
-            expired = LocalDateTime.parse((String) requestBody.get("expired"));
-        } catch (Exception e) {
-            return ResponseUtil.response(400, Finals.MESSAGES_ERROR_PARAM);
-        }
-
-        // 如果过期时间早于开始时间，返回错误
-        if (!expired.isAfter(started)) {
-            return ResponseUtil.response(400, Finals.MESSAGES_ERROR_PARAM);
+        LocalDateTime started = null;
+        LocalDateTime expired = null;
+        if (requestBody.get("started") != null && !((String) requestBody.get("started")).isEmpty() &&
+                requestBody.get("expired") != null && !((String) requestBody.get("expired")).isEmpty()) {
+            try {
+                started = LocalDateTime.parse((String) requestBody.get("started"));
+                expired = LocalDateTime.parse((String) requestBody.get("expired"));
+            } catch (Exception e) {
+                return ResponseUtil.response(400, Finals.MESSAGES_ERROR_PARAM);
+            }
+            // 如果过期时间早于开始时间，返回错误
+            if (!expired.isAfter(started)) {
+                return ResponseUtil.response(400, Finals.MESSAGES_ERROR_PARAM);
+            }
         }
 
         int count = (int) requestBody.get("count");
+
+        if (type == 0) {
+            if (started == null) {
+                return ResponseUtil.response(400, Finals.MESSAGES_ERROR_PARAM);
+            }
+        }
+        if (type == 1) {
+            if (count < 0) {
+                return ResponseUtil.response(400, Finals.MESSAGES_ERROR_PARAM);
+            }
+        }
 
         // 生成密钥
         String key = Tools.getTextMd5(String.valueOf(intApiId) + System.currentTimeMillis());
@@ -333,7 +347,7 @@ public class ApiServiceImpl implements ApiService {
             key = Tools.getTextMd5(String.valueOf(intApiId) + System.currentTimeMillis());
         }
 
-        apiMapper.createApiKey(intApiId, key, type, started, expired, count);
+        apiMapper.createApiKey(intApiId, key, type, started, expired, count, (String) requestBody.get("desc"));
 
         return ResponseUtil.success(key);
     }
@@ -388,22 +402,35 @@ public class ApiServiceImpl implements ApiService {
         }
 
         int type = (int) requestBody.get("type");
-        LocalDateTime started, expired;
-        try {
-            started = LocalDateTime.parse((String) requestBody.get("started"));
-            expired = LocalDateTime.parse((String) requestBody.get("expired"));
-        } catch (Exception e) {
-            return ResponseUtil.response(400, Finals.MESSAGES_ERROR_PARAM);
-        }
-
-        // 如果过期时间早于开始时间，返回错误
-        if (!expired.isAfter(started)) {
-            return ResponseUtil.response(400, Finals.MESSAGES_ERROR_PARAM);
+        LocalDateTime started = null;
+        LocalDateTime expired = null;
+        if (requestBody.get("started") != null && !((String) requestBody.get("started")).isEmpty() &&
+                requestBody.get("expired") != null && !((String) requestBody.get("expired")).isEmpty()) {
+            try {
+                started = LocalDateTime.parse((String) requestBody.get("started"));
+                expired = LocalDateTime.parse((String) requestBody.get("expired"));
+            } catch (Exception e) {
+                return ResponseUtil.response(400, Finals.MESSAGES_ERROR_PARAM);
+            }
+            // 如果过期时间早于开始时间，返回错误
+            if (!expired.isAfter(started)) {
+                return ResponseUtil.response(400, Finals.MESSAGES_ERROR_PARAM);
+            }
         }
 
         int count = (int) requestBody.get("count");
+        if (type == 0) {
+            if (started == null) {
+                return ResponseUtil.response(400, Finals.MESSAGES_ERROR_PARAM);
+            }
+        }
+        if (type == 1) {
+            if (count < 0) {
+                return ResponseUtil.response(400, Finals.MESSAGES_ERROR_PARAM);
+            }
+        }
 
-        apiMapper.updateApiKey(finalKey, type, started, expired, count);
+        apiMapper.updateApiKey(finalKey, type, started, expired, count, (String) requestBody.get("desc"));
 
         return ResponseUtil.success();
     }

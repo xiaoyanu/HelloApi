@@ -3,7 +3,7 @@ package ee.zxz.helloapi.domain;
 import java.time.LocalDateTime;
 
 public class ApiKey {
-    private int app_id;
+    private int api_id;
     private String key;
     private LocalDateTime created;
     private LocalDateTime updated;
@@ -11,13 +11,14 @@ public class ApiKey {
     private LocalDateTime started;
     private LocalDateTime expired;
     private long count;
+    private String desc;
 
-    public int getApp_id() {
-        return app_id;
+    public int getApi_id() {
+        return api_id;
     }
 
-    public void setApp_id(int app_id) {
-        this.app_id = app_id;
+    public void setApi_id(int api_id) {
+        this.api_id = api_id;
     }
 
     public String getKey() {
@@ -74,5 +75,13 @@ public class ApiKey {
 
     public void setCount(long count) {
         this.count = count;
+    }
+
+    public String getDesc() {
+        return desc;
+    }
+
+    public void setDesc(String desc) {
+        this.desc = desc;
     }
 }

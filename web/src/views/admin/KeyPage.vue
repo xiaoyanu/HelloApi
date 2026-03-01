@@ -1,15 +1,21 @@
 <script lang="ts" setup>
 import {Plus, Delete, Edit, Search, Refresh} from "@element-plus/icons-vue";
-import {GetUserApiKeyList, GetApiInfo, UpdateApi, UserAppListSearch, DeleteApi, CreateApiKey} from "@/api";
-import {onMounted, ref, watch} from "vue";
-import type {AppList, Pagination, SelectFormApiKey, APIKey} from "@/types";
+import {GetUserApiKeyList, GetApiKeyInfo, UpdateApiKey, UserAppListSearch, DeleteApiKey, CreateApiKey} from "@/api";
+import {onMounted, reactive, ref, watch} from "vue";
+import type {Pagination, SelectFormApiKey, APIKey} from "@/types";
 import {dayjs, type FormRules} from "element-plus";
 import {HelloAPIConfig} from "@/config/config.ts";
 import {useUserStore} from "@/stores";
+import {formatDuration, formatNativeDate} from "@/utils/more.ts";
 
 const userStore = useUserStore();
-const tableData = ref<AppList[]>();
+const tableData = ref<APIKey[]>();
 const nowTableType = ref()
+
+const copyKey = async (key: string) => {
+  await navigator.clipboard.writeText(key);
+  ElMessage.success('复制成功')
+}
 
 // 搜索筛选表单
 const searchForm = ref<SelectFormApiKey>({
@@ -72,7 +78,7 @@ watch(dateArray, (newVal, _) => {
 // 提交表单
 const formRef = ref()
 const formData = ref<APIKey>({
-  apiId: null,
+  api_id: null,
   key: '',
   type: 0,
   created: '',
@@ -83,7 +89,7 @@ const formData = ref<APIKey>({
   desc: ''
 });
 
-// 获取用户发布的API接口列表
+// 获取用户的APIKEY列表
 const getTableData = async () => {
   if (nowTableType.value != 'list') {
     nowTableType.value = 'list'
@@ -91,8 +97,15 @@ const getTableData = async () => {
   }
   const res = await GetUserApiKeyList(userStore.user.id, paging.value.page, paging.value.pageSize);
   if (res.data.code == 200) {
-    tableData.value = res.data.data.list;
+    const rawList = res.data.data.list;
     paging.value.total = res.data.data.total
+    const now = Date.now();
+    tableData.value = rawList.map((item: any) => ({
+      ...item,
+      isExpired: Date.parse(item.expired) < now,
+      remainingTime: formatDuration(now, item.expired),
+      createdText: formatNativeDate(item.created)
+    }));
   }
 }
 
@@ -105,7 +118,7 @@ function handleNewPageChange(page: number) {
 // 重置formData
 const resetFormData = () => {
   formData.value = {
-    apiId: null,
+    api_id: null,
     key: '',
     type: 0,
     created: '',
@@ -124,7 +137,7 @@ const openDrawer = (type: string, row?: object) => {
   if (type === 'edit') {
     nowRow.value = row
   }
-  drawerTitle.value = type === 'create' ? '发布接口' : '编辑接口'
+  drawerTitle.value = type === 'create' ? '创建 APIKey' : '编辑 APIKey'
   showDrawer.value = true
 }
 
@@ -134,49 +147,83 @@ const submitFormCreate = async () => {
   const isValid = await formRef.value?.validate().catch(() => false);
   if (isValid) {
     // 提交表单
+    if (formData.value.type == 0) {
+      formData.value.count = 0
+    } else {
+      formData.value.started = ''
+      formData.value.expired = ''
+    }
     const res = await CreateApiKey(formData.value)
     if (res.data.code == 200) {
       void getTableData()
-      ElMessage.success('发布成功')
+      ElMessage.success('创建成功')
       showDrawer.value = false
     }
   }
 }
 
-// 更新接口
-const submitFormUpdate = () => {
-  ElMessageBox.confirm('确定要编辑并发布吗？编辑后需要重新审核', '提示', {
-    confirmButtonText: '确定',
-    cancelButtonText: '取消',
-    type: 'warning',
-  }).then(async () => {
-    // 校验表单
-    const isValid = await formRef.value?.validate().catch(() => false);
-    if (isValid) {
-      // 提交表单
-      const res = await UpdateApi(nowRow.value.id, formData.value)
-      if (res.data.code == 200) {
-        reloadTable()
-        ElMessage.success('更新成功')
-        showDrawer.value = false
-      }
+// 更新APIKey
+const submitFormUpdate = async () => {
+  // 校验表单
+  const isValid = await formRef.value?.validate().catch(() => false);
+  if (isValid) {
+    // 提交表单
+    if (formData.value.type == 0) {
+      formData.value.count = 0
+    } else {
+      formData.value.started = ''
+      formData.value.expired = ''
     }
-  }).catch(() => {
-  })
+    const res = await UpdateApiKey(nowRow.value.key, formData.value)
+    if (res.data.code == 200) {
+      reloadTable()
+      ElMessage.success('编辑成功')
+      showDrawer.value = false
+    }
+  }
 }
 
 // 表单校验
-const rules: FormRules = {
+const rules: FormRules = reactive({
   type: [
-    {required: true, message: '类型', trigger: 'change'}
+    {required: true, message: '请选择接口类型', trigger: 'change'}
+  ],
+  api_id: [
+    {required: true, message: '请输入接口 Api ID', trigger: 'blur'}
+  ],
+  // 备注长度校验
+  desc: [
+    {max: 255, message: '备注长度不得超过 255 个字符', trigger: 'blur'}
+  ],
+  // 自定义校验逻辑
+  validateDynamicField: [
+    {
+      validator: (_, __, callback) => {
+        console.log("我走校验了" + formData.value.type)
+        console.log(dateArray)
+        if (formData.value.type == 0) {
+          if (!dateArray.value || dateArray.value[0] === '' || dateArray.value[1] === '' || dateArray.value[0] == null || dateArray.value[1] == null) {
+            return callback(new Error('请选择有效期限'));
+          }
+        }
+        if (formData.value.type == 1) {
+          if (formData.value.count === undefined || formData.value.count === null || formData.value.count < 0) {
+            return callback(new Error('请输入可用次数'));
+          }
+        }
+        callback();
+      },
+      trigger: ['blur', 'change']
+    }
   ]
-}
+})
 
 const onDrawerLoadOver = async () => {
-  if (nowRow.value?.id) {
-    const res = await GetApiInfo(nowRow.value.id)
+  if (nowRow.value?.api_id) {
+    const res = await GetApiKeyInfo(nowRow.value.key)
     if (res.data.code == 200) {
       formData.value = res.data.data
+      dateArray.value = [res.data.data.started, res.data.data.expired]
     }
   }
 }
@@ -226,8 +273,8 @@ const onDrawerClose = () => {
   nowRow.value = undefined;
 }
 
-const handleDelete = (id: number) => {
-  ElMessageBox.confirm('确定要删除吗？删除后将无法恢复！<br /><strong>所有相关的 APIKey、调用记录等也将被删除</strong>', '提示',
+const handleDelete = (key: string) => {
+  ElMessageBox.confirm('确定要删除吗？删除后将无法恢复！', '提示',
       {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
@@ -235,7 +282,7 @@ const handleDelete = (id: number) => {
         dangerouslyUseHTMLString: true,
       }
   ).then(async () => {
-    const res = await DeleteApi(id)
+    const res = await DeleteApiKey(key)
     if (res.data.code == 200) {
       reloadTable()
       ElMessage.success('删除成功')
@@ -312,12 +359,18 @@ onMounted(() => {
     <el-table :data="tableData" class="w-full">
       <el-table-column label="Api ID">
         <template #default="{row}">
-          {{ row.id }}
+          {{ row.api_id }}
         </template>
       </el-table-column>
-      <el-table-column label="APIKey" minWidth="250">
+      <el-table-column label="APIKey" minWidth="160">
         <template #default="{row}">
-          {{ row.title }}
+          <el-link
+              target="_blank"
+              type="info"
+              @click="copyKey(row.key)"
+          >
+            {{ row.key }}
+          </el-link>
         </template>
       </el-table-column>
       <el-table-column label="类型">
@@ -327,20 +380,27 @@ onMounted(() => {
           </el-tag>
         </template>
       </el-table-column>
+      <el-table-column label="创建日期" minWidth="150">
+        <template #default="{ row }">
+          {{ row.createdText }}
+        </template>
+      </el-table-column>
       <el-table-column label="有效期 / 调用次数" minWidth="150">
         <template #default="{ row }">
           <el-tag type="primary">
-            1年
+            <span v-if="row.started">{{ row.remainingTime }}</span>
+            <span v-else>-</span>
           </el-tag>&nbsp;
           <el-tag type="warning">
-            2026
+            <span v-if="row.type==1">{{ row.count }}</span>
+            <span v-else>-</span>
           </el-tag>
         </template>
       </el-table-column>
       <el-table-column label="状态">
         <template #default="{ row }">
-          <el-tag :type="row.status === 1 ? 'danger' : 'success'">
-            {{ row.status === 1 ? '失效' : '有效' }}
+          <el-tag :type="row.isExpired ? 'danger' : 'success'">
+            {{ row.isExpired ? '失效' : '有效' }}
           </el-tag>
         </template>
       </el-table-column>
@@ -358,7 +418,7 @@ onMounted(() => {
               circle
               plain
               type="danger"
-              @click="handleDelete(row.id)"
+              @click="handleDelete(row.key)"
           ></el-button>
         </template>
       </el-table-column>
@@ -395,10 +455,10 @@ onMounted(() => {
               <el-radio-button :value="1" label="计次"/>
             </el-radio-group>
           </el-form-item>
-          <el-form-item label="所属接口" prop="url">
-            <el-input v-model="formData.apiId" placeholder="请输入接口Api ID，例如：1"/>
+          <el-form-item label="所属接口" prop="api_id">
+            <el-input v-model="formData.api_id" placeholder="请输入接口Api ID，例如：1"/>
           </el-form-item>
-          <el-form-item v-if="formData.type==0" label="有效期限" prop="started">
+          <el-form-item v-if="formData.type==0" label="有效期限" prop="validateDynamicField">
             <el-date-picker
                 v-model="dateArray"
                 :shortcuts="shortcuts"
@@ -411,10 +471,10 @@ onMounted(() => {
                 value-format="YYYY-MM-DD HH:mm:ss"
             />
           </el-form-item>
-          <el-form-item v-if="formData.type==1" label="可用次数" prop="count">
+          <el-form-item v-if="formData.type==1" label="可用次数" prop="validateDynamicField">
             <el-input-number v-model="formData.count" :max="9999999999" :min="0" :step="20"/>
           </el-form-item>
-          <el-form-item label="备&emsp;&emsp;注" prop="smallTitle">
+          <el-form-item label="备&emsp;&emsp;注" prop="desc">
             <el-input v-model="formData.desc" :maxlength="255" autosize placeholder="可填写备注，例如：测试用"
                       type="textarea"/>
           </el-form-item>

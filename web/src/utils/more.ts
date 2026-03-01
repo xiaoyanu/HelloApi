@@ -1,4 +1,5 @@
 import {MD5} from 'crypto-js'
+
 const formatter = new Intl.NumberFormat('en-US');
 
 /**
@@ -54,4 +55,36 @@ export const formatNumber = (num: number): string => {
         result = formatter.format(absNum);
     }
     return isNegative ? `-${result}` : result;
+};
+
+
+export const formatDuration = (now: number, end: string): string => {
+    const target = Date.parse(end);
+    if (Number.isNaN(target) || target <= now) return '0天';
+    const dNow = new Date(now);
+    const dTarget = new Date(target);
+    let years = dTarget.getFullYear() - dNow.getFullYear();
+    let months = dTarget.getMonth() - dNow.getMonth();
+    let days = dTarget.getDate() - dNow.getDate();
+    if (days < 0) {
+        months -= 1;
+        days += new Date(dTarget.getFullYear(), dTarget.getMonth(), 0).getDate();
+    }
+    if (months < 0) {
+        years -= 1;
+        months += 12;
+    }
+    let str = '';
+    if (years > 0) str += years + '年';
+    if (months > 0) str += months + '月';
+    if (days > 0 || str === '') str += days + '天';
+    return str;
+};
+
+// 格式化原生日期字符串为易读格式
+export const formatNativeDate = (dateStr: string) => {
+    const d = new Date(dateStr);
+    if (Number.isNaN(d.getTime())) return '-';
+    const pad = (n: number) => n.toString().padStart(2, '0');
+    return `${d.getFullYear()}年${pad(d.getMonth() + 1)}月${pad(d.getDate())}日 ${pad(d.getHours())}:${pad(d.getMinutes())}`;
 };

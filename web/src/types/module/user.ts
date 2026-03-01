@@ -10,6 +10,8 @@ export interface AppList {
     user_id: number;
     // 显示状态 0正常 1拒绝 2审核中
     view_status: number;
+    // 前端专属参数，后端不返回
+    createdText?: string;
 }
 
 // 用于编辑插件/创建插件
@@ -73,7 +75,7 @@ export type SelectFormApiKey = {
 
 // APIKey
 export type APIKey = {
-    apiId: number | null;
+    api_id: number | null;
     key: string;
     created: string;
     updated: string;
@@ -82,6 +84,12 @@ export type APIKey = {
     expired: string;
     count: number;
     desc: string;
+    // 是否过期，前端自定义字段，搜索时由后端返回
+    isExpired?: boolean;
+    // 剩余时间，前端专属判断用，后端不返回
+    remainingTime?: string;
+    // 创建时间文本，前端专属显示用，后端不返回
+    createdText?: string;
 }
 
 export type LoginForm = {
