@@ -17,31 +17,45 @@ const search = () => {
 </script>
 <template>
   <div class="bg-[#ecf0f3] w-full min-h-screen">
-    <div id="head" class="flex items-center justify-between h-16 leading-16 text-[#61677C] bg-[#ecf0f3]">
-      <div class="flex items-center ml-5 w-100">
-        <img alt="logo" class="h-12.5 w-12.5 rounded-[10px]" draggable="false" src="@/assets/images/logo.png">
-        <a class="text-[24px]" href="/">Hello API</a>
-        <img alt="统计" class="h-15 ml-12.5" draggable="false" src="https://api.zxz.ee/api/api_count/">
-      </div>
-      <div id="center" class="flex items-center justify-between">
-        <input v-model="keywords" class="w-60 p-2 h-8 text-[#61677c] text-[14px] bg-[#ecf0f3] rounded-lg"
-               placeholder="搜索接口…" type="text"
-               @keyup.enter="search">
-        <div class="flex items-center p-2 rounded-lg h-7.5 ml-3 cursor-pointer" @click="search">
-          <PhMagnifyingGlass size="15" weight="duotone"/>
-          &nbsp;搜索
+    <div id="head"
+         class="flex flex-wrap md:flex-nowrap items-center justify-between min-h-16 py-3 px-4 md:py-0 md:px-0 md:h-16 md:leading-16 text-[#61677C] bg-[#ecf0f3]">
+
+      <div class="flex items-center justify-between w-full md:w-auto md:ml-5">
+        <div class="flex items-center">
+          <img alt="logo" class="h-10 w-10 md:h-12.5 md:w-12.5 rounded-[10px]" draggable="false"
+               src="@/assets/images/logo.png">
+          <a class="text-[20px] md:text-[24px] ml-3 md:ml-0 md:pl-2" href="/">Hello API</a>
+        </div>
+        <img alt="统计" class="hidden lg:block h-15 ml-12.5" draggable="false" src="https://api.zxz.ee/api/api_count/">
+
+        <div class="block md:hidden">
+          <a class="wt-btn h-8 leading-8 px-4 inline-block text-center font-semibold rounded-lg bg-[#ecf0f3] text-[14px]"
+             href="/admin" target="_blank">登录</a>
         </div>
       </div>
-      <div class="mr-12.5">
-        <a id="wt" class="h-7.5 leading-7.5 w-25 inline-block text-center font-semibold rounded-lg bg-[#ecf0f3]"
+
+      <div id="center" class="flex items-center justify-between w-full md:w-auto mt-4 md:mt-0 order-last md:order-0">
+        <input v-model="keywords"
+               class="flex-1 md:flex-none md:w-60 p-2 h-8 text-[#61677c] text-[14px] bg-[#ecf0f3] rounded-lg"
+               placeholder="搜索接口…" type="text"
+               @keyup.enter="search">
+        <div class="flex items-center p-2 rounded-lg h-8 ml-3 cursor-pointer shrink-0 text-[14px]" @click="search">
+          <PhMagnifyingGlass size="15" weight="duotone"/>
+          <span class="ml-1">搜索</span>
+        </div>
+      </div>
+
+      <div class="hidden md:block mr-5 md:mr-12.5">
+        <a class="wt-btn h-8 leading-8 w-25 inline-block text-center font-semibold rounded-lg bg-[#ecf0f3] text-[14px]"
            href="/admin" target="_blank">登录 / 注册</a>
       </div>
     </div>
     <router-view/>
-    <div id="footer" class="mt-3.75 h-20 leading-20 text-[#61677C]">
-      <p class="text-center">
-        &copy; {{ getNowYear() }} All rights reserved.&nbsp;&nbsp;|&nbsp;&nbsp;<span
-          v-html="HelloAPIConfig.website.footer"></span>
+
+    <div id="footer" class="mt-3.75 min-h-20 py-4 text-[#61677C] flex items-center justify-center px-4">
+      <p class="text-center text-[12px] md:text-[14px] leading-relaxed">
+        &copy; {{ getNowYear() }} All rights reserved.&emsp;|&emsp;
+        <span v-html="HelloAPIConfig.website.footer"></span>
       </p>
     </div>
   </div>
@@ -61,12 +75,12 @@ a {
   text-shadow: 1px 1px 0 #FFF;
 }
 
-#wt {
+.wt-btn {
   box-shadow: -5px -5px 20px #FFF, 5px 5px 20px #d1d9e6;
   transition: all 0.2s ease-in-out;
 }
 
-#wt:hover {
+.wt-btn:hover {
   box-shadow: -2px -2px 5px #FFF, 2px 2px 5px #d1d9e6;
 }
 

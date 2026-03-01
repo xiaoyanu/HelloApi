@@ -58,18 +58,21 @@ onMounted(() => {
   getApiInfo()
 })
 </script>
+
 <template>
   <banner>{{ apiInfo.title }}</banner>
-  <div id="box" class="rounded-[15px] mx-auto mt-8 mb-8 w-275 flex p-3.75 flex-col text-[#61677c] text-[18px]">
-    <div id="name" class="pb-3.75 text-[27px] font-bold">{{ apiInfo.title }}</div>
-    <div id="request" class="pb-3.75 pt-3.75">
-      <div class="flex items-center">请求地址：
-        <a :href="getApiUrl()" class="link" target="_blank">{{ getApiUrl() }}</a>
+  <div id="box"
+       class="rounded-[15px] mx-auto mt-4 mb-4 md:mt-8 md:mb-8 w-[95%] max-w-275 flex p-3 md:p-3.75 flex-col text-[#61677c] text-[14px] md:text-[18px]">
+    <div id="name" class="pb-3 md:pb-3.75 text-[20px] md:text-[27px] font-bold">{{ apiInfo.title }}</div>
+    <div id="request" class="pb-3.75 pt-3.75 space-y-2">
+      <div class="flex items-center flex-wrap gap-y-2">
+        <span class="whitespace-nowrap">请求地址：</span>
+        <a :href="getApiUrl()" class="link break-all" target="_blank">{{ getApiUrl() }}</a>
         <el-tooltip
             content="复制地址"
             placement="top-start"
         >
-          <div id="copy" class="bg-[#ecf0f3] ml-2 rounded-lg flex items-center justify-center w-7 h-7"
+          <div id="copy" class="bg-[#ecf0f3] ml-2 shrink-0 rounded-lg flex items-center justify-center w-7 h-7"
                @click="copyAddress">
             <el-icon size="16">
               <DocumentCopy/>
@@ -80,44 +83,46 @@ onMounted(() => {
       <div>请求方式：<span class="link">{{ apiInfo.sendType }}</span></div>
       <div>返回格式：<span class="link">{{ apiInfo.returnType }}</span></div>
     </div>
-    <div class="pt-3.75 pb-3.75">
-      <div class="text-[20px] border-l-[5px] border-[#61677C] pl-1 mb-2">请求参数</div>
-      <table>
-        <tbody>
-        <tr>
-          <th class="th-r">参数名</th>
-          <th class="th-r">必填</th>
-          <th class="th-r">类型</th>
-          <th>描述</th>
-        </tr>
-        <tr v-for="(item, index) in apiInfo.params" :key="index">
-          <td class="td-r">
-            <div class="tag-box">
-              <span class="tag tag-name">{{ item.name }}</span>
-            </div>
-          </td>
-          <td class="td-r">
-            <div class="tag-box">
-              <span :class="{'tag tag-required-yes': item.required == 1, 'tag tag-required-no': item.required == 0}">
-                {{ item.required == 1 ? '是' : '否' }}
-              </span>
-            </div>
-          </td>
-          <td class="td-r">
-            <div class="tag-box">
-              <span class="tag tag-type">{{ item.type }}</span>
-            </div>
-          </td>
-          <td class="whitespace-pre-wrap">
-            {{ item.msg }}
-          </td>
-        </tr>
-        </tbody>
-      </table>
+    <div class="pt-3.75 pb-3.75 w-full">
+      <div class="text-[18px] md:text-[20px] border-l-[5px] border-[#61677C] pl-1 mb-2">请求参数</div>
+      <div class="w-full overflow-x-auto rounded-lg border border-[#d1d9e6]">
+        <table class="min-w-125">
+          <tbody>
+          <tr>
+            <th class="th-r">参数名</th>
+            <th class="th-r">必填</th>
+            <th class="th-r">类型</th>
+            <th>描述</th>
+          </tr>
+          <tr v-for="(item, index) in apiInfo.params" :key="index">
+            <td class="td-r">
+              <div class="tag-box">
+                <span class="tag tag-name">{{ item.name }}</span>
+              </div>
+            </td>
+            <td class="td-r">
+              <div class="tag-box">
+                <span :class="{'tag tag-required-yes': item.required == 1, 'tag tag-required-no': item.required == 0}">
+                  {{ item.required == 1 ? '是' : '否' }}
+                </span>
+              </div>
+            </td>
+            <td class="td-r">
+              <div class="tag-box">
+                <span class="tag tag-type">{{ item.type }}</span>
+              </div>
+            </td>
+            <td class="whitespace-pre-wrap">
+              {{ item.msg }}
+            </td>
+          </tr>
+          </tbody>
+        </table>
+      </div>
     </div>
-    <div class="pt-3.75">
-      <div class="text-[20px] border-l-[5px] border-[#61677C] pl-1 mb-2">返回示例</div>
-      <div id="response">
+    <div class="pt-3.75 w-full">
+      <div class="text-[18px] md:text-[20px] border-l-[5px] border-[#61677C] pl-1 mb-2">返回示例</div>
+      <div id="response" class="overflow-x-auto">
         <m-d-view :text="apiInfo.returnContent"/>
       </div>
     </div>
@@ -128,6 +133,25 @@ onMounted(() => {
 </template>
 
 <style lang="scss" scoped>
+/* 针对局部横向滚动容器定制滚动条 */
+.overflow-x-auto::-webkit-scrollbar {
+  height: 6px;
+}
+
+.overflow-x-auto::-webkit-scrollbar-track {
+  border-radius: 10px;
+  background: transparent;
+}
+
+.overflow-x-auto::-webkit-scrollbar-thumb {
+  background-color: rgba(0, 0, 0, 0.2);
+  border-radius: 10px;
+}
+
+.overflow-x-auto::-webkit-scrollbar-thumb:hover {
+  background: #909399;
+}
+
 .backHome {
   position: fixed;
   right: 20px;
@@ -183,23 +207,17 @@ onMounted(() => {
   }
 
   table {
-    border-radius: 8px;
-    border: solid 1px #d1d9e6;
     width: 100%;
     text-align: center;
     border-spacing: 0;
     border-collapse: separate;
     align-items: center;
 
-    td {
-      user-select: text;
-
-    }
-
     th, td {
       padding: 4px;
       border: none;
       vertical-align: middle;
+      user-select: text;
     }
 
     .th-r, .td-r {
@@ -224,11 +242,19 @@ onMounted(() => {
 }
 
 .tag {
-  font-size: 14px;
-  padding: 0 8px;
+  font-size: 13px; /* 移动端字号稍微改小 */
+  padding: 2px 6px;
   border-radius: 6px;
   border-width: 1px;
   border-style: solid;
+  white-space: nowrap; /* 防止标签换行 */
+}
+
+@media (min-width: 768px) {
+  .tag {
+    font-size: 14px;
+    padding: 0 8px;
+  }
 }
 
 .tag-required-yes {
@@ -260,5 +286,4 @@ onMounted(() => {
   align-items: center;
   justify-content: center;
 }
-
 </style>

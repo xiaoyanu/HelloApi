@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+import {ref} from 'vue'
 import {
   PhGithubLogo,
   PhArrowCounterClockwise,
@@ -10,7 +11,8 @@ import {
   PhUsers,
   PhBookBookmark,
   PhSignOut,
-  PhSlidersHorizontal
+  PhSlidersHorizontal,
+  PhList
 } from '@phosphor-icons/vue'
 import {getGravatarHash} from "@/utils/more.ts";
 import {useRoute, useRouter} from "vue-router";
@@ -20,6 +22,8 @@ import {HelloAPIConfig} from "@/config/config.ts";
 const route = useRoute()
 const router = useRouter()
 const userStore = useUserStore()
+//  控制移动端菜单显隐
+const showMobileMenu = ref(false)
 const menus = [
   {label: '首页', path: '/admin', icon: PhHouse},
   {label: 'API 管理', path: '/admin/api', icon: PhRocketLaunch},
@@ -32,6 +36,7 @@ const menus = [
 ]
 const handleNav = (path: string) => {
   router.push(path)
+  showMobileMenu.value = false // 移动端点击菜单后自动收起
 }
 
 const logout = () => {
@@ -53,9 +58,20 @@ const watermark = (): string => {
 </script>
 <template>
   <el-watermark :content="watermark()">
-    <div class="bg-[#F5F7FA] w-full min-h-screen ">
-      <div class="flex h-screen">
-        <aside class="flex flex-col shrink-0 w-55 bg-white border-r border-solid border-[#E4E7ED]">
+    <div class="bg-[#F5F7FA] w-full min-h-screen">
+      <div class="flex h-screen overflow-hidden">
+
+        <div
+            v-if="showMobileMenu"
+            class="fixed inset-0 bg-black/50 z-40 md:hidden transition-opacity"
+            @click="showMobileMenu = false"
+        ></div>
+
+        <aside :class="[
+          'flex flex-col shrink-0 w-55 bg-white border-r border-solid border-[#E4E7ED]',
+          'fixed inset-y-0 left-0 z-50 transform transition-transform duration-300 ease-in-out md:relative md:translate-x-0',
+          showMobileMenu ? 'translate-x-0' : '-translate-x-full'
+        ]">
           <div class="
             bg-linear-to-l from-[#ff4e50] to-[#f9d423]
             bg-clip-text
@@ -68,7 +84,7 @@ const watermark = (): string => {
             <img alt="logo" class="w-9" draggable="false" src="@/assets/images/logo.png">
             HelloAPI
           </div>
-          <ul class="select-none flex-1 list-none pt-2.5">
+          <ul class="select-none flex-1 list-none pt-2.5 overflow-y-auto">
             <li
                 v-for="item in menus"
                 :key="item.path"
@@ -108,10 +124,17 @@ const watermark = (): string => {
             </div>
           </div>
         </aside>
-        <main class="main-container">
-          <header class="header">
+
+        <main class="main-container relative w-full">
+          <header class="header justify-between md:justify-end">
+            <div class="md:hidden flex items-center">
+              <button class="text-[#606266] hover:text-[#409EFF] flex items-center" @click="showMobileMenu = true">
+                <PhList size="24" weight="bold"/>
+              </button>
+            </div>
+
             <div class="user-info">
-              <span>Hi, {{ userStore.user.nick }}</span>
+              <span class="sm:inline-block">Hi, {{ userStore.user.nick }}</span>
               <img
                   :src="`https://cn.cravatar.com/avatar/${getGravatarHash(userStore.user.mail || 'HelloAPI')}?s=100&d=wavatar`"
                   alt="Avatar"
@@ -122,7 +145,7 @@ const watermark = (): string => {
               </el-tooltip>
             </div>
           </header>
-          <div class="p-10">
+          <div class="p-4 md:p-10 flex-1 overflow-auto">
             <router-view/>
           </div>
         </main>
@@ -145,16 +168,16 @@ const watermark = (): string => {
   flex: 1;
   display: flex;
   flex-direction: column;
-  overflow: auto;
+  overflow: hidden;
 
   .header {
     height: 60px;
     background-color: #fff;
     border-bottom: 1px solid #E4E7ED;
     display: flex;
-    justify-content: flex-end;
     align-items: center;
     padding: 0 20px;
+    flex-shrink: 0;
 
     .user-info {
       display: flex;
@@ -165,5 +188,4 @@ const watermark = (): string => {
     }
   }
 }
-
 </style>
