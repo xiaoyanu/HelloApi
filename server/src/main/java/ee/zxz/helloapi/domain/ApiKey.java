@@ -1,13 +1,16 @@
 package ee.zxz.helloapi.domain;
 
+import java.time.LocalDateTime;
+
 public class ApiKey {
     private int app_id;
     private String key;
-    private long created;
+    private LocalDateTime created;
+    private LocalDateTime updated;
     private int type;
-    private long started;
-    private long expired;
-    private int count;
+    private LocalDateTime started;
+    private LocalDateTime expired;
+    private long count;
 
     public int getApp_id() {
         return app_id;
@@ -25,12 +28,20 @@ public class ApiKey {
         this.key = key;
     }
 
-    public long getCreated() {
+    public LocalDateTime getCreated() {
         return created;
     }
 
-    public void setCreated(long created) {
+    public void setCreated(LocalDateTime created) {
         this.created = created;
+    }
+
+    public LocalDateTime getUpdated() {
+        return updated;
+    }
+
+    public void setUpdated(LocalDateTime updated) {
+        this.updated = updated;
     }
 
     public int getType() {
@@ -41,27 +52,27 @@ public class ApiKey {
         this.type = type;
     }
 
-    public long getStarted() {
+    public LocalDateTime getStarted() {
         return started;
     }
 
-    public void setStarted(long started) {
+    public void setStarted(LocalDateTime started) {
         this.started = started;
     }
 
-    public long getExpired() {
+    public LocalDateTime getExpired() {
         return expired;
     }
 
-    public void setExpired(long expired) {
+    public void setExpired(LocalDateTime expired) {
         this.expired = expired;
     }
 
-    public int getCount() {
+    public long getCount() {
         return count;
     }
 
-    public void setCount(int count) {
+    public void setCount(long count) {
         this.count = count;
     }
 }

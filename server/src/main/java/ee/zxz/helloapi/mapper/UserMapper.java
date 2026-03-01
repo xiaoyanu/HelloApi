@@ -16,34 +16,34 @@ public interface UserMapper {
     /**
      * CheckUsernameExists - 检查用户名是否存在
      *
-     * @param name 用户名
+     * @param username 用户名
      * @return 返回条数大于0则为存在
      */
-    @Select("SELECT COUNT(*) FROM `helloapi_users` WHERE `name` = #{name}")
-    int checkUsernameExists(String name);
+    @Select("SELECT COUNT(*) FROM `helloapi_users` WHERE `username` = #{username}")
+    int checkUsernameExists(String username);
 
     /**
      * Register - 注册账号
      *
-     * @param name     用户名
+     * @param username 用户名
      * @param password 密码
      * @param nick     昵称
      * @param mode     模式 0-普通用户 1-管理员
      * @return 返回插入条数大于0则为成功
      */
-    @Insert("INSERT INTO `helloapi_users` (`name`, `password`,`nick`,`mode`,`mail`) VALUES (#{name}, #{password},#{nick},#{mode},#{mail})")
-    int register(String name, String password, String nick, int mode, String mail);
+    @Insert("INSERT INTO `helloapi_users` (`username`, `password`,`nick`,`mode`,`mail`) VALUES (#{username}, #{password},#{nick},#{mode},#{mail})")
+    int register(String username, String password, String nick, int mode, String mail);
 
 
     /**
      * Login - 登录账号
      *
-     * @param name     用户名
+     * @param username 用户名
      * @param password 密码，需要先转为MD5再提交
      * @return 登录成功后返回用户信息，否则返回null
      */
-    @Select("SELECT * FROM `helloapi_users` WHERE `name` = #{name} AND `password` = #{password}")
-    User login(String name, String password);
+    @Select("SELECT * FROM `helloapi_users` WHERE `username` = #{username} AND `password` = #{password}")
+    User login(String username, String password);
 
     /**
      * UserInfo - 获取用户信息
@@ -129,12 +129,11 @@ public interface UserMapper {
     /**
      * ResetUserKey - 重置用户密钥
      *
-     * @param userId  用户ID
-     * @param key     密钥
-     * @param created 创建时间
+     * @param userId 用户ID
+     * @param key    密钥
      */
-    @Insert("INSERT INTO `helloapi_user_keys` (`user_id`, `key`,`created`) VALUES (#{userId}, #{key},#{created}) ON DUPLICATE KEY UPDATE `key` = #{key},`created` = #{created}")
-    void resetUserKey(int userId, String key, long created);
+    @Insert("INSERT INTO `helloapi_user_keys` (`user_id`, `key`) VALUES (#{userId}, #{key}) ON DUPLICATE KEY UPDATE `key` = #{key}")
+    void resetUserKey(int userId, String key);
 
     /**
      * GetUserCount - 获取用户数量

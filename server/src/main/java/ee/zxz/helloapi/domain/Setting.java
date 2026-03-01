@@ -2,19 +2,10 @@ package ee.zxz.helloapi.domain;
 
 import java.time.LocalDateTime;
 
-public class UserKey {
-    private int user_id;
+public class Setting {
     private String key;
-    private LocalDateTime created;
+    private String value;
     private LocalDateTime updated;
-
-    public int getUser_id() {
-        return user_id;
-    }
-
-    public void setUser_id(int user_id) {
-        this.user_id = user_id;
-    }
 
     public String getKey() {
         return key;
@@ -24,12 +15,12 @@ public class UserKey {
         this.key = key;
     }
 
-    public LocalDateTime getCreated() {
-        return created;
+    public String getValue() {
+        return value;
     }
 
-    public void setCreated(LocalDateTime created) {
-        this.created = created;
+    public void setValue(String value) {
+        this.value = value;
     }
 
     public LocalDateTime getUpdated() {

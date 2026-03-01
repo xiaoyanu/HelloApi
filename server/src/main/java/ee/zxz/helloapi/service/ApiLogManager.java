@@ -15,12 +15,12 @@ public class ApiLogManager {
      * 异步写入日志
      */
     @Async("logExecutor")
-    public void saveLogAsync(int appId, String ip, String time, Object header, Object body) {
+    public void saveLogAsync(int appId, String ip, Object header, Object body) {
         try {
             // 增加API调用次数
             apiMapper.addApiCount(appId);
             // 写入日志
-            apiMapper.insertApiLog(appId, ip, time, header, body);
+            apiMapper.insertApiLog(appId, ip, header, body);
         } catch (Exception e) {
             System.err.println("异步日志写入失败: " + e.getMessage());
         }

@@ -52,20 +52,20 @@ public class UserServiceImpl implements UserService {
             return ResponseUtil.response(400, "请求参数不能为空");
         }
 
-        String name = requestBody.get("name");
+        String username = requestBody.get("username");
         String password = requestBody.get("password");
         String code = requestBody.get("code");
         String mail = requestBody.get("mail");
 
 
         // 参数校验
-        if (name == null || name.trim().isEmpty()) {
+        if (username == null || username.trim().isEmpty()) {
             return ResponseUtil.response(400, "账号不能为空");
         }
-        if (name.equals(password)) {
+        if (username.equals(password)) {
             return ResponseUtil.response(400, "账号和密码不能相同");
         }
-        if (name.length() < 4) {
+        if (username.length() < 4) {
             return ResponseUtil.response(400, "账号不能少于4个字符");
         }
         if (password == null || password.trim().isEmpty()) {
@@ -79,10 +79,10 @@ public class UserServiceImpl implements UserService {
             return ResponseUtil.response(400, "密码不能包含空格");
         }
         // 检查用户名是否包含空格
-        if (name.contains(" ")) {
+        if (username.contains(" ")) {
             return ResponseUtil.response(400, "账号不能包含空格");
         }
-        if (name.length() > 32) {
+        if (username.length() > 32) {
             return ResponseUtil.response(400, "账号不能超过32个字符");
         }
         if (password.length() > 64) {
@@ -109,7 +109,7 @@ public class UserServiceImpl implements UserService {
 
         try {
             // 4. 数据库校验与写入
-            if (userMapper.checkUsernameExists(name) > 0) {
+            if (userMapper.checkUsernameExists(username) > 0) {
                 return ResponseUtil.response(400, "账号已存在");
             }
 
@@ -117,9 +117,9 @@ public class UserServiceImpl implements UserService {
             int result;
             if (userMapper.getUserCount() < 1) {
                 // 第一个注册用户为管理员
-                result = userMapper.register(name, md5Password, name, 1, mail);
+                result = userMapper.register(username, md5Password, username, 1, mail);
             } else {
-                result = userMapper.register(name, md5Password, name, 0, mail);
+                result = userMapper.register(username, md5Password, username, 0, mail);
             }
 
             if (result <= 0) {
@@ -136,26 +136,26 @@ public class UserServiceImpl implements UserService {
     public Map<String, Object> login(Map<String, String> requestBody, HttpServletRequest request) {
 
         // 获取JSON中的username和password
-        String name = requestBody.get("name");
+        String username = requestBody.get("username");
         String password = requestBody.get("password");
         String code = requestBody.get("code");
         // 参数校验
-        if (name == null || name.trim().isEmpty()) {
+        if (username == null || username.trim().isEmpty()) {
             return ResponseUtil.response(400, "账号不能为空");
         }
         if (password == null || password.trim().isEmpty()) {
             return ResponseUtil.response(400, "密码不能为空");
         }
-        if (name.contains(" ")) {
+        if (username.contains(" ")) {
             return ResponseUtil.response(400, "账号不能包含空格");
         }
         if (password.contains(" ")) {
             return ResponseUtil.response(400, "密码不能包含空格");
         }
-        if (name.length() > 32) {
+        if (username.length() > 32) {
             return ResponseUtil.response(400, "账号不能超过32个字符");
         }
-        if (name.length() < 4) {
+        if (username.length() < 4) {
             return ResponseUtil.response(400, "账号不能少于4个字符");
         }
         if (password.length() < 6) {
@@ -180,18 +180,18 @@ public class UserServiceImpl implements UserService {
 
         password = Tools.getTextMd5(password);
 
-        if (userMapper.checkUsernameExists(name) <= 0) {
+        if (userMapper.checkUsernameExists(username) <= 0) {
             return ResponseUtil.response(400, "账号不存在");
         }
 
         // 获取用户信息
-        User user = userMapper.login(name, password);
+        User user = userMapper.login(username, password);
         if (user == null) {
             return ResponseUtil.response(400, "密码错误");
         }
 
         // 生成JWT token
-        String token = JwtUtil.getToken(user.getId(), user.getName(), user.getMode());
+        String token = JwtUtil.getToken(user.getId(), user.getUsername(), user.getMode());
 
         // 构建返回
         Map<String, Object> data = new LinkedHashMap<>();
@@ -199,7 +199,7 @@ public class UserServiceImpl implements UserService {
         data.put("token", token);
         data.put("user", info);
         info.put("id", user.getId());
-        info.put("name", user.getName());
+        info.put("username", user.getUsername());
         info.put("nick", user.getNick());
         info.put("mode", user.getMode());
         info.put("mail", user.getMail());
@@ -228,7 +228,7 @@ public class UserServiceImpl implements UserService {
 
         Map<String, Object> data = new LinkedHashMap<>();
         data.put("id", user.getId());
-        data.put("name", user.getName());
+        data.put("username", user.getUsername());
         data.put("nick", user.getNick());
         data.put("mode", user.getMode());
         data.put("mail", user.getMail());
@@ -329,6 +329,7 @@ public class UserServiceImpl implements UserService {
             map.put("type", apiApp.getType());
             map.put("status", apiApp.getStatus());
             map.put("created", apiApp.getCreated());
+            map.put("updated", apiApp.getUpdated());
             map.put("user_id", apiApp.getUser_id());
             map.put("view_status", apiApp.getView_status());
             apiInfoList.add(map);
@@ -357,7 +358,7 @@ public class UserServiceImpl implements UserService {
         String key = Tools.getTextMd5(String.valueOf(intUserId) + System.currentTimeMillis());
 
         // 重置用户密钥
-        userMapper.resetUserKey(intUserId, key, System.currentTimeMillis());
+        userMapper.resetUserKey(intUserId, key);
         return ResponseUtil.success(key);
     }
 
@@ -400,6 +401,7 @@ public class UserServiceImpl implements UserService {
             map.put("type", apiApp.getType());
             map.put("status", apiApp.getStatus());
             map.put("created", apiApp.getCreated());
+            map.put("updated", apiApp.getUpdated());
             map.put("user_id", apiApp.getUser_id());
             map.put("view_status", apiApp.getView_status());
             apiInfoList.add(map);

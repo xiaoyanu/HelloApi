@@ -1,5 +1,7 @@
 package ee.zxz.helloapi.domain;
 
+import java.time.LocalDateTime;
+
 public class ApiApp {
     private int id;
     private String title;
@@ -12,7 +14,8 @@ public class ApiApp {
     private int sendType;
     private String returnType;
     private String returnContent;
-    private long created;
+    private LocalDateTime created;
+    private LocalDateTime updated;
     private int user_id;
     // 展示状态，0正常，1拒绝，2审核
     private int view_status;
@@ -89,12 +92,20 @@ public class ApiApp {
         this.returnContent = returnContent;
     }
 
-    public long getCreated() {
+    public LocalDateTime getCreated() {
         return created;
     }
 
-    public void setCreated(long created) {
+    public void setCreated(LocalDateTime created) {
         this.created = created;
+    }
+
+    public LocalDateTime getUpdated() {
+        return updated;
+    }
+
+    public void setUpdated(LocalDateTime updated) {
+        this.updated = updated;
     }
 
     public int getUser_id() {

@@ -17,12 +17,10 @@ import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 @Service
 public class ApiServiceImpl implements ApiService {
-    private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
     private final ApiMapper apiMapper;
     private final UserMapper userMapper;
 
@@ -314,25 +312,20 @@ public class ApiServiceImpl implements ApiService {
         }
 
         int type = (int) requestBody.get("type");
-        long created = System.currentTimeMillis();
-        long started, expired;
+        LocalDateTime started, expired;
         try {
-            started = Tools.timeStampEx(((Number) requestBody.getOrDefault("started", 0L)).longValue(), 0);
-            expired = Tools.timeStampEx(((Number) requestBody.getOrDefault("expired", 0L)).longValue(), 0);
+            started = LocalDateTime.parse((String) requestBody.get("started"));
+            expired = LocalDateTime.parse((String) requestBody.get("expired"));
         } catch (Exception e) {
             return ResponseUtil.response(400, Finals.MESSAGES_ERROR_PARAM);
         }
+
+        // 如果过期时间早于开始时间，返回错误
+        if (!expired.isAfter(started)) {
+            return ResponseUtil.response(400, Finals.MESSAGES_ERROR_PARAM);
+        }
+
         int count = (int) requestBody.get("count");
-
-
-        // 校验数字长度
-        if (String.valueOf(started).length() < 10 || String.valueOf(expired).length() < 10) {
-            return ResponseUtil.response(400, Finals.MESSAGES_ERROR_PARAM);
-        }
-
-        if (started > expired || type < 0 || type > 1 || count < 0) {
-            return ResponseUtil.response(400, Finals.MESSAGES_ERROR_PARAM);
-        }
 
         // 生成密钥
         String key = Tools.getTextMd5(String.valueOf(intApiId) + System.currentTimeMillis());
@@ -340,7 +333,7 @@ public class ApiServiceImpl implements ApiService {
             key = Tools.getTextMd5(String.valueOf(intApiId) + System.currentTimeMillis());
         }
 
-        apiMapper.createApiKey(intApiId, key, created, type, started, expired, count);
+        apiMapper.createApiKey(intApiId, key, type, started, expired, count);
 
         return ResponseUtil.success(key);
     }
@@ -395,24 +388,20 @@ public class ApiServiceImpl implements ApiService {
         }
 
         int type = (int) requestBody.get("type");
-        long started, expired;
+        LocalDateTime started, expired;
         try {
-            started = Tools.timeStampEx(((Number) requestBody.getOrDefault("started", 0L)).longValue(), 0);
-            expired = Tools.timeStampEx(((Number) requestBody.getOrDefault("expired", 0L)).longValue(), 0);
+            started = LocalDateTime.parse((String) requestBody.get("started"));
+            expired = LocalDateTime.parse((String) requestBody.get("expired"));
         } catch (Exception e) {
             return ResponseUtil.response(400, Finals.MESSAGES_ERROR_PARAM);
         }
+
+        // 如果过期时间早于开始时间，返回错误
+        if (!expired.isAfter(started)) {
+            return ResponseUtil.response(400, Finals.MESSAGES_ERROR_PARAM);
+        }
+
         int count = (int) requestBody.get("count");
-
-
-        // 校验数字长度
-        if (String.valueOf(started).length() < 10 || String.valueOf(expired).length() < 10) {
-            return ResponseUtil.response(400, Finals.MESSAGES_ERROR_PARAM);
-        }
-
-        if (started > expired || type < 0 || type > 1 || count < 0) {
-            return ResponseUtil.response(400, Finals.MESSAGES_ERROR_PARAM);
-        }
 
         apiMapper.updateApiKey(finalKey, type, started, expired, count);
 
@@ -513,7 +502,7 @@ public class ApiServiceImpl implements ApiService {
             if (apiKey.getType() == 0) {
                 // 0 时间类型
                 // 检查是否过期
-                if (System.currentTimeMillis() > apiKey.getExpired()) {
+                if (LocalDateTime.now().isAfter(apiKey.getExpired())) {
                     return ResponseUtil.error(Finals.MESSAGES_ERROR_KEY_EXPIRED);
                 }
             } else {
@@ -527,7 +516,6 @@ public class ApiServiceImpl implements ApiService {
             }
         }
 
-        String time = LocalDateTime.now().format(FORMATTER);
         // 记录日志
         if (apiRequestLog.getHeader().equals("")) {
             apiRequestLog.setHeader(null);
@@ -538,7 +526,6 @@ public class ApiServiceImpl implements ApiService {
         apiLogManager.saveLogAsync(
                 apiRequestLog.getApp_id(),
                 apiRequestLog.getIp(),
-                time,
                 apiRequestLog.getHeader(),
                 apiRequestLog.getBody()
         );
@@ -562,6 +549,5 @@ public class ApiServiceImpl implements ApiService {
         apiApp.setReturnContent((String) requestBody.get("returnContent"));
         apiApp.setView_status((Integer) requestBody.get("view_status"));
         apiApp.setUser_id(userId);
-        apiApp.setCreated(System.currentTimeMillis());
     }
 }

@@ -5,6 +5,7 @@ import ee.zxz.helloapi.domain.ApiKey;
 import ee.zxz.helloapi.domain.ApiParam;
 import org.apache.ibatis.annotations.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Mapper
@@ -133,7 +134,7 @@ public interface ApiMapper {
     /**
      * 搜索Api接口总数
      *
-     * @param keyword  搜索关键词
+     * @param keyword 搜索关键词
      * @return 搜索到的Api接口总数
      */
     @Select("select count(*) from helloapi_api_apps where  (`title` LIKE CONCAT('%',#{keyword},'%') OR `smalltitle` LIKE CONCAT('%',#{keyword},'%'))")
@@ -153,14 +154,13 @@ public interface ApiMapper {
      *
      * @param apiId   API ID
      * @param key     密钥
-     * @param created 创建时间
      * @param type    密钥类型
      * @param started 开始时间
      * @param expired 过期时间
      * @param count   调用次数
      */
-    @Insert("insert into helloapi_api_keys (`api_id`, `key`, `created` , `type`, `started`,`expired`,`count`) values (#{apiId}, #{key}, #{created}, #{type}, #{started}, #{expired}, #{count})")
-    void createApiKey(int apiId, String key, long created, int type, long started, long expired, int count);
+    @Insert("insert into helloapi_api_keys (`api_id`, `key` , `type`, `started`,`expired`,`count`) values (#{apiId}, #{key}, #{type}, #{started}, #{expired}, #{count})")
+    void createApiKey(int apiId, String key, int type, LocalDateTime started, LocalDateTime expired, int count);
 
     /**
      * 查询API密钥是否存在
@@ -227,7 +227,7 @@ public interface ApiMapper {
      * @param count   调用次数
      */
     @Update("update helloapi_api_keys set `type` = #{type}, `started` = #{started}, `expired` = #{expired}, `count` = #{count} where `key` = #{key}")
-    void updateApiKey(String key, int type, long started, long expired, int count);
+    void updateApiKey(String key, int type, LocalDateTime started, LocalDateTime expired, int count);
 
     /**
      * 删除API密钥
@@ -250,12 +250,11 @@ public interface ApiMapper {
      *
      * @param apiId  API ID
      * @param ip     IP地址
-     * @param time   时间
      * @param header 请求头
      * @param body   请求体
      */
-    @Insert("insert into helloapi_api_request_logs (`api_id`,`ip`, `time`,`header`, `body`) values (#{apiId}, #{ip}, #{time}, #{header}, #{body})")
-    void insertApiLog(int apiId, String ip, String time, Object header, Object body);
+    @Insert("insert into helloapi_api_request_logs (`api_id`,`ip`, `header`, `body`) values (#{apiId}, #{ip}, #{header}, #{body})")
+    void insertApiLog(int apiId, String ip, Object header, Object body);
 
     /**
      * 增加ApiId调用次数
