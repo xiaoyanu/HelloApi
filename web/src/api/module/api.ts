@@ -1,4 +1,5 @@
 import request from '@/utils/request.ts'
+import type {APIKey} from "@/types";
 
 const apiUrl = '/api/v1/app'
 
@@ -40,3 +41,6 @@ export const GetUserApiKeyList =
                 pageSize: pageSize,
             }
         })
+
+// 创建API密钥
+export const CreateApiKey = (form: APIKey): any => request.post(apiUrl + '/key/' + form.apiId, form)

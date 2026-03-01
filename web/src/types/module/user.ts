@@ -73,20 +73,15 @@ export type SelectFormApiKey = {
 
 // APIKey
 export type APIKey = {
-    apiId: number;
+    apiId: number | null;
     key: string;
-    created: Date | null;
-    updated: Date | null;
+    created: string;
+    updated: string;
     type: number;
-    started: Date | null;
-    expired: Date | null;
+    started: string;
+    expired: string;
     count: number;
     desc: string;
-}
-
-export type ElDate = {
-    start: Date;
-    end: Date;
 }
 
 export type LoginForm = {

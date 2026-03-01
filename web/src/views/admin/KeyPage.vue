@@ -1,9 +1,9 @@
 <script lang="ts" setup>
 import {Plus, Delete, Edit, Search, Refresh} from "@element-plus/icons-vue";
-import {GetUserApiKeyList, GetApiInfo, CreateApi, UpdateApi, UserAppListSearch, DeleteApi} from "@/api";
-import {onMounted, ref} from "vue";
+import {GetUserApiKeyList, GetApiInfo, UpdateApi, UserAppListSearch, DeleteApi, CreateApiKey} from "@/api";
+import {onMounted, ref, watch} from "vue";
 import type {AppList, Pagination, SelectFormApiKey, APIKey} from "@/types";
-import type {FormRules} from "element-plus";
+import {dayjs, type FormRules} from "element-plus";
 import {HelloAPIConfig} from "@/config/config.ts";
 import {useUserStore} from "@/stores";
 
@@ -58,16 +58,27 @@ const resizable = ref(true) // 是否可调整大小
 const drawerSize = ref('30%') // 抽屉大小
 const nowRow = ref()
 
+// 日期表单
+const dateArray = ref(['', ''])
+watch(dateArray, (newVal, _) => {
+  if (newVal && newVal[0] && newVal[1]) {
+    if (showDrawer.value) {
+      formData.value.started = dayjs(newVal[0]).format('YYYY-MM-DDTHH:mm:ss')
+      formData.value.expired = dayjs(newVal[1]).format('YYYY-MM-DDTHH:mm:ss')
+    }
+  }
+})
+
 // 提交表单
 const formRef = ref()
 const formData = ref<APIKey>({
-  apiId: 0,
+  apiId: null,
   key: '',
   type: 0,
-  created: null,
-  updated: null,
-  started: null,
-  expired: null,
+  created: '',
+  updated: '',
+  started: '',
+  expired: '',
   count: 0,
   desc: ''
 });
@@ -94,16 +105,17 @@ function handleNewPageChange(page: number) {
 // 重置formData
 const resetFormData = () => {
   formData.value = {
-    apiId: 0,
+    apiId: null,
     key: '',
     type: 0,
-    created: null,
-    updated: null,
-    started: null,
-    expired: null,
+    created: '',
+    updated: '',
+    started: '',
+    expired: '',
     count: 0,
     desc: ''
   }
+  dateArray.value = ['', '']
 }
 
 // 打开抽屉
@@ -116,13 +128,13 @@ const openDrawer = (type: string, row?: object) => {
   showDrawer.value = true
 }
 
-// 发布接口
+// 创建APIKey
 const submitFormCreate = async () => {
   // 校验表单
   const isValid = await formRef.value?.validate().catch(() => false);
   if (isValid) {
     // 提交表单
-    const res = await CreateApi(formData.value)
+    const res = await CreateApiKey(formData.value)
     if (res.data.code == 200) {
       void getTableData()
       ElMessage.success('发布成功')
@@ -388,7 +400,7 @@ onMounted(() => {
           </el-form-item>
           <el-form-item v-if="formData.type==0" label="有效期限" prop="started">
             <el-date-picker
-                v-model="formData.started"
+                v-model="dateArray"
                 :shortcuts="shortcuts"
                 end-placeholder="过期日期"
                 range-separator="至"
@@ -396,6 +408,7 @@ onMounted(() => {
                 start-placeholder="开始日期"
                 type="daterange"
                 unlink-panels
+                value-format="YYYY-MM-DD HH:mm:ss"
             />
           </el-form-item>
           <el-form-item v-if="formData.type==1" label="可用次数" prop="count">
