@@ -12,21 +12,21 @@ import java.util.List;
 public interface ApiMapper {
 
     /**
-     * 获取所有API列表
+     * 获取所有API列表（仅过审的）
      *
      * @param pageSize 每页数量
      * @param offset   偏移量 = (page - 1) * pageSize
      * @return ApiApp列表
      */
-    @Select("select * from helloapi_api_apps ORDER BY created DESC LIMIT #{pageSize} OFFSET #{offset}")
+    @Select("select * from helloapi_api_apps where `view_status` = 0 ORDER BY created DESC LIMIT #{pageSize} OFFSET #{offset}")
     List<ApiApp> getApiList(int pageSize, int offset);
 
     /**
-     * 获取所有API列表（总数）
+     * 获取所有API列表（仅过审的总数）
      *
      * @return 所有API总数
      */
-    @Select("select count(*) from helloapi_api_apps ")
+    @Select("select count(*) from helloapi_api_apps where `view_status` = 0")
     int getApiListAllCount();
 
     /**
@@ -45,7 +45,7 @@ public interface ApiMapper {
      * @param apiApp ApiApp对象
      * @return 插入成功的行数
      */
-    @Insert("insert into helloapi_api_apps (title,smallTitle,status,type,url,sendtype,returnType,returnContent,created,user_id,view_status) values (#{title}, #{smallTitle}, #{status}, #{type}, #{url}, #{sendType}, #{returnType}, #{returnContent}, #{created}, #{user_id},#{view_status})")
+    @Insert("insert into helloapi_api_apps (title,smallTitle,status,type,url,sendtype,returnType,returnContent,user_id,view_status) values (#{title}, #{smallTitle}, #{status}, #{type}, #{url}, #{sendType}, #{returnType}, #{returnContent}, #{user_id},#{view_status})")
     @Options(useGeneratedKeys = true, keyProperty = "id")
     int createApiApp(ApiApp apiApp);
 

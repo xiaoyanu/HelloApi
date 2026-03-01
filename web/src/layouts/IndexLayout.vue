@@ -1,7 +1,7 @@
-<script setup lang="ts">
+<script lang="ts" setup>
 import {HelloAPIConfig} from '@/config/config'
 import {getNowYear, getSearchNullMessage} from "@/utils/more.ts";
-import {PhMagnifyingGlass} from "@phosphor-icons/vue"
+import {PhArrowLineUp, PhMagnifyingGlass} from "@phosphor-icons/vue"
 import router from "@/router";
 import {ref} from "vue";
 
@@ -11,7 +11,7 @@ const search = () => {
   if (keywords.value.trim() === '') {
     ElMessage.warning(getSearchNullMessage())
   } else {
-    router.push('/search/' + keywords.value.trim())
+    router.push('/search/' + encodeURIComponent(keywords.value.trim()))
   }
 }
 </script>
@@ -19,13 +19,14 @@ const search = () => {
   <div class="bg-[#ecf0f3] w-full min-h-screen">
     <div id="head" class="flex items-center justify-between h-16 leading-16 text-[#61677C] bg-[#ecf0f3]">
       <div class="flex items-center ml-5 w-100">
-        <img class="h-12.5 w-12.5 rounded-[10px]" src="@/assets/images/logo.png" draggable="false" alt="logo">
+        <img alt="logo" class="h-12.5 w-12.5 rounded-[10px]" draggable="false" src="@/assets/images/logo.png">
         <a class="text-[24px]" href="/">Hello API</a>
-        <img class="h-15 ml-12.5" src="https://api.zxz.ee/api/api_count/" draggable="false" alt="统计">
+        <img alt="统计" class="h-15 ml-12.5" draggable="false" src="https://api.zxz.ee/api/api_count/">
       </div>
       <div id="center" class="flex items-center justify-between">
-        <input v-model="keywords" class="w-60 p-2 h-8 text-[#61677c] text-[14px] bg-[#ecf0f3] rounded-lg" type="text"
-               placeholder="搜索接口…">
+        <input v-model="keywords" class="w-60 p-2 h-8 text-[#61677c] text-[14px] bg-[#ecf0f3] rounded-lg"
+               placeholder="搜索接口…" type="text"
+               @keyup.enter="search">
         <div class="flex items-center p-2 rounded-lg h-7.5 ml-3 cursor-pointer" @click="search">
           <PhMagnifyingGlass size="15" weight="duotone"/>
           &nbsp;搜索
@@ -33,7 +34,7 @@ const search = () => {
       </div>
       <div class="mr-12.5">
         <a id="wt" class="h-7.5 leading-7.5 w-25 inline-block text-center font-semibold rounded-lg bg-[#ecf0f3]"
-           href="/admin">登录 / 注册</a>
+           href="/admin" target="_blank">登录 / 注册</a>
       </div>
     </div>
     <router-view/>
@@ -44,8 +45,11 @@ const search = () => {
       </p>
     </div>
   </div>
+  <el-backtop :bottom="20" :right="20" class="backtop-info">
+    <PhArrowLineUp size="24" weight="bold"/>
+  </el-backtop>
 </template>
-<style scoped lang="scss">
+<style lang="scss" scoped>
 a {
   text-decoration: none;
 }
@@ -99,5 +103,22 @@ a {
   :deep() a {
     color: #ff627c;
   }
+}
+</style>
+<style>
+.backtop-info {
+  background-color: #ecf0f3 !important;
+  border-radius: 8px !important;
+  box-shadow: -5px -5px 20px #FFF, 5px 5px 20px #d1d9e6 !important;
+  color: #61677C !important;
+  transition: all 0.2s ease-in-out !important;
+}
+
+.backtop-info:hover {
+  box-shadow: -2px -2px 5px #FFF, 2px 2px 5px #d1d9e6 !important;
+}
+
+.backtop-info:active {
+  box-shadow: inset 1px 1px 2px #d1d9e6, inset -1px -1px 2px #FFF !important;
 }
 </style>

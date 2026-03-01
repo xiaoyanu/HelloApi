@@ -11,9 +11,12 @@ export {}
 /* prettier-ignore */
 declare module 'vue' {
   export interface GlobalComponents {
+    ApiCardList: typeof import('./src/components/ApiCardList.vue')['default']
     Banner: typeof import('./src/components/banner.vue')['default']
     BaseChart: typeof import('./src/components/BaseChart.vue')['default']
     ChartSkeleton: typeof import('./src/components/ChartSkeleton.vue')['default']
+    ElAffix: typeof import('element-plus/es')['ElAffix']
+    ElBacktop: typeof import('element-plus/es')['ElBacktop']
     ElBadge: typeof import('element-plus/es')['ElBadge']
     ElButton: typeof import('element-plus/es')['ElButton']
     ElDatePicker: typeof import('element-plus/es')['ElDatePicker']

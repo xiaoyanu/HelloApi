@@ -4,6 +4,7 @@ import {GetCaptchaUrl, Login, Register} from "@/api";
 import {useUserStore} from "@/stores";
 import {useRouter} from "vue-router";
 import type {FormRules} from "element-plus";
+import type {LoginForm} from "@/types/module/user";
 
 const userStore = useUserStore();
 const router = useRouter()
@@ -11,8 +12,8 @@ const router = useRouter()
 const isLogin = ref(true)
 // 校验表单
 const formRef = ref()
-const userForm = ref({
-  name: '',
+const userForm = ref<LoginForm>({
+  username: '',
   password: '',
   confirmPassword: '',
   code: '',
@@ -37,7 +38,7 @@ const rules: FormRules = {
     {required: true, message: '请输入密码', trigger: 'blur'},
     {pattern: /^\S{6,15}$/, message: '密码为6-15位非空字符', trigger: 'change'},
     {
-      validator: (_: any, val: any, cb: any) => (val === userForm.value.name ? cb(new Error('账号密码不能相同')) : cb()),
+      validator: (_: any, val: any, cb: any) => (val === userForm.value.username ? cb(new Error('账号密码不能相同')) : cb()),
       trigger: 'blur'
     }
   ],
@@ -69,7 +70,7 @@ onMounted(() => {
 watch(isLogin, () => {
   // 重置表单
   userForm.value = {
-    name: '',
+    username: '',
     password: '',
     confirmPassword: '',
     code: '',
@@ -177,12 +178,12 @@ const login = async () => {
                 :rules="rules"
                 label-position="top"
             >
-              <el-form-item prop="name">
+              <el-form-item prop="username">
                 <template #label>
                   <span class="text-[#71717a] font-bold text-[12px] uppercase tracking-wider ml-1">账号</span>
                 </template>
                 <el-input
-                    v-model="userForm.name"
+                    v-model="userForm.username"
                     placeholder="请输入账号"
                 />
               </el-form-item>

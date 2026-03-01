@@ -5,7 +5,8 @@ export interface AppList {
     type: number;
     // 接口状态 0正常 1异常 2维护
     status: number;
-    created: number;
+    created: Date | null;
+    updated: Date | null;
     user_id: number;
     // 显示状态 0正常 1拒绝 2审核中
     view_status: number;
@@ -49,13 +50,13 @@ interface Param {
 export interface User {
     id?: number;
     mode?: number;
-    name?: string;
+    username?: string;
     mail?: string;
     nick?: string;
 }
 
 // 用于筛选条件API接口
-export type selectFormApi = {
+export type SelectFormApi = {
     keywords: string;
     type: number;
     status: number;
@@ -63,7 +64,7 @@ export type selectFormApi = {
 }
 
 // 用于筛选条件APIKey
-export type selectFormApiKey = {
+export type SelectFormApiKey = {
     keywords: string;
     type: number;
     status: number;
@@ -74,10 +75,32 @@ export type selectFormApiKey = {
 export type APIKey = {
     apiId: number;
     key: string;
-    created: number;
+    created: Date | null;
+    updated: Date | null;
     type: number;
-    started: number | Array<Date>;
-    expired: number;
+    started: Date | null;
+    expired: Date | null;
     count: number;
     desc: string;
+}
+
+export type ElDate = {
+    start: Date;
+    end: Date;
+}
+
+export type LoginForm = {
+    username: string;
+    password: string;
+    confirmPassword: string;
+    code: string;
+    mail: string;
+}
+
+export type homeApiList = {
+    id: number;
+    title: string;
+    smallTitle: string;
+    status: number;
+    type: number;
 }

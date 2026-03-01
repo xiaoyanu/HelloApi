@@ -1,16 +1,18 @@
 <script lang="ts" setup>
 import {Plus, Delete, Edit, Search, Refresh} from "@element-plus/icons-vue";
-import {GetUserAppList, GetApiInfo, CreateApi, UpdateApi, UserAppListSearch, DeleteApi} from "@/api";
+import {GetUserApiKeyList, GetApiInfo, CreateApi, UpdateApi, UserAppListSearch, DeleteApi} from "@/api";
 import {onMounted, ref} from "vue";
-import type {AppList, Pagination, selectFormApiKey, APIKey} from "@/types";
+import type {AppList, Pagination, SelectFormApiKey, APIKey} from "@/types";
 import type {FormRules} from "element-plus";
 import {HelloAPIConfig} from "@/config/config.ts";
+import {useUserStore} from "@/stores";
 
+const userStore = useUserStore();
 const tableData = ref<AppList[]>();
 const nowTableType = ref()
 
 // 搜索筛选表单
-const searchForm = ref<selectFormApiKey>({
+const searchForm = ref<SelectFormApiKey>({
   keywords: '',
   type: -1, // -1 代表不限，0 免费，1 收费
   status: -1, // -1 代表不限，0 正常，1 异常，2 维护
@@ -61,13 +63,11 @@ const formRef = ref()
 const formData = ref<APIKey>({
   apiId: 0,
   key: '',
-  created: 0,
   type: 0,
-  started: [
-    new Date(),
-    new Date()
-  ],
-  expired: 0,
+  created: null,
+  updated: null,
+  started: null,
+  expired: null,
   count: 0,
   desc: ''
 });
@@ -78,7 +78,7 @@ const getTableData = async () => {
     nowTableType.value = 'list'
     paging.value.page = 1
   }
-  const res = await GetUserAppList(0, paging.value.page, paging.value.pageSize);
+  const res = await GetUserApiKeyList(userStore.user.id, paging.value.page, paging.value.pageSize);
   if (res.data.code == 200) {
     tableData.value = res.data.data.list;
     paging.value.total = res.data.data.total
@@ -96,13 +96,11 @@ const resetFormData = () => {
   formData.value = {
     apiId: 0,
     key: '',
-    created: 0,
     type: 0,
-    started: [
-      new Date(),
-      new Date()
-    ],
-    expired: 0,
+    created: null,
+    updated: null,
+    started: null,
+    expired: null,
     count: 0,
     desc: ''
   }

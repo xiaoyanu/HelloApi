@@ -119,7 +119,7 @@ public class ApiServiceImpl implements ApiService {
             }
             return ResponseUtil.success();
         } catch (Exception e) {
-            return ResponseUtil.response(400, Finals.MESSAGES_ERROR_PARAM, e.getMessage());
+            return ResponseUtil.response(400, Finals.MESSAGES_ERROR_PARAM);
         }
     }
 

@@ -128,7 +128,7 @@ public class UserServiceImpl implements UserService {
 
             return ResponseUtil.response(200, "注册成功");
         } catch (Exception e) {
-            return ResponseUtil.response(500, "系统繁忙：" + e.getMessage());
+            return ResponseUtil.response(500, "注册失败");
         }
     }
 

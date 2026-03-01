@@ -11,7 +11,7 @@ const HelloAPIConfig = {
     website: {
         index: {
             // 每页显示数量，影响范围：前台页面
-            pageSize: 12,
+            pageSize: 16,
         },
         admin: {
             // 每页显示数量，影响范围：后台页面

@@ -2,7 +2,7 @@
 import {Plus, Delete, Edit, Close, Search, Refresh} from "@element-plus/icons-vue";
 import {GetUserAppList, GetApiInfo, CreateApi, UpdateApi, UserAppListSearch, DeleteApi} from "@/api";
 import {onMounted, ref} from "vue";
-import type {AppList, App, Pagination, selectFormApi} from "@/types";
+import type {AppList, App, Pagination, SelectFormApi} from "@/types";
 import type {FormRules} from "element-plus";
 import {dayjs} from "element-plus";
 import {useUserStore} from "@/stores";
@@ -13,7 +13,7 @@ const tableData = ref<AppList[]>();
 const nowTableType = ref()
 
 // 搜索筛选表单
-const searchForm = ref<selectFormApi>({
+const searchForm = ref<SelectFormApi>({
   keywords: '',
   type: -1, // -1 代表不限，0 免费，1 收费
   status: -1, // -1 代表不限，0 正常，1 异常，2 维护

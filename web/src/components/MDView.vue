@@ -15,5 +15,7 @@ defineProps(
 <style scoped>
 :deep(.vuepress-markdown-body) {
   background-color: #ECF0F3;
+  color: #61677c;
+  padding: 10px;
 }
 </style>
