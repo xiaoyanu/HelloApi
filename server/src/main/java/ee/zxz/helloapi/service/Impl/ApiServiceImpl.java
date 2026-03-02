@@ -559,6 +559,45 @@ public class ApiServiceImpl implements ApiService {
         return ResponseUtil.success();
     }
 
+    @Override
+    public Map<String, Object> userApiKeyListSearch(String userId, Map<String, String> requestParam, HttpServletRequest request) {
+        int intUserId = Tools.strToInt(userId);
+        int tokenUserId = Tools.strToInt((String) request.getAttribute("tokenUserId"));
+        if (tokenUserId != intUserId) {
+            int userMode = (int) request.getAttribute("userMode");
+            if (userMode != Finals.Admin) {
+                return ResponseUtil.response(400, Finals.MESSAGES_ERROR_NOT_CREATOR);
+            }
+        }
+
+        // 检查用户是否存在
+        if (userMapper.checkUserIdExists(intUserId) < 1) {
+            return ResponseUtil.response(400, Finals.MESSAGES_ERROR_USER_NOT_FOUND);
+        }
+
+        String keyword = requestParam.get("keywords");
+        // status，type 他们的-1表示不筛选
+        int type = Tools.strToInt(requestParam.get("type"));
+        int status = Tools.strToInt(requestParam.get("status")); // 过没过期/有没有次数，0没有，1过期
+        int pageSize = Tools.strToInt(requestParam.get("pageSize"));
+        int page = Tools.strToInt(requestParam.get("page"));
+        if (pageSize < 1) {
+            pageSize = 30;
+        }
+        if (page < 1) {
+            page = 1;
+        }
+
+        Map<String, Object> resultMap = new LinkedHashMap<>();
+        int total = apiMapper.ApiKeyListSearchCount(intUserId, keyword, type, status);
+        List<ApiKey> apiKeyList = apiMapper.ApiKeyListSearch(intUserId, keyword, type, status, pageSize, Tools.getPageOffset(page, pageSize));
+        System.out.println(apiKeyList.size());
+        resultMap.put("total", total);
+        resultMap.put("list", apiKeyList);
+
+        return ResponseUtil.success(resultMap);
+    }
+
     /**
      * 从请求体中获取API应用信息
      *

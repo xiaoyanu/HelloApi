@@ -76,6 +76,14 @@ public class ApiController {
         return apiService.getUserApiKeyList(finalUserId, requestParam, request);
     }
 
+    // UserApiKeyListSearch - 搜索用户API密钥列表 - GET
+    @GetMapping({"/key/list/", "/key/list/{user_id}/Search"})
+    @RequiresLogin
+    public Map<String, Object> UserApiKeyListSearch(@PathVariable(required = false) String user_id, @RequestParam(required = false) Map<String, String> requestParam, HttpServletRequest request) {
+        String finalUserId = (user_id == null) ? "0" : user_id;
+        return apiService.userApiKeyListSearch(finalUserId, requestParam, request);
+    }
+
     // UpdateApiKey - 更新API密钥 - PUT
     @PutMapping({"/key/{key}", "/key/"})
     @RequiresLogin

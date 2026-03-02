@@ -70,7 +70,6 @@ export type SelectFormApiKey = {
     keywords: string;
     type: number;
     status: number;
-    view_status: number;
 }
 
 // APIKey

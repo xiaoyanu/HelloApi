@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import {Plus, Delete, Edit, Search, Refresh} from "@element-plus/icons-vue";
-import {GetUserApiKeyList, GetApiKeyInfo, UpdateApiKey, UserAppListSearch, DeleteApiKey, CreateApiKey} from "@/api";
+import {GetUserApiKeyList, GetApiKeyInfo, UpdateApiKey, UserApiKeyListSearch, DeleteApiKey, CreateApiKey} from "@/api";
 import {onMounted, reactive, ref, watch} from "vue";
 import type {Pagination, SelectFormApiKey, APIKey} from "@/types";
 import {dayjs, type FormRules} from "element-plus";
@@ -22,7 +22,6 @@ const searchForm = ref<SelectFormApiKey>({
   keywords: '',
   type: -1, // -1 代表不限，0 免费，1 收费
   status: -1, // -1 代表不限，0 正常，1 异常，2 维护
-  view_status: -1 // -1 代表不限，0 通过，1 拒绝，2 审核中
 })
 
 // 搜索
@@ -31,10 +30,17 @@ const handleSearch = async () => {
     nowTableType.value = 'listSearch'
     paging.value.page = 1
   }
-  const res = await UserAppListSearch(searchForm.value, paging.value.pageSize, paging.value.page);
+  const res = await UserApiKeyListSearch(searchForm.value, userStore.user.id, paging.value.page, paging.value.pageSize);
   if (res.data.code == 200) {
-    tableData.value = res.data.data.list;
+    const rawList = res.data.data.list;
     paging.value.total = res.data.data.total
+    const now = Date.now();
+    tableData.value = rawList.map((item: any) => ({
+      ...item,
+      isExpired: Date.parse(item.expired) < now && item.type == 0 || item.count == 0 && item.type == 1,
+      remainingTime: formatDuration(now, item.expired),
+      createdText: formatNativeDate(item.created)
+    }));
   }
 }
 
@@ -44,7 +50,6 @@ const resetSearch = () => {
     keywords: '',
     type: -1, // -1 代表不限，0 免费，1 收费
     status: -1, // -1 代表不限，0 正常，1 异常，2 维护
-    view_status: -1 // -1 代表不限，0 通过，1 拒绝，2 审核中
   };
   nowTableType.value = 'list'
   handleSearch()
@@ -102,7 +107,7 @@ const getTableData = async () => {
     const now = Date.now();
     tableData.value = rawList.map((item: any) => ({
       ...item,
-      isExpired: Date.parse(item.expired) < now,
+      isExpired: Date.parse(item.expired) < now && item.type == 0 || item.count == 0 && item.type == 1,
       remainingTime: formatDuration(now, item.expired),
       createdText: formatNativeDate(item.created)
     }));
@@ -199,8 +204,6 @@ const rules: FormRules = reactive({
   validateDynamicField: [
     {
       validator: (_, __, callback) => {
-        console.log("我走校验了" + formData.value.type)
-        console.log(dateArray)
         if (formData.value.type == 0) {
           if (!dateArray.value || dateArray.value[0] === '' || dateArray.value[1] === '' || dateArray.value[0] == null || dateArray.value[1] == null) {
             return callback(new Error('请选择有效期限'));

@@ -1,5 +1,5 @@
 import request from '@/utils/request.ts'
-import type {APIKey} from "@/types";
+import type {APIKey, SelectFormApiKey} from "@/types";
 
 const apiUrl = '/api/v1/app'
 
@@ -53,3 +53,17 @@ export const UpdateApiKey = (key: string, form: APIKey): any => request.put(apiU
 
 // 删除API密钥
 export const DeleteApiKey = (key: string): any => request.delete(apiUrl + '/key/' + key)
+
+
+// 用户接口密钥列表搜索
+export const UserApiKeyListSearch =
+    (form: SelectFormApiKey, userid: number = 0, page: number = 1, pageSize: number = 30): any =>
+        request.get(apiUrl + '/key/list/' + userid + '/Search', {
+            params: {
+                keywords: form.keywords,
+                type: form.type,
+                status: form.status,
+                page: page,
+                pageSize: pageSize,
+            }
+        })

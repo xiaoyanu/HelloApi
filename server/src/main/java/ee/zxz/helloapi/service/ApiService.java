@@ -46,4 +46,6 @@ public interface ApiService {
     // 记录API日志/消耗等
     Map<String, Object> logApi(String userKey, String key, ApiRequestLog apiRequestLog, HttpServletRequest request);
 
+    // 搜索用户API密钥列表
+    Map<String, Object> userApiKeyListSearch(String userId, Map<String, String> requestParam, HttpServletRequest request);
 }

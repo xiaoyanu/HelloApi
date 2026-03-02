@@ -281,4 +281,42 @@ public interface ApiMapper {
      */
     @Delete("delete from helloapi_api_request_logs where api_id = #{apiId}")
     void deleteApiLog(int apiId);
+
+    /**
+     * API密钥列表搜索
+     *
+     * @param userId  用户ID
+     * @param keyword 搜索关键词
+     * @param type    密钥类型 0 期限 1次数
+     * @param status  密钥状态 -1 全部 0 有效（没过期/次数>0） 1失效（过期/次数<=0）
+     * @return ApiKey列表
+     */
+    @Select("SELECT * FROM helloapi_api_keys " +
+            "WHERE api_id IN (SELECT id FROM helloapi_api_apps WHERE user_id = #{userId}) " +
+            "AND (#{keyword} = '' OR `key` LIKE CONCAT('%',#{keyword},'%') OR `desc` LIKE CONCAT('%',#{keyword},'%') OR CAST(api_id AS CHAR) = #{keyword}) " +
+            "AND (#{type} = -1 OR `type` = #{type}) " +
+            "AND (#{status} = -1 " +
+            "     OR (#{status} = 0 AND ((`type` = 0 AND (expired IS NULL OR expired > NOW())) OR (`type` = 1 AND `count` > 0))) " +
+            "     OR (#{status} = 1 AND ((`type` = 0 AND expired IS NOT NULL AND expired <= NOW()) OR (`type` = 1 AND `count` <= 0)))) " +
+            "ORDER BY created DESC LIMIT #{pageSize} OFFSET #{offset}")
+    List<ApiKey> ApiKeyListSearch(int userId, String keyword, int type, int status, int pageSize, int offset);
+
+    /**
+     * API密钥列表搜索-总数量
+     *
+     * @param userId  用户ID
+     * @param keyword 搜索关键词
+     * @param type    密钥类型 0 期限 1次数
+     * @param status  密钥状态 -1 全部 0 有效（没过期/次数>0） 1失效（过期/次数<=0）
+     * @return int
+     */
+    @Select("SELECT count(*) FROM helloapi_api_keys " +
+            "WHERE api_id IN (SELECT id FROM helloapi_api_apps WHERE user_id = #{userId}) " +
+            "AND (#{keyword} = '' OR `key` LIKE CONCAT('%',#{keyword},'%') OR `desc` LIKE CONCAT('%',#{keyword},'%') OR CAST(api_id AS CHAR) = #{keyword}) " +
+            "AND (#{type} = -1 OR `type` = #{type}) " +
+            "AND (#{status} = -1 " +
+            "     OR (#{status} = 0 AND ((`type` = 0 AND (expired IS NULL OR expired > NOW())) OR (`type` = 1 AND `count` > 0))) " +
+            "     OR (#{status} = 1 AND ((`type` = 0 AND expired IS NOT NULL AND expired <= NOW()) OR (`type` = 1 AND `count` <= 0)))) " +
+            "ORDER BY created DESC")
+    int ApiKeyListSearchCount(int userId, String keyword, int type, int status);
 }
