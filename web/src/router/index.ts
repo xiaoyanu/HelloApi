@@ -89,7 +89,7 @@ const router = createRouter({
 })
 
 // 路由守卫
-router.beforeEach((to) => {
+router.beforeEach(async (to) => {
     const userStore = useUserStore()
     const token = userStore.token
 
@@ -108,7 +108,7 @@ router.beforeEach((to) => {
         }
 
         if (path == '/admin/manage' || path == '/admin/setting' || path == '/admin') {
-            void userStore.refreshUser()
+            await userStore.refreshUser()
         }
     }
 })

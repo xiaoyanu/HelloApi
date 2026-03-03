@@ -410,4 +410,112 @@ public class UserServiceImpl implements UserService {
         resultMap.put("list", apiInfoList);
         return ResponseUtil.response(200, "获取成功", resultMap);
     }
+
+    @Override
+    public Map<String, Object> updateUserNick(Map<String, String> requestParam, Map<String, String> requestBody, HttpServletRequest request) {
+        int userId = (int) request.getAttribute("userId");
+        if (userMapper.checkUserIdExists(userId) < 1) {
+            return ResponseUtil.response(401, Finals.MESSAGES_ERROR_USER_NOT_FOUND);
+        }
+
+        if (requestParam.get("id") != null && !requestParam.get("id").trim().isEmpty()) {
+            // 检查Token是否为管理员
+            if ((int) request.getAttribute("userMode") != Finals.Admin) {
+                return ResponseUtil.response(403, Finals.MESSAGES_ERROR_NOT_ADMIN);
+            }
+            userId = Tools.strToInt(String.valueOf(requestParam.get("id")));
+            if (userMapper.checkUserIdExists(userId) < 1) {
+                return ResponseUtil.response(400, Finals.MESSAGES_ERROR_USER_NOT_FOUND);
+            }
+
+        }
+
+        String nick = requestBody.get("nick");
+        if (nick == null || nick.trim().isEmpty()) {
+            return ResponseUtil.response(400, "昵称不能为空");
+        }
+        if (nick.length() > 32) {
+            return ResponseUtil.response(400, "昵称不能超过32个字符");
+        }
+
+
+        try {
+            userMapper.updateUserNick(userId, nick);
+            return ResponseUtil.success();
+        } catch (Exception e) {
+            return ResponseUtil.response(500, "修改昵称失败");
+        }
+    }
+
+
+    @Override
+    public Map<String, Object> updateUserMail(Map<String, String> requestParam, Map<String, String> requestBody, HttpServletRequest request) {
+        int userId = (int) request.getAttribute("userId");
+        if (userMapper.checkUserIdExists(userId) < 1) {
+            return ResponseUtil.response(401, Finals.MESSAGES_ERROR_USER_NOT_FOUND);
+        }
+
+        if (requestParam.get("id") != null && !requestParam.get("id").trim().isEmpty()) {
+            // 检查Token是否为管理员
+            if ((int) request.getAttribute("userMode") != Finals.Admin) {
+                return ResponseUtil.response(403, Finals.MESSAGES_ERROR_NOT_ADMIN);
+            }
+            userId = Tools.strToInt(String.valueOf(requestParam.get("id")));
+            if (userMapper.checkUserIdExists(userId) < 1) {
+                return ResponseUtil.response(400, Finals.MESSAGES_ERROR_USER_NOT_FOUND);
+            }
+
+        }
+
+        String mail = requestBody.get("mail");
+        if (mail == null || mail.trim().isEmpty()) {
+            return ResponseUtil.response(400, "邮箱不能为空");
+        }
+        if (!mail.matches("^[a-zA-Z0-9_.-]+@[a-zA-Z0-9-]+(\\.[a-zA-Z0-9-]+)*\\.[a-zA-Z0-9]{2,6}$")) {
+            return ResponseUtil.response(400, "邮箱格式错误");
+        }
+
+        try {
+            userMapper.updateUserMail(userId, mail);
+            return ResponseUtil.success();
+        } catch (Exception e) {
+            return ResponseUtil.response(500, "修改邮箱失败");
+        }
+    }
+
+    @Override
+    public Map<String, Object> updateUserPassword(Map<String, String> requestParam, Map<String, String> requestBody, HttpServletRequest request) {
+        int userId = (int) request.getAttribute("userId");
+        if (userMapper.checkUserIdExists(userId) < 1) {
+            return ResponseUtil.response(401, Finals.MESSAGES_ERROR_USER_NOT_FOUND);
+        }
+
+        if (requestParam.get("id") != null && !requestParam.get("id").trim().isEmpty()) {
+            // 检查Token是否为管理员
+            if ((int) request.getAttribute("userMode") != Finals.Admin) {
+                return ResponseUtil.response(403, Finals.MESSAGES_ERROR_NOT_ADMIN);
+            }
+            userId = Tools.strToInt(String.valueOf(requestParam.get("id")));
+            if (userMapper.checkUserIdExists(userId) < 1) {
+                return ResponseUtil.response(400, Finals.MESSAGES_ERROR_USER_NOT_FOUND);
+            }
+
+        }
+
+        String oldPassword = Tools.getTextMd5(requestBody.get("oldPassword"));
+        String newPassword = Tools.getTextMd5(requestBody.get("newPassword"));
+        if (Objects.equals(oldPassword, newPassword)) {
+            return ResponseUtil.response(400, "新旧密码相同");
+        }
+
+        try {
+            if (userMapper.updateUserPassword(userId, oldPassword, newPassword) < 1) {
+                return ResponseUtil.response(400, "旧密码错误");
+            }
+            return ResponseUtil.success();
+        } catch (Exception e) {
+            return ResponseUtil.response(500, "修改密码失败");
+        }
+
+    }
 }

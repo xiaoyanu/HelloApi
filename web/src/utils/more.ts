@@ -1,6 +1,11 @@
 import {MD5} from 'crypto-js'
 
 const formatter = new Intl.NumberFormat('en-US');
+/**
+ * 判断是否为移动端
+ * @returns {boolean} - 是否为移动端
+ */
+export const isMobile = window.matchMedia('(max-width: 768px)').matches
 
 /**
  * 获取当前年份

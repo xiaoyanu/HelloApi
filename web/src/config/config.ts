@@ -15,7 +15,7 @@ const HelloAPIConfig = {
         },
         admin: {
             // 每页显示数量，影响范围：后台页面
-            pageSize: 1,
+            pageSize: 10,
             // 水印
             watermark: {
                 // 是否显示水印 [true/false]

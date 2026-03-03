@@ -56,7 +56,6 @@ const rules: FormRules = {
   ],
   mail: [
     {required: true, message: '请输入邮箱', trigger: 'blur'},
-    // Element 内置支持 type: 'email'，无需手写长正则
     {type: 'email', message: '请输入正确的邮箱格式', trigger: ['blur', 'change']}
   ]
 }

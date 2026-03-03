@@ -171,4 +171,31 @@ public interface UserMapper {
     @Select("SELECT COUNT(*) FROM `helloapi_api_apps` WHERE `user_id` = #{userId} AND (#{keyword} IS NULL OR #{keyword} = '' OR `title` LIKE CONCAT('%', #{keyword}, '%') OR `smallTitle` LIKE CONCAT('%', #{keyword}, '%')) AND (#{type} = -1 OR `type` = #{type}) AND (#{status} = -1 OR `status` = #{status}) AND (#{view_status} = -1 OR `view_status` = #{view_status})")
     int getUserListSearchCount(int userId, String keyword, int type, int status, int view_status);
 
+    /**
+     * UpdateUserNick - 修改用户昵称
+     *
+     * @param userId 用户ID
+     * @param nick   昵称
+     */
+    @Update("UPDATE `helloapi_users` SET `nick` = #{nick} WHERE `id` = #{userId}")
+    void updateUserNick(int userId, String nick);
+
+    /**
+     * UpdateUserMail - 修改用户邮箱
+     *
+     * @param userId 用户ID
+     * @param mail   昵称
+     */
+    @Update("UPDATE `helloapi_users` SET `mail` = #{mail} WHERE `id` = #{userId}")
+    void updateUserMail(int userId, String mail);
+
+    /**
+     * updateUserPassword - 修改用户密码
+     *
+     * @param userId      用户ID
+     * @param oldPassword 旧密码
+     * @param newPassword 新密码
+     */
+    @Update("UPDATE `helloapi_users` SET `password` = #{newPassword} WHERE `id` = #{userId} AND `password`=#{oldPassword}")
+    int updateUserPassword(int userId, String oldPassword, String newPassword);
 }

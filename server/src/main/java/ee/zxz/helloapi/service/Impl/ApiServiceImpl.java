@@ -355,7 +355,7 @@ public class ApiServiceImpl implements ApiService {
     @Override
     public Map<String, Object> getUserApiKeyList(String userId, Map<String, String> requestParam, HttpServletRequest request) {
         int intUserId = Tools.strToInt(userId);
-        int tokenUserId = Tools.strToInt((String) request.getAttribute("tokenUserId"));
+        int tokenUserId = (int) request.getAttribute("userId");
         if (tokenUserId != intUserId) {
             int userMode = (int) request.getAttribute("userMode");
             if (userMode != Finals.Admin) {
@@ -591,7 +591,6 @@ public class ApiServiceImpl implements ApiService {
         Map<String, Object> resultMap = new LinkedHashMap<>();
         int total = apiMapper.ApiKeyListSearchCount(intUserId, keyword, type, status);
         List<ApiKey> apiKeyList = apiMapper.ApiKeyListSearch(intUserId, keyword, type, status, pageSize, Tools.getPageOffset(page, pageSize));
-        System.out.println(apiKeyList.size());
         resultMap.put("total", total);
         resultMap.put("list", apiKeyList);
 

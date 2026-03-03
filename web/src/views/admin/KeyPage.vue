@@ -8,9 +8,52 @@ import {HelloAPIConfig} from "@/config/config.ts";
 import {useUserStore} from "@/stores";
 import {formatDuration, formatNativeDate} from "@/utils/more.ts";
 
+// 分页
+const paging = ref<Pagination>({
+  page: 1,
+  pageSize: HelloAPIConfig.website.admin.pageSize,
+  total: 0,
+})
+
+// 统一数据获取
+const fetchData = async () => {
+  const isSearching = searchForm.value.keywords !== '' || searchForm.value.type !== -1 || searchForm.value.status !== -1;
+  const apiCall = isSearching
+      ? UserApiKeyListSearch(searchForm.value, userStore.user.id, paging.value.page, paging.value.pageSize)
+      : GetUserApiKeyList(userStore.user.id, paging.value.page, paging.value.pageSize);
+
+  try {
+    const res = await apiCall;
+    if (res.data.code === 200) {
+      const { list, total } = res.data.data;
+      paging.value.total = total;
+      tableData.value = processTableData(list);
+    }
+  } catch (error) {
+    console.error("Failed to fetch data:", error);
+    // 可选：向用户显示错误消息
+  }
+}
+
+// 处理表格数据
+const processTableData = (rawData: any[]): APIKey[] => {
+  const now = Date.now();
+  return rawData.map((item: any) => ({
+    ...item,
+    isExpired: (Date.parse(item.expired) < now && item.type === 0) || (item.count === 0 && item.type === 1),
+    remainingTime: formatDuration(now, item.expired),
+    createdText: formatNativeDate(item.created)
+  }));
+}
+
+
+// 分页改变时触发
+const handlePageChange = () => {
+  fetchData()
+}
+
 const userStore = useUserStore();
 const tableData = ref<APIKey[]>();
-const nowTableType = ref()
 
 const copyKey = async (key: string) => {
   await navigator.clipboard.writeText(key);
@@ -25,23 +68,9 @@ const searchForm = ref<SelectFormApiKey>({
 })
 
 // 搜索
-const handleSearch = async () => {
-  if (nowTableType.value != 'listSearch') {
-    nowTableType.value = 'listSearch'
-    paging.value.page = 1
-  }
-  const res = await UserApiKeyListSearch(searchForm.value, userStore.user.id, paging.value.page, paging.value.pageSize);
-  if (res.data.code == 200) {
-    const rawList = res.data.data.list;
-    paging.value.total = res.data.data.total
-    const now = Date.now();
-    tableData.value = rawList.map((item: any) => ({
-      ...item,
-      isExpired: Date.parse(item.expired) < now && item.type == 0 || item.count == 0 && item.type == 1,
-      remainingTime: formatDuration(now, item.expired),
-      createdText: formatNativeDate(item.created)
-    }));
-  }
+const handleSearch = () => {
+  paging.value.page = 1;
+  fetchData();
 }
 
 // 重置搜索
@@ -51,16 +80,10 @@ const resetSearch = () => {
     type: -1, // -1 代表不限，0 免费，1 收费
     status: -1, // -1 代表不限，0 正常，1 异常，2 维护
   };
-  nowTableType.value = 'list'
-  handleSearch()
+  paging.value.page = 1
+  fetchData()
 }
 
-// 分页
-const paging = ref<Pagination>({
-  page: 1,
-  pageSize: HelloAPIConfig.website.admin.pageSize,
-  total: 0,
-})
 
 // 抽屉
 const showDrawer = ref(false)
@@ -93,32 +116,6 @@ const formData = ref<APIKey>({
   count: 0,
   desc: ''
 });
-
-// 获取用户的APIKEY列表
-const getTableData = async () => {
-  if (nowTableType.value != 'list') {
-    nowTableType.value = 'list'
-    paging.value.page = 1
-  }
-  const res = await GetUserApiKeyList(userStore.user.id, paging.value.page, paging.value.pageSize);
-  if (res.data.code == 200) {
-    const rawList = res.data.data.list;
-    paging.value.total = res.data.data.total
-    const now = Date.now();
-    tableData.value = rawList.map((item: any) => ({
-      ...item,
-      isExpired: Date.parse(item.expired) < now && item.type == 0 || item.count == 0 && item.type == 1,
-      remainingTime: formatDuration(now, item.expired),
-      createdText: formatNativeDate(item.created)
-    }));
-  }
-}
-
-// 分页改变时触发
-function handleNewPageChange(page: number) {
-  paging.value.page = page
-  reloadTable()
-}
 
 // 重置formData
 const resetFormData = () => {
@@ -160,7 +157,7 @@ const submitFormCreate = async () => {
     }
     const res = await CreateApiKey(formData.value)
     if (res.data.code == 200) {
-      void getTableData()
+      await fetchData()
       ElMessage.success('创建成功')
       showDrawer.value = false
     }
@@ -181,7 +178,6 @@ const submitFormUpdate = async () => {
     }
     const res = await UpdateApiKey(nowRow.value.key, formData.value)
     if (res.data.code == 200) {
-      reloadTable()
       ElMessage.success('编辑成功')
       showDrawer.value = false
     }
@@ -287,25 +283,15 @@ const handleDelete = (key: string) => {
   ).then(async () => {
     const res = await DeleteApiKey(key)
     if (res.data.code == 200) {
-      reloadTable()
       ElMessage.success('删除成功')
     }
   }).catch(() => {
   })
 }
 
-// 根据当前表格类型判断是刷新搜索结果还是全部数据
-const reloadTable = () => {
-  if (nowTableType.value == 'listSearch') {
-    handleSearch()
-  } else {
-    getTableData()
-  }
-}
-
 
 onMounted(() => {
-  getTableData();
+  fetchData();
 })
 </script>
 <template>
@@ -431,11 +417,11 @@ onMounted(() => {
     </el-table>
     <div class="flex items-center justify-center mt-6">
       <el-pagination
-          :current-page="paging.page"
+          v-model:current-page="paging.page"
           :page-size="paging.pageSize"
           :total="paging.total"
           layout="prev, pager, next"
-          @current-change="handleNewPageChange"
+          @current-change="handlePageChange"
       />
     </div>
 

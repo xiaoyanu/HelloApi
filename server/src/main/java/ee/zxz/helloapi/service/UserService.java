@@ -32,4 +32,13 @@ public interface UserService {
 
     // 用户API列表搜索
     Map<String, Object> userApiListSearch(Map<String, String> requestParam, HttpServletRequest request);
+
+    // 更新用户昵称
+    Map<String, Object> updateUserNick(Map<String, String> requestParam,Map<String,String> requestBody, HttpServletRequest request);
+
+    // 更新用户邮箱
+    Map<String, Object> updateUserMail(Map<String, String> requestParam, Map<String, String> requestBody, HttpServletRequest request);
+
+    // 更新用户密码
+    Map<String, Object> updateUserPassword(Map<String, String> requestParam, Map<String, String> requestBody, HttpServletRequest request);
 }

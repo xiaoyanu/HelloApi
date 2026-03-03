@@ -14,7 +14,11 @@ export const Register = (form: object): any => request.post(apiUrl + '/Register'
 export const Login = (form: object): any => request.post(apiUrl + '/Login', form)
 
 // 用户信息
-export const GetUserInfo = (): any => request.get(apiUrl + '/')
+export const GetUserInfo = (id: number = 0): any => request.get(apiUrl + '/', {
+    params: {
+        ...(id != 0 && {id: id})
+    }
+})
 
 // 用户接口列表
 export const GetUserAppList =
@@ -38,3 +42,31 @@ export const UserAppListSearch = (form: SelectFormApi, pageSize: number, page: n
             page: page,
         }
     })
+
+// 更新用户昵称
+export const UpdateUserNick = (nick: string, id: number = 0): any => request.put(apiUrl + '/nick', {
+    nick,
+}, {
+    params: {
+        ...(id != 0 && {id: id})
+    }
+})
+
+// 更新用户邮箱
+export const UpdateUserMail = (mail: string, id: number = 0): any => request.put(apiUrl + '/mail', {
+    mail,
+}, {
+    params: {
+        ...(id != 0 && {id: id})
+    }
+})
+
+
+// 更新用户密码
+export const UpdateUserPassword = (oldPassword: string, newPassword: string, id: number = 0): any => request.put(apiUrl + '/password', {
+    oldPassword, newPassword
+}, {
+    params: {
+        ...(id != 0 && {id: id})
+    }
+})

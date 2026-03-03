@@ -43,6 +43,28 @@ public class UserController {
         return userService.getUserInfo(requestParam, request);
     }
 
+    // UpdateUserNick - 修改用户昵称 - PUT
+    @PutMapping("/nick")
+    @RequiresLogin
+    public Map<String, Object> UpdateUserNick(@RequestParam(required = false) Map<String, String> requestParam, @RequestBody(required = false) Map<String, String> requestBody, HttpServletRequest request) {
+        return userService.updateUserNick(requestParam, requestBody, request);
+    }
+
+    // UpdateUserMail - 修改用户邮箱 - PUT
+    @PutMapping("/mail")
+    @RequiresLogin
+    public Map<String, Object> UpdateUserMail(@RequestParam(required = false) Map<String, String> requestParam, @RequestBody(required = false) Map<String, String> requestBody, HttpServletRequest request) {
+        return userService.updateUserMail(requestParam, requestBody, request);
+    }
+
+    // UpdateUserPassword - 修改用户密码 - PUT
+    @PutMapping("/password")
+    @RequiresLogin
+    public Map<String, Object> UpdateUserPassword(@RequestParam(required = false) Map<String, String> requestParam, @RequestBody(required = false) Map<String, String> requestBody, HttpServletRequest request) {
+        return userService.updateUserPassword(requestParam, requestBody, request);
+    }
+
+
     // GetUserKey - 获取用户密钥 - GET
     @GetMapping("/key")
     @RequiresLogin

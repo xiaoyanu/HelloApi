@@ -10,7 +10,6 @@ import {formatNativeDate} from "@/utils/more.ts";
 
 const userStore = useUserStore();
 const tableData = ref<AppList[]>();
-const nowTableType = ref()
 
 // 搜索筛选表单
 const searchForm = ref<SelectFormApi>({
@@ -20,33 +19,49 @@ const searchForm = ref<SelectFormApi>({
   view_status: -1 // -1 代表不限，0 通过，1 拒绝，2 审核中
 })
 
+// 统一数据获取
+const fetchData = async () => {
+  const isSearching = searchForm.value.keywords !== '' || searchForm.value.type !== -1 || searchForm.value.status !== -1 || searchForm.value.view_status !== -1;
+  const apiCall = isSearching
+      ? UserAppListSearch(searchForm.value, paging.value.pageSize, paging.value.page)
+      : GetUserAppList(0, paging.value.page, paging.value.pageSize);
+
+  try {
+    const res = await apiCall;
+    if (res.data.code === 200) {
+      const { list, total } = res.data.data;
+      paging.value.total = total;
+      tableData.value = processTableData(list);
+    }
+  } catch (error) {
+    console.error("Failed to fetch data:", error);
+  }
+}
+
+// 处理表格数据
+const processTableData = (rawData: any[]): AppList[] => {
+  return rawData.map((item: any) => ({
+    ...item,
+    createdText: formatNativeDate(item.created),
+  }));
+}
+
 // 搜索
-const handleSearch = async () => {
-  if (nowTableType.value != 'listSearch') {
-    nowTableType.value = 'listSearch'
-    paging.value.page = 1
-  }
-  const res = await UserAppListSearch(searchForm.value, paging.value.pageSize, paging.value.page);
-  if (res.data.code == 200) {
-    const rawList = res.data.data.list;
-    paging.value.total = res.data.data.total
-    tableData.value = rawList.map((item: any) => ({
-      ...item,
-      createdText: formatNativeDate(item.created),
-    }));
-  }
+const handleSearch = () => {
+  paging.value.page = 1;
+  fetchData();
 }
 
 // 重置搜索
 const resetSearch = () => {
   searchForm.value = {
     keywords: '',
-    type: -1, // -1 代表不限，0 免费，1 收费
-    status: -1, // -1 代表不限，0 正常，1 异常，2 维护
-    view_status: -1 // -1 代表不限，0 通过，1 拒绝，2 审核中
+    type: -1,
+    status: -1,
+    view_status: -1
   };
-  nowTableType.value = 'list'
-  handleSearch()
+  paging.value.page = 1;
+  fetchData();
 }
 
 // 分页
@@ -55,6 +70,12 @@ const paging = ref<Pagination>({
   pageSize: HelloAPIConfig.website.admin.pageSize,
   total: 0,
 })
+
+// 分页改变时触发
+const handlePageChange = (page: number) => {
+  paging.value.page = page;
+  fetchData();
+}
 
 // 抽屉
 const showDrawer = ref(false)
@@ -93,29 +114,6 @@ const removeParam = (index: number) => {
   formData.value.params.splice(index, 1);
 };
 
-// 获取用户发布的API接口列表
-const getTableData = async () => {
-  if (nowTableType.value != 'list') {
-    nowTableType.value = 'list'
-    paging.value.page = 1
-  }
-  const res = await GetUserAppList(0, paging.value.page, paging.value.pageSize);
-  if (res.data.code == 200) {
-    const rawList = res.data.data.list;
-    paging.value.total = res.data.data.total
-    tableData.value = rawList.map((item: any) => ({
-      ...item,
-      createdText: formatNativeDate(item.created),
-    }));
-  }
-}
-
-// 分页改变时触发
-function handleNewPageChange(page: number) {
-  paging.value.page = page
-  reloadTable()
-}
-
 // 重置formData
 const resetFormData = () => {
   formData.value = {
@@ -153,7 +151,7 @@ const submitFormCreate = async () => {
     }
     const res = await CreateApi(formData.value)
     if (res.data.code == 200) {
-      void getTableData()
+      await fetchData()
       ElMessage.success('发布成功')
       showDrawer.value = false
     }
@@ -176,7 +174,7 @@ const submitFormUpdate = () => {
       }
       const res = await UpdateApi(nowRow.value.id, formData.value)
       if (res.data.code == 200) {
-        reloadTable()
+        await fetchData()
         ElMessage.success('编辑成功')
         showDrawer.value = false
       }
@@ -274,25 +272,15 @@ const handleDelete = (id: number) => {
   ).then(async () => {
     const res = await DeleteApi(id)
     if (res.data.code == 200) {
-      reloadTable()
+      await fetchData()
       ElMessage.success('删除成功')
     }
   }).catch(() => {
   })
 }
 
-// 根据当前表格类型判断是刷新搜索结果还是全部数据
-const reloadTable = () => {
-  if (nowTableType.value == 'listSearch') {
-    handleSearch()
-  } else {
-    getTableData()
-  }
-}
-
-
 onMounted(() => {
-  getTableData();
+  fetchData();
 })
 </script>
 <template>
@@ -439,7 +427,7 @@ onMounted(() => {
           :page-size="paging.pageSize"
           :total="paging.total"
           layout="prev, pager, next"
-          @current-change="handleNewPageChange"
+          @current-change="handlePageChange"
       />
     </div>
 

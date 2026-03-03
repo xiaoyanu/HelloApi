@@ -30,7 +30,7 @@ instance.interceptors.request.use(
 
 // 响应拦截器
 instance.interceptors.response.use(
-    (res) => {
+    async (res) => {
         // HTTP状态码为2XX时
         const userStore = useUserStore()
 
@@ -43,14 +43,10 @@ instance.interceptors.response.use(
         if (res.data.code === 401) {
             // 移除token和user信息
             userStore.removeAll()
-            const currentPath = router.currentRoute.value.path
-            if (currentPath.startsWith('/admin')) {
-                // 提示登录过期
-                ElMessage.error('登录过期，请重新登录')
-                // 跳转到登录页
-                void router.push({name: 'AdminLogin'})
-            }
-            return Promise.reject(res.data.msg || '登录过期')
+            // 提示登录过期
+            ElMessage.error('登录过期，请重新登录')
+            // 跳转到登录页
+            void router.push({name: 'AdminLogin'})
         }
 
         // code 非200 提示错误信息，返回响应
