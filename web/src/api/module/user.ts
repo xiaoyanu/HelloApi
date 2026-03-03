@@ -1,4 +1,4 @@
-import request from '@/utils/request.ts'
+import request from '@/utils/module/request'
 import {HelloAPIConfig} from "@/config/config.ts";
 import type {SelectFormApi} from "@/types";
 
@@ -70,3 +70,9 @@ export const UpdateUserPassword = (oldPassword: string, newPassword: string, id:
         ...(id != 0 && {id: id})
     }
 })
+
+// 获取用户密钥
+export const GetUserKey = (): any => request.get(apiUrl + '/key')
+
+// 重置用户密钥
+export const RestUserKey = (userId: number): any => request.put(apiUrl + '/key/' + userId)

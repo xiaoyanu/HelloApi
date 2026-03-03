@@ -1,5 +1,5 @@
 import axios from 'axios'
-import {HelloAPIConfig} from '@/config/config'
+import {HelloAPIConfig} from '@/config/config.ts'
 import {useUserStore} from "@/stores";
 import router from "@/router"
 

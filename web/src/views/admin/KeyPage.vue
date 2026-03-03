@@ -6,7 +6,7 @@ import type {Pagination, SelectFormApiKey, APIKey} from "@/types";
 import {dayjs, type FormRules} from "element-plus";
 import {HelloAPIConfig} from "@/config/config.ts";
 import {useUserStore} from "@/stores";
-import {formatDuration, formatNativeDate} from "@/utils/more.ts";
+import {copyText, formatDuration, formatNativeDate, isMobile} from "@/utils";
 
 // 分页
 const paging = ref<Pagination>({
@@ -22,16 +22,11 @@ const fetchData = async () => {
       ? UserApiKeyListSearch(searchForm.value, userStore.user.id, paging.value.page, paging.value.pageSize)
       : GetUserApiKeyList(userStore.user.id, paging.value.page, paging.value.pageSize);
 
-  try {
-    const res = await apiCall;
-    if (res.data.code === 200) {
-      const { list, total } = res.data.data;
-      paging.value.total = total;
-      tableData.value = processTableData(list);
-    }
-  } catch (error) {
-    console.error("Failed to fetch data:", error);
-    // 可选：向用户显示错误消息
+  const res = await apiCall;
+  if (res.data.code === 200) {
+    const {list, total} = res.data.data;
+    paging.value.total = total;
+    tableData.value = processTableData(list);
   }
 }
 
@@ -54,11 +49,6 @@ const handlePageChange = () => {
 
 const userStore = useUserStore();
 const tableData = ref<APIKey[]>();
-
-const copyKey = async (key: string) => {
-  await navigator.clipboard.writeText(key);
-  ElMessage.success('复制成功')
-}
 
 // 搜索筛选表单
 const searchForm = ref<SelectFormApiKey>({
@@ -89,7 +79,7 @@ const resetSearch = () => {
 const showDrawer = ref(false)
 const drawerTitle = ref()
 const resizable = ref(true) // 是否可调整大小
-const drawerSize = ref('30%') // 抽屉大小
+const drawerSize = ref(isMobile ? '100%' : '30%') // 抽屉大小
 const nowRow = ref()
 
 // 日期表单
@@ -356,7 +346,7 @@ onMounted(() => {
           <el-link
               target="_blank"
               type="info"
-              @click="copyKey(row.key)"
+              @click="copyText(row.key)"
           >
             {{ row.key }}
           </el-link>

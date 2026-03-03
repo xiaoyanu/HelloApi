@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import {ref} from 'vue'
+import {computed, ref} from 'vue'
 import {
   PhGithubLogo,
   PhArrowCounterClockwise,
@@ -14,7 +14,7 @@ import {
   PhSlidersHorizontal,
   PhList
 } from '@phosphor-icons/vue'
-import {getGravatarHash} from "@/utils/more.ts";
+import {getGravatarHash} from "@/utils";
 import {useRoute, useRouter} from "vue-router";
 import {useUserStore} from "@/stores";
 import {HelloAPIConfig} from "@/config/config.ts";
@@ -25,15 +25,22 @@ const userStore = useUserStore()
 //  控制移动端菜单显隐
 const showMobileMenu = ref(false)
 const menus = [
-  {label: '首页', path: '/admin', icon: PhHouse},
-  {label: 'API 管理', path: '/admin/api', icon: PhRocketLaunch},
-  {label: 'APIKey 管理', path: '/admin/key', icon: PhKey},
-  {label: '我的信息', path: '/admin/user', icon: PhIdentificationCard},
-  {label: '数据概括', path: '/admin/stat', icon: PhPresentationChart},
-  {label: '用户管理', path: '/admin/manage', icon: PhUsers},
-  {label: '全局设置', path: '/admin/setting', icon: PhSlidersHorizontal},
-  {label: '使用文档', path: '/admin/doc', icon: PhBookBookmark},
+  {label: '首页', path: '/admin', icon: PhHouse, mode: 0},
+  {label: 'API 管理', path: '/admin/api', icon: PhRocketLaunch, mode: 0},
+  {label: 'APIKey 管理', path: '/admin/key', icon: PhKey, mode: 0},
+  {label: '我的信息', path: '/admin/user', icon: PhIdentificationCard, mode: 0},
+  {label: '数据概括', path: '/admin/stat', icon: PhPresentationChart, mode: 0},
+  {label: '用户管理', path: '/admin/manage', icon: PhUsers, mode: 1},
+  {label: '全局设置', path: '/admin/setting', icon: PhSlidersHorizontal, mode: 1},
+  {label: '使用文档', path: '/admin/doc', icon: PhBookBookmark, mode: 0},
 ]
+
+const filteredMenus = computed(() => {
+  return menus.filter(item =>
+      item.mode === 0 || item.mode === userStore.user.mode
+  )
+})
+
 const handleNav = (path: string) => {
   router.push(path)
   showMobileMenu.value = false // 移动端点击菜单后自动收起
@@ -86,25 +93,18 @@ const watermark = (): string => {
           </div>
           <ul class="select-none flex-1 list-none pt-2.5 overflow-y-auto">
             <li
-                v-for="item in menus"
+                v-for="item in filteredMenus"
                 :key="item.path"
-                :class="{ 'active': route.path === item.path }"
-                class="
-              h-12.5
-              flex items-center
-              pl-6.25
-              cursor-pointer
-              text-[#606266]
-              transition-all duration-300
-              font-[14px]
-              border-r-[3px] border-transparent
-              hover:bg-[#ecf5ff]
-              "
+                :class="[
+                    'h-12.5 flex items-center pl-6.25 cursor-pointer text-[#606266] transition-all duration-300 font-[14px] border-r-[3px] border-transparent hover:bg-[#ecf5ff]',
+                    { 'active': route.path === item.path }
+                ]"
                 @click="handleNav(item.path)"
             >
               <component :is="item.icon" :size="18" class="mr-3" weight="duotone"/>
               {{ item.label }}
             </li>
+
           </ul>
           <div class="p-5 border-t border-[#E4E7ED] border-solid">
             <button class="

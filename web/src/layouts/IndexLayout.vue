@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import {HelloAPIConfig} from '@/config/config'
-import {getNowYear, getSearchNullMessage} from "@/utils/more.ts";
+import {getNowYear, getSearchNullMessage} from "@/utils";
 import {PhArrowLineUp, PhMagnifyingGlass} from "@phosphor-icons/vue"
 import router from "@/router";
 import {ref} from "vue";

@@ -1,4 +1,4 @@
-import request from '@/utils/request.ts'
+import request from '@/utils/module/request.ts'
 import type {APIKey, SelectFormApiKey} from "@/types";
 
 const apiUrl = '/api/v1/app'

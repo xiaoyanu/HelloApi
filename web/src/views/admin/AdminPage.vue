@@ -3,7 +3,7 @@ import { defineAsyncComponent, ref } from "vue";
 import {
   PhUserCircle, PhChartPieSlice, PhChartBar, PhArrowBendRightDown, PhArrowBendLeftUp, PhCalendar
 } from "@phosphor-icons/vue";
-import { formatNumber } from "@/utils/more";
+import { formatNumber } from "@/utils";
 
 // 异步按需加载图表组件
 const BaseChart = defineAsyncComponent(() => import('@/components/BaseChart.vue'));

@@ -107,8 +107,12 @@ router.beforeEach(async (to) => {
             return '/admin/login';
         }
 
-        if (path == '/admin/manage' || path == '/admin/setting' || path == '/admin') {
+        if (path == '/admin/manage' || path == '/admin/setting') {
             await userStore.refreshUser()
+            if (userStore.user.mode != 1) {
+                ElMessage.error("权限不足，无法访问此页面")
+                return '/admin'
+            }
         }
     }
 })

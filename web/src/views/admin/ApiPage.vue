@@ -6,7 +6,7 @@ import type {AppList, App, Pagination, SelectFormApi} from "@/types";
 import type {FormRules} from "element-plus";
 import {useUserStore} from "@/stores";
 import {HelloAPIConfig} from "@/config/config.ts";
-import {formatNativeDate} from "@/utils/more.ts";
+import {formatNativeDate} from "@/utils/module/more.ts";
 
 const userStore = useUserStore();
 const tableData = ref<AppList[]>();

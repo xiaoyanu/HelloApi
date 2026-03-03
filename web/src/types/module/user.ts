@@ -55,6 +55,7 @@ export interface User {
     username?: string;
     mail?: string;
     nick?: string;
+    key?: string;
 }
 
 // 用于筛选条件API接口

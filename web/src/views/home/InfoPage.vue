@@ -5,6 +5,7 @@ import {onMounted, ref} from "vue"
 import type {App} from "@/types";
 import {GetApiInfo} from "@/api";
 import {PhHouseLine} from "@phosphor-icons/vue";
+import {copyText} from "@/utils";
 
 const router = useRouter()
 const route = useRoute()
@@ -40,11 +41,6 @@ const getApiInfo = async () => {
   }
 }
 
-const copyAddress = async () => {
-  await navigator.clipboard.writeText(getApiUrl());
-  ElMessage.success('复制成功')
-}
-
 const getApiUrl = () => {
   const url = apiInfo.value.url;
   if (/^https?:\/\//i.test(url)) {
@@ -73,7 +69,7 @@ onMounted(() => {
             placement="top-start"
         >
           <div id="copy" class="bg-[#ecf0f3] ml-2 shrink-0 rounded-lg flex items-center justify-center w-7 h-7"
-               @click="copyAddress">
+               @click="copyText(getApiUrl())">
             <el-icon size="16">
               <DocumentCopy/>
             </el-icon>

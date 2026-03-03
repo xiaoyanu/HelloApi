@@ -2,10 +2,11 @@
 import {onMounted, reactive, ref} from 'vue'
 import {useUserStore} from "@/stores";
 import type {FormInstance, FormRules} from "element-plus";
-import {Edit} from "@element-plus/icons-vue";
+import {DocumentCopy, Edit} from "@element-plus/icons-vue";
 import type {User} from "@/types";
-import {GetUserInfo, UpdateUserMail, UpdateUserNick, UpdateUserPassword} from "@/api";
+import {GetUserInfo, GetUserKey, RestUserKey, UpdateUserMail, UpdateUserNick, UpdateUserPassword} from "@/api";
 import {useRouter} from "vue-router"
+import {copyText} from "@/utils";
 
 const router = useRouter()
 const userStore = useUserStore()
@@ -16,6 +17,7 @@ const userInfo = ref<User>({
   mode: -1,
   username: '',
   mail: '',
+  key: ''
 })
 
 // 修改密码对话框
@@ -82,6 +84,29 @@ const openPasswordDialog = () => {
   dialogVisible.value = true
 }
 
+// resetUserKey
+const resetUserKey = (userId: number) => {
+  ElMessageBox.confirm('确定要重置用户密钥吗？重置密钥后之前的密钥会立即失效，请谨慎操作！', '提示', {
+    confirmButtonText: '确定',
+    cancelButtonText: '取消',
+    type: 'warning'
+  }).then(async () => {
+    const res = await RestUserKey(userId)
+    if (res.data.code == 200) {
+      await getUserKey()
+      ElMessage.success('密钥重置成功')
+    }
+  })
+}
+
+// 获取用户密钥
+const getUserKey = async () => {
+  const res = await GetUserKey()
+  if (res.data.code == 200) {
+    userInfo.value.key = res.data.data.key;
+  }
+}
+
 // 提交修改密码
 const submitPasswordForm = async () => {
   const isValid = await formRef.value?.validate().catch(() => false);
@@ -136,8 +161,9 @@ const updateUserMail = async () => {
   }
 }
 
-onMounted(() => {
-  getUserInfo()
+onMounted(async () => {
+  await getUserInfo()
+  void getUserKey()
 })
 </script>
 
@@ -154,6 +180,12 @@ onMounted(() => {
         :rules="rulesUser"
         ref="formRef"
     >
+      <el-form-item label="权限">
+        <el-tag :type="userInfo.mode==0?'primary':'danger'" size="large">{{
+            userInfo.mode == 0 ? "普通用户" : "管理员"
+          }}
+        </el-tag>
+      </el-form-item>
       <el-form-item label="UID">
         <el-input v-model="userInfo.id" disabled/>
       </el-form-item>
@@ -174,7 +206,6 @@ onMounted(() => {
             </el-button>
           </template>
         </el-input>
-
       </el-form-item>
       <el-form-item label="邮箱" prop="mail">
         <el-input v-model="userInfo.mail">
@@ -188,14 +219,22 @@ onMounted(() => {
           </template>
         </el-input>
       </el-form-item>
-      <el-form-item label="权限">
-        <el-tag :type="userInfo.mode==0?'primary':'danger'" size="large">{{
-            userInfo.mode == 0 ? "普通用户" : "管理员"
-          }}
-        </el-tag>
+      <el-form-item label="密钥" prop="mail">
+        <el-input placeholder="重置密钥生成" v-model="userInfo.key" disabled>
+          <template #append>
+            <el-button @click="copyText(userInfo.key)">
+              <el-icon>
+                <DocumentCopy/>
+              </el-icon>
+              &nbsp;复制
+            </el-button>
+          </template>
+        </el-input>
       </el-form-item>
+      <el-form-item></el-form-item>
       <el-form-item>
-        <el-button type="primary" @click="openPasswordDialog">修改密码</el-button>
+        <el-button type="warning" plain @click="resetUserKey(userStore.user.id as number)">重置密钥</el-button>
+        <el-button type="primary" plain @click="openPasswordDialog">修改密码</el-button>
       </el-form-item>
     </el-form>
   </div>
@@ -206,7 +245,6 @@ onMounted(() => {
       v-model="dialogVisible"
       title="修改密码"
       width="500px"
-      :close-on-click-modal="false"
       align-center
       class="responsive-dialog"
       @closed="clearForm"

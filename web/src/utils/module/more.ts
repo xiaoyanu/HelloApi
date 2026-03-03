@@ -1,6 +1,7 @@
 import {MD5} from 'crypto-js'
 
 const formatter = new Intl.NumberFormat('en-US');
+
 /**
  * 判断是否为移动端
  * @returns {boolean} - 是否为移动端
@@ -93,3 +94,9 @@ export const formatNativeDate = (dateStr: string) => {
     const pad = (n: number) => n.toString().padStart(2, '0');
     return `${d.getFullYear()}年${pad(d.getMonth() + 1)}月${pad(d.getDate())}日 ${pad(d.getHours())}:${pad(d.getMinutes())}`;
 };
+
+// 复制文本，并弹窗提示
+export const copyText = async (str: any) => {
+    await navigator.clipboard.writeText(str);
+    ElMessage.success('复制成功')
+}
