@@ -240,6 +240,14 @@ public interface ApiMapper {
     void deleteApiKey(String key);
 
     /**
+     * 删除指定ApiID下的所有Api密钥
+     *
+     * @param api_id Api的ID
+     */
+    @Delete("delete from helloapi_api_keys where `api_id` = #{api_id}")
+    void deleteApiKeyAll(int api_id);
+
+    /**
      * 重置API密钥
      *
      * @param key 密钥
@@ -293,7 +301,7 @@ public interface ApiMapper {
      */
     @Select("SELECT * FROM helloapi_api_keys " +
             "WHERE api_id IN (SELECT id FROM helloapi_api_apps WHERE user_id = #{userId}) " +
-            "AND (#{keyword} = '' OR `key` LIKE CONCAT('%',#{keyword},'%') OR `desc` LIKE CONCAT('%',#{keyword},'%') OR CAST(api_id AS CHAR) = #{keyword}) " +
+            "AND (#{keyword} = '' OR `key` = #{keyword} OR `desc` LIKE CONCAT('%',#{keyword},'%') OR `api_id` = #{keyword}) " +
             "AND (#{type} = -1 OR `type` = #{type}) " +
             "AND (#{status} = -1 " +
             "     OR (#{status} = 0 AND ((`type` = 0 AND (expired IS NULL OR expired > NOW())) OR (`type` = 1 AND `count` > 0))) " +
@@ -312,7 +320,7 @@ public interface ApiMapper {
      */
     @Select("SELECT count(*) FROM helloapi_api_keys " +
             "WHERE api_id IN (SELECT id FROM helloapi_api_apps WHERE user_id = #{userId}) " +
-            "AND (#{keyword} = '' OR `key` LIKE CONCAT('%',#{keyword},'%') OR `desc` LIKE CONCAT('%',#{keyword},'%') OR CAST(api_id AS CHAR) = #{keyword}) " +
+            "AND (#{keyword} = '' OR `key` = #{keyword} OR `desc` LIKE CONCAT('%',#{keyword},'%') OR `api_id` = #{keyword}) " +
             "AND (#{type} = -1 OR `type` = #{type}) " +
             "AND (#{status} = -1 " +
             "     OR (#{status} = 0 AND ((`type` = 0 AND (expired IS NULL OR expired > NOW())) OR (`type` = 1 AND `count` > 0))) " +

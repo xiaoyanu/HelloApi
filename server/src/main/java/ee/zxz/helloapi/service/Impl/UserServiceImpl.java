@@ -275,8 +275,12 @@ public class UserServiceImpl implements UserService {
                 List<ApiApp> apiAppList = userMapper.getUserApiListAll(intUserId);
                 if (!apiAppList.isEmpty()) {
                     for (ApiApp apiApp : apiAppList) {
+                        // 删除APIKey
+                        apiMapper.deleteApiKeyAll(apiApp.getId());
                         // 删除API参数
                         apiMapper.deleteApiParamAll(apiApp.getId());
+                        // 删除APIlog
+                        apiMapper.deleteApiLog(apiApp.getId());
                         // 删除API应用
                         apiMapper.deleteApiApp(apiApp.getId());
                     }
@@ -392,9 +396,9 @@ public class UserServiceImpl implements UserService {
         Map<String, Object> resultMap = new LinkedHashMap<>();
         List<Map<String, Object>> apiInfoList = new ArrayList<>();
         // 获取用户API总数量
-        int total = userMapper.getUserListSearchCount(userId, keyword, type, status, view_status);
+        int total = userMapper.getUserApiListSearchCount(userId, keyword, type, status, view_status);
         // 获取用户API列表
-        for (ApiApp apiApp : userMapper.getUserListSearch(userId, keyword, type, status, view_status, pageSize, Tools.getPageOffset(page, pageSize))) {
+        for (ApiApp apiApp : userMapper.getUserApiListSearch(userId, keyword, type, status, view_status, pageSize, Tools.getPageOffset(page, pageSize))) {
             Map<String, Object> map = new LinkedHashMap<>();
             map.put("id", apiApp.getId());
             map.put("title", apiApp.getTitle());
@@ -507,15 +511,116 @@ public class UserServiceImpl implements UserService {
         if (Objects.equals(oldPassword, newPassword)) {
             return ResponseUtil.response(400, "新旧密码相同");
         }
+        userMapper.updateUserPassword(userId, oldPassword, newPassword);
+        return ResponseUtil.success();
+    }
 
-        try {
-            if (userMapper.updateUserPassword(userId, oldPassword, newPassword) < 1) {
-                return ResponseUtil.response(400, "旧密码错误");
-            }
-            return ResponseUtil.success();
-        } catch (Exception e) {
-            return ResponseUtil.response(500, "修改密码失败");
+    @Override
+    public Map<String, Object> setUserPassword(Map<String, String> requestParam, Map<String, String> requestBody, HttpServletRequest request) {
+        // 检查Token是否为管理员
+        if ((int) request.getAttribute("userMode") != Finals.Admin) {
+            return ResponseUtil.response(403, Finals.MESSAGES_ERROR_NOT_ADMIN);
         }
 
+        if (requestParam.get("id") != null && !requestParam.get("id").trim().isEmpty()) {
+            int userId = Tools.strToInt(String.valueOf(requestParam.get("id")));
+            if (userMapper.checkUserIdExists(userId) < 1) {
+                return ResponseUtil.response(401, Finals.MESSAGES_ERROR_USER_NOT_FOUND);
+            }
+            String password = requestBody.get("password");
+            if (password.isEmpty()) {
+                return ResponseUtil.response(400, "密码不能为空");
+            }
+            userMapper.setUserPassword(userId, Tools.getTextMd5(password));
+            return ResponseUtil.success();
+        } else {
+            return ResponseUtil.response(400, Finals.MESSAGES_ERROR_PARAM);
+        }
+    }
+
+    @Override
+    public Map<String, Object> getUserList(Map<String, String> requestParam, HttpServletRequest request) {
+        int userId = (int) request.getAttribute("userId");
+        if (userMapper.checkUserIdExists(userId) < 1) {
+            return ResponseUtil.response(401, Finals.MESSAGES_ERROR_USER_NOT_FOUND);
+        }
+        if ((int) request.getAttribute("userMode") != Finals.Admin) {
+            return ResponseUtil.response(403, Finals.MESSAGES_ERROR_NOT_ADMIN);
+        }
+
+        int pageSize = Tools.strToInt(requestParam.get("pageSize"));
+        int page = Tools.strToInt(requestParam.get("page"));
+        if (pageSize < 1) {
+            pageSize = 30;
+        }
+        if (page < 1) {
+            page = 1;
+        }
+        // 获取用户列表
+        Map<String, Object> resultMap = new LinkedHashMap<>();
+        List<User> userList = userMapper.getUserList(pageSize, Tools.getPageOffset(page, pageSize));
+        // 获取用户API总数量
+        int total = userMapper.getUserListAllCount();
+        resultMap.put("total", total);
+        resultMap.put("list", userList);
+        return ResponseUtil.response(200, "获取成功", resultMap);
+    }
+
+    @Override
+    public Map<String, Object> userListSearch(Map<String, String> requestParam, HttpServletRequest request) {
+        int userId = (int) request.getAttribute("userId");
+        if (userMapper.checkUserIdExists(userId) < 1) {
+            return ResponseUtil.response(401, Finals.MESSAGES_ERROR_USER_NOT_FOUND);
+        }
+        if ((int) request.getAttribute("userMode") != Finals.Admin) {
+            return ResponseUtil.response(403, Finals.MESSAGES_ERROR_NOT_ADMIN);
+        }
+        String keyword = requestParam.get("keywords");
+        // -1表示不筛选
+        int mode = Tools.strToInt(requestParam.get("mode"));
+        int pageSize = Tools.strToInt(requestParam.get("pageSize"));
+        int page = Tools.strToInt(requestParam.get("page"));
+        if (pageSize < 1) {
+            pageSize = 30;
+        }
+        if (page < 1) {
+            page = 1;
+        }
+
+        Map<String, Object> resultMap = new LinkedHashMap<>();
+        // 获取总数量
+        int total = userMapper.getUserListSearchCount(keyword, mode);
+        // 获取列表
+        List<User> userList = userMapper.getUserListSearch(keyword, mode, pageSize, Tools.getPageOffset(page, pageSize));
+        resultMap.put("total", total);
+        resultMap.put("list", userList);
+        return ResponseUtil.success(resultMap);
+    }
+
+
+    @Override
+    public Map<String, Object> setUserMode(Map<String, String> requestParam, Map<String, String> requestBody, HttpServletRequest request) {
+        int userId = (int) request.getAttribute("userId");
+        if (userMapper.checkUserIdExists(userId) < 1) {
+            return ResponseUtil.response(401, Finals.MESSAGES_ERROR_USER_NOT_FOUND);
+        }
+        if ((int) request.getAttribute("userMode") != Finals.Admin) {
+            return ResponseUtil.response(403, Finals.MESSAGES_ERROR_NOT_ADMIN);
+        }
+
+        if (requestParam.get("id") != null && !requestParam.get("id").trim().isEmpty()) {
+            userId = Tools.strToInt(String.valueOf(requestParam.get("id")));
+            if (userMapper.checkUserIdExists(userId) < 1) {
+                return ResponseUtil.response(401, Finals.MESSAGES_ERROR_USER_NOT_FOUND);
+            }
+            int mode = Tools.strToInt(requestBody.get("mode"));
+            if (mode < 0 || mode > 1) {
+                return ResponseUtil.response(400, "权限错误");
+            }
+            userMapper.setUserMode(userId, mode);
+            return ResponseUtil.success();
+        } else {
+            return ResponseUtil.response(400, Finals.MESSAGES_ERROR_PARAM);
+        }
     }
 }

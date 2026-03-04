@@ -34,11 +34,23 @@ public interface UserService {
     Map<String, Object> userApiListSearch(Map<String, String> requestParam, HttpServletRequest request);
 
     // 更新用户昵称
-    Map<String, Object> updateUserNick(Map<String, String> requestParam,Map<String,String> requestBody, HttpServletRequest request);
+    Map<String, Object> updateUserNick(Map<String, String> requestParam, Map<String, String> requestBody, HttpServletRequest request);
 
     // 更新用户邮箱
     Map<String, Object> updateUserMail(Map<String, String> requestParam, Map<String, String> requestBody, HttpServletRequest request);
 
     // 更新用户密码
     Map<String, Object> updateUserPassword(Map<String, String> requestParam, Map<String, String> requestBody, HttpServletRequest request);
+
+    // 设置用户密码
+    Map<String, Object> setUserPassword(Map<String, String> requestParam, Map<String, String> requestBody, HttpServletRequest request);
+
+    // 获取用户列表
+    Map<String, Object> getUserList(Map<String, String> requestParam, HttpServletRequest request);
+
+    // 用户列表搜索
+    Map<String, Object> userListSearch(Map<String, String> requestParam, HttpServletRequest request);
+
+    // 设置用户权限
+    Map<String, Object> setUserMode(Map<String, String> requestParam, Map<String, String> requestBody, HttpServletRequest request);
 }

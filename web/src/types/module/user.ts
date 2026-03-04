@@ -56,6 +56,9 @@ export interface User {
     mail?: string;
     nick?: string;
     key?: string;
+    created?:string
+    updated?:string
+    createdText?:string
 }
 
 // 用于筛选条件API接口
@@ -71,6 +74,12 @@ export type SelectFormApiKey = {
     keywords: string;
     type: number;
     status: number;
+}
+
+// 用于筛选条件用户
+export type SelectFormUser = {
+    keywords: string;
+    mode: number;
 }
 
 // APIKey

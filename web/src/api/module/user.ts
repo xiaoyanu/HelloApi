@@ -22,9 +22,8 @@ export const GetUserInfo = (id: number = 0): any => request.get(apiUrl + '/', {
 
 // 用户接口列表
 export const GetUserAppList =
-    (userid: number = 0, page: number = 1, pageSize: number = 30): any => request.get(apiUrl + '/AppList', {
+    (page: number = 1, pageSize: number = 30): any => request.get(apiUrl + '/AppList', {
         params: {
-            ...(userid != 0 && {id: userid}),
             page: page,
             pageSize: pageSize,
         }
@@ -76,3 +75,43 @@ export const GetUserKey = (): any => request.get(apiUrl + '/key')
 
 // 重置用户密钥
 export const RestUserKey = (userId: number): any => request.put(apiUrl + '/key/' + userId)
+
+// 获取用户列表
+export const GetUserList = (page: number = 1, pageSize: number = 30): any => request.get(apiUrl + "/list", {
+    params: {
+        page,
+        pageSize
+    }
+})
+
+// 获取用户列表搜索
+export const UserListSearch = (keywords: string, mode: number, page: number = 1, pageSize: number = 30): any =>
+    request.get(apiUrl + "/list/Search", {
+        params: {
+            keywords,
+            mode,
+            page,
+            pageSize
+        }
+    })
+
+// 删除用户
+export const DeleteUser = (id: number): any => request.delete(apiUrl + '/' + id)
+
+// 设置用户密码
+export const SetUserPassword = (id: number, password: string): any => request.put(apiUrl + '/setPassword', {
+    password
+}, {
+    params: {
+        id
+    }
+})
+
+// 设置用户权限
+export const SetUserMode = (id: number, mode: number): any => request.put(apiUrl + '/setMode', {
+    mode
+}, {
+    params: {
+        id
+    }
+})

@@ -54,6 +54,8 @@ export const UpdateApiKey = (key: string, form: APIKey): any => request.put(apiU
 // 删除API密钥
 export const DeleteApiKey = (key: string): any => request.delete(apiUrl + '/key/' + key)
 
+// 重置API密钥
+export const ResetApiKey = (key: string): any => request.put(apiUrl + '/key/reset/' + key)
 
 // 用户接口密钥列表搜索
 export const UserApiKeyListSearch =

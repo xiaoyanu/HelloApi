@@ -24,12 +24,12 @@ const fetchData = async () => {
   const isSearching = searchForm.value.keywords !== '' || searchForm.value.type !== -1 || searchForm.value.status !== -1 || searchForm.value.view_status !== -1;
   const apiCall = isSearching
       ? UserAppListSearch(searchForm.value, paging.value.pageSize, paging.value.page)
-      : GetUserAppList(0, paging.value.page, paging.value.pageSize);
+      : GetUserAppList(paging.value.page, paging.value.pageSize);
 
   try {
     const res = await apiCall;
     if (res.data.code === 200) {
-      const { list, total } = res.data.data;
+      const {list, total} = res.data.data;
       paging.value.total = total;
       tableData.value = processTableData(list);
     }
@@ -407,14 +407,14 @@ onMounted(() => {
               plain
               type="primary"
               @click="openDrawer('edit', row)"
-          ></el-button>
+          />
           <el-button
               :icon="Delete"
               circle
               plain
               type="danger"
               @click="handleDelete(row.id)"
-          ></el-button>
+          />
         </template>
       </el-table-column>
       <template #empty>

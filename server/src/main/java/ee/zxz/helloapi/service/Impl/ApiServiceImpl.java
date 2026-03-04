@@ -231,6 +231,7 @@ public class ApiServiceImpl implements ApiService {
             apiMapper.deleteApiParamAll(intApiId);
             apiMapper.deleteApiCount(intApiId);
             apiMapper.deleteApiLog(intApiId);
+            apiMapper.deleteApiKeyAll(intApiId);
             return ResponseUtil.success();
 
         } catch (Exception e) {

@@ -64,6 +64,19 @@ public class UserController {
         return userService.updateUserPassword(requestParam, requestBody, request);
     }
 
+    // SetUserPassword - 设置用户密码 - PUT
+    @PutMapping("/setPassword")
+    @RequiresLogin
+    public Map<String, Object> SetUserPassword(@RequestParam(required = false) Map<String, String> requestParam, @RequestBody(required = false) Map<String, String> requestBody, HttpServletRequest request) {
+        return userService.setUserPassword(requestParam, requestBody, request);
+    }
+
+    // SetUserMode - 设置用户权限 - PUT
+    @PutMapping("/setMode")
+    @RequiresLogin
+    public Map<String, Object> SetUserMode(@RequestParam(required = false) Map<String, String> requestParam, @RequestBody(required = false) Map<String, String> requestBody, HttpServletRequest request) {
+        return userService.setUserMode(requestParam, requestBody, request);
+    }
 
     // GetUserKey - 获取用户密钥 - GET
     @GetMapping("/key")
@@ -92,6 +105,20 @@ public class UserController {
     @RequiresLogin
     public Map<String, Object> UserApiListSearch(@RequestParam(required = false) Map<String, String> requestParam, HttpServletRequest request) {
         return userService.userApiListSearch(requestParam, request);
+    }
+
+    // GetUserList - 获取用户列表 - GET
+    @GetMapping("/list")
+    @RequiresLogin
+    public Map<String, Object> GetUserList(@RequestParam(required = false) Map<String, String> requestParam, HttpServletRequest request) {
+        return userService.getUserList(requestParam, request);
+    }
+
+    // UserListSearch - 用户列表搜索 - GET
+    @GetMapping("/list/Search")
+    @RequiresLogin
+    public Map<String, Object> UserListSearch(@RequestParam(required = false) Map<String, String> requestParam, HttpServletRequest request) {
+        return userService.userListSearch(requestParam, request);
     }
 
     // ResetUserKey - 重置用户密钥 - PUT

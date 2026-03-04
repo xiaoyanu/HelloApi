@@ -136,8 +136,9 @@ const watermark = (): string => {
             <div class="user-info">
               <span class="sm:inline-block">Hi, {{ userStore.user.nick }}</span>
               <img
-                  :src="`https://cn.cravatar.com/avatar/${getGravatarHash(userStore.user.mail || 'HelloAPI')}?s=100&d=wavatar`"
+                  :src="`https://${HelloAPIConfig.avatarDomain}/avatar/${getGravatarHash(userStore.user.mail || 'HelloAPI')}?s=100&d=wavatar`"
                   alt="Avatar"
+                  draggable="false"
                   class="avatar w-10 h-10 rounded-full">
               <el-tooltip content="退出登录" placement="bottom-end">
                 <PhSignOut class="text-[#909399] hover:text-red-400 cursor-pointer" size="18" weight="duotone"

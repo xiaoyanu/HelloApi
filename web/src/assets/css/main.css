@@ -42,3 +42,10 @@
 ::-webkit-scrollbar-thumb:hover {
     background: #909399;
 }
+
+/**
+    消息盒子、对话框圆角
+ */
+.el-message-box, .el-dialog {
+    border-radius: 8px !important;
+}

@@ -86,7 +86,7 @@ const openPasswordDialog = () => {
 
 // resetUserKey
 const resetUserKey = (userId: number) => {
-  ElMessageBox.confirm('确定要重置用户密钥吗？重置密钥后之前的密钥会立即失效，请谨慎操作！', '提示', {
+  ElMessageBox.confirm('确定要重置用户密钥吗？之前的密钥会立即失效，请谨慎操作！', '提示', {
     confirmButtonText: '确定',
     cancelButtonText: '取消',
     type: 'warning'
@@ -241,12 +241,10 @@ onMounted(async () => {
 
   <!-- 修改密码对话框 -->
   <el-dialog
-      style="border-radius: 8px"
       v-model="dialogVisible"
       title="修改密码"
       width="500px"
       align-center
-      class="responsive-dialog"
       @closed="clearForm"
   >
     <el-form
@@ -256,7 +254,6 @@ onMounted(async () => {
         label-position="right"
         label-width="100px"
         status-icon
-        class="responsive-form"
     >
       <el-form-item label="旧密码" prop="oldPassword">
         <el-input v-model="passwordForm.oldPassword" type="password" show-password/>

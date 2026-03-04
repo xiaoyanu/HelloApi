@@ -7,6 +7,9 @@ const HelloAPIConfig = {
     // 前端域名
     domain: 'api.zxz.ee',
 
+    // Gravatar 头像域名
+    avatarDomain: "cn.cravatar.com",
+
     // 网站配置
     website: {
         index: {

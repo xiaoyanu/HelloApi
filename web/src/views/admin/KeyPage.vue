@@ -1,6 +1,14 @@
 <script lang="ts" setup>
 import {Plus, Delete, Edit, Search, Refresh} from "@element-plus/icons-vue";
-import {GetUserApiKeyList, GetApiKeyInfo, UpdateApiKey, UserApiKeyListSearch, DeleteApiKey, CreateApiKey} from "@/api";
+import {
+  GetUserApiKeyList,
+  GetApiKeyInfo,
+  UpdateApiKey,
+  UserApiKeyListSearch,
+  DeleteApiKey,
+  CreateApiKey,
+  ResetApiKey
+} from "@/api";
 import {onMounted, reactive, ref, watch} from "vue";
 import type {Pagination, SelectFormApiKey, APIKey} from "@/types";
 import {dayjs, type FormRules} from "element-plus";
@@ -217,6 +225,24 @@ const onDrawerLoadOver = async () => {
   }
 }
 
+// 重置APIKey
+const resetAPIKey = async (key: string) => {
+  ElMessageBox.confirm('你确定要重置此APIKey吗？之前的会立即失效，操作不可逆。', '提示',
+      {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning',
+        dangerouslyUseHTMLString: true,
+      }
+  ).then(async () => {
+    const res = await ResetApiKey(key)
+    if (res.data.code == 200) {
+      await fetchData()
+      ElMessage.success('重置成功')
+    }
+  })
+}
+
 // 时间范围快捷选择
 const shortcuts = [
   {
@@ -383,22 +409,31 @@ onMounted(() => {
           </el-tag>
         </template>
       </el-table-column>
-      <el-table-column label="操作" width="120">
+      <el-table-column label="操作" width="180">
         <template #default="{ row }">
+          <el-tooltip content="重置APIKey" placement="left">
+            <el-button
+                :icon="Refresh"
+                circle
+                plain
+                type="warning"
+                @click="resetAPIKey(row.key)"
+            />
+          </el-tooltip>
           <el-button
               :icon="Edit"
               circle
               plain
               type="primary"
               @click="openDrawer('edit', row)"
-          ></el-button>
+          />
           <el-button
               :icon="Delete"
               circle
               plain
               type="danger"
               @click="handleDelete(row.key)"
-          ></el-button>
+          />
         </template>
       </el-table-column>
       <template #empty>
