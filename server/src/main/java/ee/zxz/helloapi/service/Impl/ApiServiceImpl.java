@@ -72,6 +72,13 @@ public class ApiServiceImpl implements ApiService {
     @Override
     public Map<String, Object> createApi(Map<String, Object> requestBody, HttpServletRequest request) {
         try {
+            // 全局设置检测
+            int tokenMode = (int) request.getAttribute("userMode");
+            String settingValue = userMapper.getSettingValue("api");
+            if (settingValue != null && tokenMode != Finals.Admin && settingValue.equals("false")) {
+                return ResponseUtil.response(400, "发布API已关闭");
+            }
+
             ApiApp apiApp = new ApiApp();
             int user_id = (int) request.getAttribute("userId");
             getRequestApiApp(requestBody, apiApp, user_id);
@@ -81,8 +88,7 @@ public class ApiServiceImpl implements ApiService {
             // 检查审核状态
             if (apiApp.getView_status() != 2) {
                 // 检测是不是管理员
-                int userMode = (int) request.getAttribute("userMode");
-                if (userMode != Finals.Admin) {
+                if (tokenMode != Finals.Admin) {
                     return ResponseUtil.response(400, Finals.MESSAGES_ERROR_NOT_ADMIN);
                 }
             }
@@ -299,6 +305,14 @@ public class ApiServiceImpl implements ApiService {
 
     @Override
     public Map<String, Object> createApiKey(String finalApiID, Map<String, Object> requestBody, HttpServletRequest request) {
+        // 全局设置检测
+        int tokenMode = (int) request.getAttribute("userMode");
+        String settingValue = userMapper.getSettingValue("api_key");
+        if (settingValue != null && tokenMode != Finals.Admin && settingValue.equals("false")) {
+            return ResponseUtil.response(400, "创建APIKey已关闭");
+        }
+
+
         int intApiId = Tools.strToInt(finalApiID);
         // 检查API是否存在
         if (apiMapper.checkApiExist(intApiId) < 1) {
@@ -307,7 +321,7 @@ public class ApiServiceImpl implements ApiService {
         // 检查是否是创建人或管理员
         int userId = (int) request.getAttribute("userId");
         if (apiMapper.checkApiCreator(intApiId, userId) < 1) {
-            if ((int) request.getAttribute("userMode") != Finals.Admin) {
+            if (tokenMode != Finals.Admin) {
                 return ResponseUtil.response(400, Finals.MESSAGES_ERROR_NOT_CREATOR);
             }
         }
@@ -366,7 +380,7 @@ public class ApiServiceImpl implements ApiService {
 
         // 检查用户是否存在
         if (userMapper.checkUserIdExists(intUserId) < 1) {
-            return ResponseUtil.response(400, Finals.MESSAGES_ERROR_USER_NOT_FOUND);
+            return ResponseUtil.response(401, Finals.MESSAGES_ERROR_USER_NOT_FOUND);
         }
 
         int pageSize = Tools.strToInt(requestParam.get("pageSize"));
@@ -387,7 +401,6 @@ public class ApiServiceImpl implements ApiService {
 
     @Override
     public Map<String, Object> updateApiKey(String finalKey, Map<String, Object> requestBody, HttpServletRequest request) {
-
         // 检查密钥是否存在
         if (apiMapper.checkApiKeyExist(finalKey) < 1) {
             return ResponseUtil.response(400, Finals.MESSAGES_ERROR_KEY_NOT_FOUND);
@@ -573,7 +586,7 @@ public class ApiServiceImpl implements ApiService {
 
         // 检查用户是否存在
         if (userMapper.checkUserIdExists(intUserId) < 1) {
-            return ResponseUtil.response(400, Finals.MESSAGES_ERROR_USER_NOT_FOUND);
+            return ResponseUtil.response(401, Finals.MESSAGES_ERROR_USER_NOT_FOUND);
         }
 
         String keyword = requestParam.get("keywords");

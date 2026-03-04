@@ -1,6 +1,7 @@
 package ee.zxz.helloapi.mapper;
 
 import ee.zxz.helloapi.domain.ApiApp;
+import ee.zxz.helloapi.domain.Setting;
 import ee.zxz.helloapi.domain.User;
 import ee.zxz.helloapi.domain.UserKey;
 import org.apache.ibatis.annotations.*;
@@ -269,4 +270,40 @@ public interface UserMapper {
      */
     @Select("UPDATE `helloapi_users` SET `mode` = #{mode} WHERE `id` = #{userId}")
     void setUserMode(int userId, int mode);
+
+    /**
+     * GetSettingValue - 获取设置的参数值
+     *
+     * @param key 键值
+     * @return 键值内容
+     */
+    @Select("SELECT `value` FROM `helloapi_settings` WHERE `key` = #{key}")
+    String getSettingValue(String key);
+
+    /**
+     * UpdateSettingValue - 更新设置的参数值
+     *
+     * @param key   键值
+     * @param value 键值内容
+     */
+    @Insert("INSERT INTO `helloapi_settings` (`key`, `value`) VALUES (#{key}, #{value}) ON DUPLICATE KEY UPDATE `value` = #{value}")
+    void updateSettingValue(String key, String value);
+
+    /**
+     * GetSettingValueAll - 获取设置的参数值全部
+     *
+     * @return Setting数组
+     */
+    @Select("SELECT * FROM `helloapi_settings`")
+    List<Setting> getSettingValueAll();
+
+    /**
+     * CheckUserIsAdmin - 检查用户是否为管理员
+     *
+     * @param userId 用户ID
+     * @return 返回条数大于0则为管理员
+     */
+    @Select("SELECT COUNT(*) FROM `helloapi_users` WHERE `id` = #{userId} AND `mode` = 1")
+    int checkUserIsAdmin(int userId);
+
 }

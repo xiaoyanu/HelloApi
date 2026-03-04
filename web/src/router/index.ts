@@ -72,6 +72,11 @@ const router = createRouter({
                     name: 'AdminSetting',
                     path: 'setting', // 全局设置页 /admin/setting
                     component: () => import('@/views/admin/SettingPage.vue')
+                },
+                {
+                    name: 'AdminCheck',
+                    path: 'check', // 全局审核API页 /admin/check
+                    component: () => import('@/views/admin/CheckPage.vue')
                 }
             ]
         },

@@ -7,5 +7,6 @@ import java.lang.annotation.*;
 @Target({ElementType.METHOD, ElementType.TYPE}) // 作用在方法上
 @Retention(RetentionPolicy.RUNTIME) // 运行时有效
 public @interface RequiresLogin {
+    // 默认0
     int mode() default 0;
 }

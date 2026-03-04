@@ -53,4 +53,10 @@ public interface UserService {
 
     // 设置用户权限
     Map<String, Object> setUserMode(Map<String, String> requestParam, Map<String, String> requestBody, HttpServletRequest request);
+
+    // 更改全局设置
+    Map<String, Object> updateSettingValue(Map<String, String> requestParam, Map<String, String> requestBody, HttpServletRequest request);
+
+    // 获取设置参数
+    Map<String, Object> getSetting(Map<String, String> requestParam, Map<String, String> requestBody, HttpServletRequest request);
 }

@@ -5,7 +5,9 @@ import {onMounted, ref} from "vue";
 import type {Pagination, SelectFormUser, User} from "@/types";
 import {HelloAPIConfig} from "@/config/config.ts";
 import {formatNativeDate} from "@/utils/module/more.ts";
+import {useUserStore} from "@/stores";
 
+const userStore = useUserStore();
 const tableData = ref<User[]>();
 const dialogVisible = ref({
   user: false,
@@ -137,6 +139,9 @@ const setUserMode = (userid: number) => {
     const res = await SetUserMode(userid, 1)
     if (res.data.code == 200) {
       ElMessage.success("设置权限成功")
+      if (userid == userStore.user.id) {
+        await userStore.refreshUser()
+      }
       await fetchData()
     }
   }).catch(async (action) => {
@@ -144,6 +149,9 @@ const setUserMode = (userid: number) => {
       const res = await SetUserMode(userid, 0)
       if (res.data.code == 200) {
         ElMessage.success("设置权限成功")
+        if (userid == userStore.user.id) {
+          await userStore.refreshUser()
+        }
         await fetchData()
       }
     }

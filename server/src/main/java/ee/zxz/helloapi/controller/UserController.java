@@ -66,16 +66,30 @@ public class UserController {
 
     // SetUserPassword - 设置用户密码 - PUT
     @PutMapping("/setPassword")
-    @RequiresLogin
+    @RequiresLogin(mode = Finals.Admin)
     public Map<String, Object> SetUserPassword(@RequestParam(required = false) Map<String, String> requestParam, @RequestBody(required = false) Map<String, String> requestBody, HttpServletRequest request) {
         return userService.setUserPassword(requestParam, requestBody, request);
     }
 
     // SetUserMode - 设置用户权限 - PUT
     @PutMapping("/setMode")
-    @RequiresLogin
+    @RequiresLogin(mode = Finals.Admin)
     public Map<String, Object> SetUserMode(@RequestParam(required = false) Map<String, String> requestParam, @RequestBody(required = false) Map<String, String> requestBody, HttpServletRequest request) {
         return userService.setUserMode(requestParam, requestBody, request);
+    }
+
+    // UpdateSettingValue - 更新设置的参数值 - PUT
+    @PutMapping("/setting")
+    @RequiresLogin(mode = Finals.Admin)
+    public Map<String, Object> UpdateSettingValue(@RequestParam(required = false) Map<String, String> requestParam, @RequestBody(required = false) Map<String, String> requestBody, HttpServletRequest request) {
+        return userService.updateSettingValue(requestParam, requestBody, request);
+    }
+
+    // GetSetting - 获取设置的所有参数 - GET
+    @GetMapping("/setting")
+    @RequiresLogin(mode = Finals.Admin)
+    public Map<String, Object> GetSetting(@RequestParam(required = false) Map<String, String> requestParam, @RequestBody(required = false) Map<String, String> requestBody, HttpServletRequest request) {
+        return userService.getSetting(requestParam, requestBody, request);
     }
 
     // GetUserKey - 获取用户密钥 - GET
@@ -109,14 +123,14 @@ public class UserController {
 
     // GetUserList - 获取用户列表 - GET
     @GetMapping("/list")
-    @RequiresLogin
+    @RequiresLogin(mode = Finals.Admin)
     public Map<String, Object> GetUserList(@RequestParam(required = false) Map<String, String> requestParam, HttpServletRequest request) {
         return userService.getUserList(requestParam, request);
     }
 
     // UserListSearch - 用户列表搜索 - GET
     @GetMapping("/list/Search")
-    @RequiresLogin
+    @RequiresLogin(mode = Finals.Admin)
     public Map<String, Object> UserListSearch(@RequestParam(required = false) Map<String, String> requestParam, HttpServletRequest request) {
         return userService.userListSearch(requestParam, request);
     }

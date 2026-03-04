@@ -2,11 +2,13 @@ package ee.zxz.helloapi.config.interceptor;
 
 import com.alibaba.fastjson.JSON;
 import ee.zxz.helloapi.annotation.RequiresLogin;
+import ee.zxz.helloapi.mapper.UserMapper;
 import ee.zxz.helloapi.utils.Finals;
 import ee.zxz.helloapi.utils.ResponseUtil;
 import ee.zxz.helloapi.utils.Tools;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.jspecify.annotations.NonNull;
 import org.springframework.stereotype.Component;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerInterceptor;
@@ -17,8 +19,14 @@ import java.lang.reflect.Method;
 public class JwtInterceptor implements HandlerInterceptor {
 
 
+    private final UserMapper userMapper;
+
+    public JwtInterceptor(UserMapper userMapper) {
+        this.userMapper = userMapper;
+    }
+
     @Override
-    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
+    public boolean preHandle(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response, @NonNull Object handler) throws Exception {
         // 1. 如果不是映射到方法（比如静态资源），直接放行
         if (!(handler instanceof HandlerMethod handlerMethod)) {
             return true;
@@ -41,11 +49,16 @@ public class JwtInterceptor implements HandlerInterceptor {
             RequiresLogin annotation = method.getAnnotation(RequiresLogin.class);
             int userMode = Tools.tokenToUserMode(request.getHeader("Authorization"));
             if (annotation.mode() != 0) {
-                if (userMode != Finals.Admin) {
+                if (userMapper.checkUserIsAdmin(userId) < 1) {
                     response.setContentType("application/json;charset=UTF-8");
                     json = JSON.toJSONString(ResponseUtil.response(403, Finals.MESSAGES_ERROR_NOT_ADMIN));
                     response.getWriter().write(json);
                     return false;
+                }
+
+                // 如果是管理员，但是token的状态是普通用户，那么更新一下
+                if (userMode == 0) {
+                    userMode = 1;
                 }
             }
 
