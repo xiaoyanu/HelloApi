@@ -2,7 +2,8 @@
 const HelloAPIConfig = {
 
     // 后端接口地址
-    serverURL: 'http://localhost:8080',
+    // serverURL: 'http://localhost:8080',
+    serverURL: 'https://api-server.zxz.ee',
 
     // 前端域名
     domain: 'api.zxz.ee',

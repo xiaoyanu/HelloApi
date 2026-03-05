@@ -1,6 +1,5 @@
 package ee.zxz.helloapi.service;
 
-import ee.zxz.helloapi.domain.ApiRequestLog;
 import jakarta.servlet.http.HttpServletRequest;
 
 import java.util.Map;

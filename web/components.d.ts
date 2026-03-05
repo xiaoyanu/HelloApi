@@ -14,11 +14,8 @@ declare module 'vue' {
     ApiCardList: typeof import('./src/components/ApiCardList.vue')['default']
     Banner: typeof import('./src/components/banner.vue')['default']
     BaseChart: typeof import('./src/components/BaseChart.vue')['default']
-    ChartSkeleton: typeof import('./src/components/ChartSkeleton.vue')['default']
     CountTo: typeof import('./src/components/CountTo.vue')['default']
-    ElAffix: typeof import('element-plus/es')['ElAffix']
     ElBacktop: typeof import('element-plus/es')['ElBacktop']
-    ElBadge: typeof import('element-plus/es')['ElBadge']
     ElButton: typeof import('element-plus/es')['ElButton']
     ElDatePicker: typeof import('element-plus/es')['ElDatePicker']
     ElDescriptions: typeof import('element-plus/es')['ElDescriptions']
@@ -30,13 +27,11 @@ declare module 'vue' {
     ElForm: typeof import('element-plus/es')['ElForm']
     ElFormItem: typeof import('element-plus/es')['ElFormItem']
     ElIcon: typeof import('element-plus/es')['ElIcon']
-    ElImage: typeof import('element-plus/es')['ElImage']
     ElInput: typeof import('element-plus/es')['ElInput']
     ElInputNumber: typeof import('element-plus/es')['ElInputNumber']
     ElLink: typeof import('element-plus/es')['ElLink']
     ElOption: typeof import('element-plus/es')['ElOption']
     ElPagination: typeof import('element-plus/es')['ElPagination']
-    ElPopover: typeof import('element-plus/es')['ElPopover']
     ElRadioButton: typeof import('element-plus/es')['ElRadioButton']
     ElRadioGroup: typeof import('element-plus/es')['ElRadioGroup']
     ElSelect: typeof import('element-plus/es')['ElSelect']
@@ -50,8 +45,5 @@ declare module 'vue' {
     MDView: typeof import('./src/components/MDView.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
-  }
-  export interface GlobalDirectives {
-    vLoading: typeof import('element-plus/es')['ElLoadingDirective']
   }
 }

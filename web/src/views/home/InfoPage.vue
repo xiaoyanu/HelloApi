@@ -76,7 +76,12 @@ onMounted(() => {
           </div>
         </el-tooltip>
       </div>
-      <div>请求方式：<span class="link">{{ apiInfo.sendType }}</span></div>
+      <div>请求方式：<span class="link">{{
+          apiInfo.sendType == 0 ? 'GET' :
+              apiInfo.sendType == 1 ? 'POST' :
+                  apiInfo.sendType == 2 ? 'PUT' :
+                      apiInfo.sendType == 3 ? 'DELETE' : '...'
+        }}</span></div>
       <div>返回格式：<span class="link">{{ apiInfo.returnType }}</span></div>
     </div>
     <div class="pt-3.75 pb-3.75 w-full">

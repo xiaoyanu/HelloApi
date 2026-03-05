@@ -45,7 +45,7 @@ function handleNewPageChange(page: number) {
           </div>
         </div>
         <div class="text-sm leading-4.5 mt-1.5 wrap-break-word overflow-hidden line-clamp-2">
-          API描述
+          {{ item.smallTitle }}
         </div>
       </div>
       <div class="flex items-center justify-end h-10">

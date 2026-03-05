@@ -88,7 +88,13 @@ const router = createRouter({
         {
             name: 'NotFound',
             path: '/:pathMatch(.*)*', // 404 页面不存在
-            component: () => import('@/views/NotFound.vue')
+            component: () => import('@/views/NotFound.vue'),
+            beforeEnter: (to, _, next) => {
+                if (to.path.startsWith('/api')) {
+                    return false;
+                }
+                next();
+            }
         }
     ],
 })
