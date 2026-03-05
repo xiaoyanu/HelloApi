@@ -156,7 +156,7 @@ public interface UserMapper {
      * @param offset      偏移量
      * @return 返回用户列表，否则返回null
      */
-    @Select("SELECT * FROM `helloapi_api_apps` WHERE `user_id` = #{userId} AND (#{keyword} IS NULL OR #{keyword} = '' OR `title` LIKE CONCAT('%', #{keyword}, '%') OR `id` = #{keyword} OR `smallTitle` LIKE CONCAT('%', #{keyword}, '%')) AND (#{type} = -1 OR `type` = #{type}) AND (#{status} = -1 OR `status` = #{status}) AND (#{view_status} = -1 OR `view_status` = #{view_status}) ORDER BY created DESC LIMIT #{pageSize} OFFSET #{offset}")
+    @Select("SELECT * FROM `helloapi_api_apps` WHERE `user_id` = #{userId} AND (#{keyword} IS NULL OR #{keyword} = '' OR `url` LIKE CONCAT('%',#{keyword},'%') OR `title` LIKE CONCAT('%', #{keyword}, '%') OR `id` = #{keyword} OR `smallTitle` LIKE CONCAT('%', #{keyword}, '%')) AND (#{type} = -1 OR `type` = #{type}) AND (#{status} = -1 OR `status` = #{status}) AND (#{view_status} = -1 OR `view_status` = #{view_status}) ORDER BY created DESC LIMIT #{pageSize} OFFSET #{offset}")
     List<ApiApp> getUserApiListSearch(int userId, String keyword, int type, int status, int view_status, int pageSize, int offset);
 
     /**
@@ -169,7 +169,7 @@ public interface UserMapper {
      * @param view_status 视图状态 0通过 1拒绝 2审核中 -1表示不筛选
      * @return 返回用户列表(搜索)总数量
      */
-    @Select("SELECT COUNT(*) FROM `helloapi_api_apps` WHERE `user_id` = #{userId} AND (#{keyword} IS NULL OR #{keyword} = '' OR `title` LIKE CONCAT('%', #{keyword}, '%') OR `id` = #{keyword} OR `smallTitle` LIKE CONCAT('%', #{keyword}, '%')) AND (#{type} = -1 OR `type` = #{type}) AND (#{status} = -1 OR `status` = #{status}) AND (#{view_status} = -1 OR `view_status` = #{view_status})")
+    @Select("SELECT COUNT(*) FROM `helloapi_api_apps` WHERE `user_id` = #{userId} AND (#{keyword} IS NULL OR #{keyword} = '' OR `url` LIKE CONCAT('%',#{keyword},'%') OR `title` LIKE CONCAT('%', #{keyword}, '%') OR `id` = #{keyword} OR `smallTitle` LIKE CONCAT('%', #{keyword}, '%')) AND (#{type} = -1 OR `type` = #{type}) AND (#{status} = -1 OR `status` = #{status}) AND (#{view_status} = -1 OR `view_status` = #{view_status})")
     int getUserApiListSearchCount(int userId, String keyword, int type, int status, int view_status);
 
     /**
