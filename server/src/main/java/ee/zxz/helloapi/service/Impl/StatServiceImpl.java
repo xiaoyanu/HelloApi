@@ -1,8 +1,7 @@
 package ee.zxz.helloapi.service.Impl;
 
-import ee.zxz.helloapi.domain.ApiApp;
+import com.alibaba.fastjson.JSON;
 import ee.zxz.helloapi.domain.ApiKey;
-import ee.zxz.helloapi.domain.ApiRequestLog;
 import ee.zxz.helloapi.domain.DTO.ApiTodayArray;
 import ee.zxz.helloapi.mapper.ApiMapper;
 import ee.zxz.helloapi.mapper.StatMapper;
@@ -11,6 +10,7 @@ import ee.zxz.helloapi.service.ApiLogManager;
 import ee.zxz.helloapi.service.StatService;
 import ee.zxz.helloapi.utils.Finals;
 import ee.zxz.helloapi.utils.ResponseUtil;
+import ee.zxz.helloapi.utils.Tools;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.stereotype.Service;
@@ -36,65 +36,8 @@ public class StatServiceImpl implements StatService {
     private ApiLogManager apiLogManager;
 
     @Override
-    public Map<String, Object> logApi(String userKey, String key, ApiRequestLog apiRequestLog, HttpServletRequest request) {
-        // 检查用户密钥是否存在
-        if (userMapper.checkUserKeyExists(userKey) < 1) {
-            return ResponseUtil.error(Finals.MESSAGES_ERROR_KEY_NOT_FOUND);
-        }
-
-        ApiApp apiApp = apiMapper.getApiApp(apiRequestLog.getApp_id());
-
-        // 校验ApiId是否存在
-        if (apiApp == null) {
-            return ResponseUtil.error(Finals.MESSAGES_ERROR_API_NOT_FOUND);
-        }
-
-        if (key != null) {
-            ApiKey apiKey = apiMapper.getApiKey(key);
-            if (apiKey == null) {
-                return ResponseUtil.error(Finals.MESSAGES_ERROR_KEY_NOT_FOUND);
-            }
-            // 判断密钥类型
-            if (apiKey.getType() == 0) {
-                // 0 时间类型
-                // 检查是否过期
-                if (LocalDateTime.now().isAfter(apiKey.getExpired())) {
-                    return ResponseUtil.error(Finals.MESSAGES_ERROR_KEY_EXPIRED);
-                }
-            } else {
-                // 1 计数类型
-                // 检查是否用完
-                if (apiKey.getCount() <= 0) {
-                    return ResponseUtil.error(Finals.MESSAGES_ERROR_KEY_COUNT_EXPIRED);
-                }
-                // 减少次数
-                apiMapper.reduceApiKeyCount(key);
-            }
-        }
-
-        // 记录日志
-        if (apiRequestLog.getHeader().equals("")) {
-            apiRequestLog.setHeader(null);
-        }
-        if (apiRequestLog.getBody().equals("")) {
-            apiRequestLog.setBody(null);
-        }
-        apiLogManager.saveLogAsync(
-                apiRequestLog.getApp_id(),
-                apiRequestLog.getIp(),
-                apiRequestLog.getHeader(),
-                apiRequestLog.getBody(),
-                apiRequestLog.getApi_key(),
-                apiRequestLog.getUser_id()
-        );
-        return ResponseUtil.success();
-    }
-
-    @Override
     public Map<String, Object> getStat(Map<String, String> requestParam, Map<String, String> requestBody, HttpServletRequest request) {
         try {
-//            int tokenMode = (int) request.getAttribute("userMode");
-//            int tokenUserId = (int) request.getAttribute("userId");
             String type = requestBody.get("type");
             if (type == null || type.isEmpty()) {
                 return ResponseUtil.response(400, Finals.MESSAGES_ERROR_PARAM);
@@ -141,4 +84,81 @@ public class StatServiceImpl implements StatService {
             return ResponseUtil.response(400, Finals.MESSAGES_ERROR_PARAM);
         }
     }
+
+    @Override
+    public Map<String, Object> logApi(Map<String, String> requestBody, HttpServletRequest request) {
+        try {
+            // 检查用户密钥是否存在
+            if (userMapper.checkUserKeyExists(requestBody.get("user_key")) < 1) {
+                return ResponseUtil.error("user_key用户密钥不存在");
+            }
+
+            // 检查userID与Key是否匹配
+            if (userMapper.getUserIdByUserKey(requestBody.get("user_key")) != Tools.strToInt(requestBody.get("user_id"))) {
+                return ResponseUtil.error("user_id与user_key不匹配");
+            }
+
+
+            // 校验ApiId是否存在
+            int api_id = Tools.strToInt(requestBody.get("api_id"));
+            if (apiMapper.checkApiExist(api_id) < 1) {
+                return ResponseUtil.error("api_id不存在");
+            }
+
+            String api_key = requestBody.get("api_key");
+            if (api_key != null && !api_key.isEmpty()) {
+                ApiKey apiKey = apiMapper.getApiKey(api_key);
+                if (apiKey == null) {
+                    return ResponseUtil.error("api_key不存在");
+                }
+                if (apiKey.getApi_id() != api_id) {
+                    return ResponseUtil.error("api_id与api_key不匹配");
+                }
+                // 判断密钥类型
+                if (apiKey.getType() == 0) {
+                    // 0 时间类型
+                    // 检查是否过期
+                    if (LocalDateTime.now().isAfter(apiKey.getExpired())) {
+                        return ResponseUtil.error(Finals.MESSAGES_ERROR_KEY_EXPIRED);
+                    }
+                } else {
+                    // 1 计数类型
+                    // 检查是否用完
+                    if (apiKey.getCount() <= 0) {
+                        return ResponseUtil.error(Finals.MESSAGES_ERROR_KEY_COUNT_EXPIRED);
+                    }
+                    // 减少次数
+                    apiMapper.reduceApiKeyCount(api_key);
+                }
+            }
+
+
+            String headerStr = requestBody.get("header");
+            String bodyStr = requestBody.get("body");
+            Object header = null;
+            Object body = null;
+            try {
+                header = JSON.parse(headerStr);
+            } catch (Exception ignored) {
+            }
+            try {
+                body = JSON.parse(bodyStr);
+            } catch (Exception ignored) {
+            }
+
+            // 记录日志
+            apiLogManager.saveLogAsync(
+                    api_id,
+                    requestBody.get("app_id"),
+                    header,
+                    body,
+                    api_key,
+                    Tools.strToInt(requestBody.get("user_id"))
+            );
+            return ResponseUtil.success();
+        } catch (Exception e) {
+            return ResponseUtil.error(Finals.MESSAGES_ERROR_PARAM);
+        }
+    }
+
 }

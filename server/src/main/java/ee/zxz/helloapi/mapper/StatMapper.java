@@ -44,7 +44,7 @@ public interface StatMapper {
      * @param body   请求体
      */
     @Insert("insert into helloapi_api_request_logs (`api_id`,`ip`, `header`, `body`,`api_key`,`user_id`) values (#{apiId}, #{ip}, #{header}, #{body},#{apiKey},#{userId})")
-    void insertApiLog(int apiId, String ip, Object header, Object body, String apiKey, String userId);
+    void insertApiLog(int apiId, String ip, Object header, Object body, String apiKey, int userId);
 
     /**
      * GetApiAllCount - 获取所有API调用次数的总和

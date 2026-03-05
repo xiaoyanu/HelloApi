@@ -306,4 +306,12 @@ public interface UserMapper {
     @Select("SELECT COUNT(*) FROM `helloapi_users` WHERE `id` = #{userId} AND `mode` = 1")
     int checkUserIsAdmin(int userId);
 
+    /**
+     * 通过UserKey获取用户ID
+     *
+     * @param key 用户密钥
+     * @return 用户ID，若不存在则返回0或null
+     */
+    @Select("SELECT `user_id` FROM `helloapi_user_keys` WHERE `key` = #{key}")
+    int getUserIdByUserKey(String key);
 }

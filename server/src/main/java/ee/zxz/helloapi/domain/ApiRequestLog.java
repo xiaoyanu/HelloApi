@@ -9,7 +9,7 @@ public class ApiRequestLog {
     private Object header;
     private Object body;
     private String api_key;
-    private String user_id;
+    private int user_id;
 
     public int getApp_id() {
         return app_id;
@@ -59,11 +59,11 @@ public class ApiRequestLog {
         this.api_key = api_key;
     }
 
-    public String getUser_id() {
+    public int getUser_id() {
         return user_id;
     }
 
-    public void setUser_id(String user_id) {
+    public void setUser_id(int user_id) {
         this.user_id = user_id;
     }
 }

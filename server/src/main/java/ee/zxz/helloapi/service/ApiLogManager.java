@@ -15,7 +15,7 @@ public class ApiLogManager {
      * 异步写入日志
      */
     @Async("logExecutor")
-    public void saveLogAsync(int appId, String ip, Object header, Object body, String apiKey, String userId) {
+    public void saveLogAsync(int appId, String ip, Object header, Object body, String apiKey, int userId) {
         try {
             // 增加API调用次数
             statMapper.addApiCount(appId);
