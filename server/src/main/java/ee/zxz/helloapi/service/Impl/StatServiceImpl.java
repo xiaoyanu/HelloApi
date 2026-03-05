@@ -1,6 +1,7 @@
 package ee.zxz.helloapi.service.Impl;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONException;
 import ee.zxz.helloapi.domain.ApiKey;
 import ee.zxz.helloapi.domain.DTO.ApiTodayArray;
 import ee.zxz.helloapi.mapper.ApiMapper;
@@ -30,6 +31,18 @@ public class StatServiceImpl implements StatService {
         this.apiMapper = apiMapper;
         this.userMapper = userMapper;
         this.statMapper = statMapper;
+    }
+
+    public boolean isValidJson(String str) {
+        if (str == null || str.trim().isEmpty()) {
+            return false;
+        }
+        try {
+            JSON.parse(str);
+            return true;
+        } catch (JSONException e) {
+            return false;
+        }
     }
 
     @Resource
@@ -133,23 +146,15 @@ public class StatServiceImpl implements StatService {
             }
 
 
-            String headerStr = requestBody.get("header");
-            String bodyStr = requestBody.get("body");
-            Object header = null;
-            Object body = null;
-            try {
-                header = JSON.parse(headerStr);
-            } catch (Exception ignored) {
-            }
-            try {
-                body = JSON.parse(bodyStr);
-            } catch (Exception ignored) {
-            }
+            String header = requestBody.get("header");
+            String body = requestBody.get("body");
+            header = isValidJson(header) ? header : null;
+            body = isValidJson(body) ? body : null;
 
             // 记录日志
             apiLogManager.saveLogAsync(
                     api_id,
-                    requestBody.get("app_id"),
+                    requestBody.get("ip"),
                     header,
                     body,
                     api_key,
@@ -160,5 +165,6 @@ public class StatServiceImpl implements StatService {
             return ResponseUtil.error(Finals.MESSAGES_ERROR_PARAM);
         }
     }
-
 }
+
+

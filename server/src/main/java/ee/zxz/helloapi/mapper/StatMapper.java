@@ -44,7 +44,7 @@ public interface StatMapper {
      * @param body   请求体
      */
     @Insert("insert into helloapi_api_request_logs (`api_id`,`ip`, `header`, `body`,`api_key`,`user_id`) values (#{apiId}, #{ip}, #{header}, #{body},#{apiKey},#{userId})")
-    void insertApiLog(int apiId, String ip, Object header, Object body, String apiKey, int userId);
+    void insertApiLog(int apiId, String ip, Object header, String body, String apiKey, int userId);
 
     /**
      * GetApiAllCount - 获取所有API调用次数的总和
@@ -124,9 +124,10 @@ public interface StatMapper {
             "    SELECT DATE(`time`) AS stat_date, COUNT(*) AS cnt " +
             "    FROM `helloapi_api_request_logs` " +
             "    WHERE `time` >= CURDATE() - INTERVAL 6 DAY " +
-            "    AND `time` < CURDATE() + INTERVAL 1 DAY " + // <-- 这里是关键补充
+            "    AND `time` < CURDATE() + INTERVAL 1 DAY " +
             "    GROUP BY DATE(`time`) " +
-            ") AS Stats ON Days.Date = Stats.stat_date")
+            ") AS Stats ON Days.Date = Stats.stat_date " +
+            "ORDER BY date")
     List<ApiWeekArray> getApiWeekCountArray();
 
     /**
