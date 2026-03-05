@@ -255,40 +255,7 @@ public interface ApiMapper {
     @Update("update helloapi_api_keys set `key` = #{newKey} where `key` = #{key}")
     void resetApiKey(String key, String newKey);
 
-    /**
-     * 插入API日志
-     *
-     * @param apiId  API ID
-     * @param ip     IP地址
-     * @param header 请求头
-     * @param body   请求体
-     */
-    @Insert("insert into helloapi_api_request_logs (`api_id`,`ip`, `header`, `body`) values (#{apiId}, #{ip}, #{header}, #{body})")
-    void insertApiLog(int apiId, String ip, Object header, Object body);
 
-    /**
-     * 增加ApiId调用次数
-     *
-     * @param apiId API ID
-     */
-    @Insert("INSERT INTO `helloapi_api_views` (`api_id`, `count`) VALUES (#{apiId}, 1) ON DUPLICATE KEY UPDATE `count` = `count` + 1")
-    void addApiCount(int apiId);
-
-    /**
-     * 删除API调用次数
-     *
-     * @param apiId API ID
-     */
-    @Delete("delete from helloapi_api_views where api_id = #{apiId}")
-    void deleteApiCount(int apiId);
-
-    /**
-     * 删除API日志
-     *
-     * @param apiId API ID
-     */
-    @Delete("delete from helloapi_api_request_logs where api_id = #{apiId}")
-    void deleteApiLog(int apiId);
 
     /**
      * API密钥列表搜索

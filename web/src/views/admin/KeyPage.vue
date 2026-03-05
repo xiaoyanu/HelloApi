@@ -176,6 +176,7 @@ const submitFormUpdate = async () => {
     }
     const res = await UpdateApiKey(nowRow.value.key, formData.value)
     if (res.data.code == 200) {
+      await fetchData()
       ElMessage.success('编辑成功')
       showDrawer.value = false
     }
@@ -299,6 +300,11 @@ const handleDelete = (key: string) => {
   ).then(async () => {
     const res = await DeleteApiKey(key)
     if (res.data.code == 200) {
+      // 如果当前页只有一条数据，并且不是第一页，则删除后请求前一页
+      if (tableData.value && tableData.value.length === 1 && paging.value.page > 1) {
+        paging.value.page--;
+      }
+      await fetchData()
       ElMessage.success('删除成功')
     }
   }).catch(() => {

@@ -15,6 +15,7 @@ declare module 'vue' {
     Banner: typeof import('./src/components/banner.vue')['default']
     BaseChart: typeof import('./src/components/BaseChart.vue')['default']
     ChartSkeleton: typeof import('./src/components/ChartSkeleton.vue')['default']
+    CountTo: typeof import('./src/components/CountTo.vue')['default']
     ElAffix: typeof import('element-plus/es')['ElAffix']
     ElBacktop: typeof import('element-plus/es')['ElBacktop']
     ElBadge: typeof import('element-plus/es')['ElBadge']

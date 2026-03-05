@@ -1,45 +1,81 @@
 <script setup lang="ts">
-import { defineAsyncComponent, ref } from "vue";
+import {defineAsyncComponent, onMounted, onUnmounted, ref, computed} from "vue";
 import {
-  PhUserCircle, PhChartPieSlice, PhChartBar, PhArrowBendRightDown, PhArrowBendLeftUp, PhCalendar
+  PhUserCircle, PhChartPieSlice, PhChartBar, PhArrowBendRightDown, PhArrowBendLeftUp, PhCalendar,
+  PhChatDots
 } from "@phosphor-icons/vue";
-import { formatNumber } from "@/utils";
+import {formatNumber} from "@/utils";
+import {GetStat} from "@/api/module/stat.ts";
+import CountTo from "@/components/CountTo.vue";
 
 // 异步按需加载图表组件
 const BaseChart = defineAsyncComponent(() => import('@/components/BaseChart.vue'));
 
-const card = [
-  {text: '用户数量', value: 10000, icon: PhUserCircle},
-  {text: '累计调用', value: 500030000, icon: PhChartBar},
-  {text: '今日调用', value: 20200, delta: -100000000, tip: '较昨日', icon: PhChartPieSlice},
-  {text: '本周调用', value: 1000, delta: 12200, tip: '较上周', icon: PhCalendar},
-];
+const data = ref({
+  userCount: {count: 0, change: 0},
+  apiAllCount: {count: 0, change: 0},
+  apiTodayCount: {count: 0, change: 0},
+  apiWeekCount: {count: 0, change: 0},
+  array: {
+    apiWeekCount: {date: [], count: []},
+    apiTodayCount: {name: [], count: []}
+  }
+});
 
-const getRandomData = (count: number, min: number, max: number) =>
-    Array.from({ length: count }, () => Math.floor(Math.random() * (max - min + 1)) + min);
+const getCardData = async () => {
+  try {
+    const [
+      userRes, allRes, todayRes, weekRes, weekArrRes, todayArrRes
+    ] = await Promise.all([
+      GetStat('userCount'),
+      GetStat('apiAllCount'),
+      GetStat('apiTodayCount'),
+      GetStat('apiWeekCount'),
+      GetStat('apiWeekCountArray'),
+      GetStat('apiTodayCountArray')
+    ]);
 
-// 图表 1 配置 (近7天调用统计)
-const chart1Options = ref({
+    // 赋值基础统计数据
+    if (userRes.data.code === 200) data.value.userCount = userRes.data.data;
+    if (allRes.data.code === 200) data.value.apiAllCount = allRes.data.data;
+    if (todayRes.data.code === 200) data.value.apiTodayCount = todayRes.data.data;
+    if (weekRes.data.code === 200) data.value.apiWeekCount = weekRes.data.data;
+
+    if (weekArrRes.data.code === 200) {
+      data.value.array.apiWeekCount.date = weekArrRes.data.data.map((item: any) => item.date.slice(5, 10));
+      data.value.array.apiWeekCount.count = weekArrRes.data.data.map((item: any) => item.count);
+    }
+
+    if (todayArrRes.data.code === 200) {
+      data.value.array.apiTodayCount.name = todayArrRes.data.data.map((item: any) => item.name);
+      data.value.array.apiTodayCount.count = todayArrRes.data.data.map((item: any) => item.count);
+    }
+  } catch (error) {
+    console.error("获取统计数据失败:", error);
+  }
+};
+
+const chart1Options = computed(() => ({
   tooltip: {
     trigger: 'axis',
     backgroundColor: 'rgba(255, 255, 255, 0.9)',
     padding: [10, 15],
-    textStyle: { color: '#333' },
+    textStyle: {color: '#333'},
     extraCssText: 'box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); border-radius: 4px;'
   },
-  grid: { left: '3%', right: '4%', bottom: '3%', top: '15%', containLabel: true },
+  grid: {left: '3%', right: '4%', bottom: '3%', top: '15%', containLabel: true},
   xAxis: {
     type: 'category',
     boundaryGap: false,
-    data: ['02-21', '02-22', '02-23', '02-24', '02-25', '02-26', '02-27'],
-    axisLine: { show: false },
-    axisTick: { show: false },
-    axisLabel: { color: '#909399', margin: 15 }
+    data: data.value.array.apiWeekCount.date,
+    axisLine: {show: false},
+    axisTick: {show: false},
+    axisLabel: {color: '#909399', margin: 15}
   },
   yAxis: {
     type: 'value',
-    axisLabel: { color: '#909399' },
-    splitLine: { lineStyle: { color: '#ebeef5', type: 'dashed' } }
+    axisLabel: {color: '#909399'},
+    splitLine: {lineStyle: {color: '#ebeef5', type: 'dashed'}}
   },
   series: [
     {
@@ -49,16 +85,15 @@ const chart1Options = ref({
       symbol: 'circle',
       symbolSize: 8,
       showSymbol: true,
-      data: getRandomData(7, 300000, 900000),
-      itemStyle: { color: '#409EFF', borderWidth: 2, borderColor: '#fff' },
-      lineStyle: { width: 3, color: '#409EFF' },
-      // 巧妙之处：使用纯对象声明渐变，无需引入 echarts.graphic
+      data: data.value.array.apiWeekCount.count,
+      itemStyle: {color: '#409EFF', borderWidth: 2, borderColor: '#fff'},
+      lineStyle: {width: 3, color: '#409EFF'},
       areaStyle: {
         color: {
           type: 'linear', x: 0, y: 0, x2: 0, y2: 1,
           colorStops: [
-            { offset: 0, color: 'rgba(64, 158, 255, 0.3)' },
-            { offset: 1, color: 'rgba(64, 158, 255, 0.05)' }
+            {offset: 0, color: 'rgba(64, 158, 255, 0.3)'},
+            {offset: 1, color: 'rgba(64, 158, 255, 0.05)'}
           ]
         }
       },
@@ -71,45 +106,43 @@ const chart1Options = ref({
       }
     }
   ]
-});
+}));
 
-// 图表 2 配置 (今日热门接口)
-const chart2Options = ref({
+const chart2Options = computed(() => ({
   tooltip: {
     trigger: 'axis',
-    axisPointer: { type: 'shadow' },
+    axisPointer: {type: 'shadow'},
     backgroundColor: 'rgba(255, 255, 255, 0.9)',
     padding: [10, 15],
-    textStyle: { color: '#333' },
+    textStyle: {color: '#333'},
     extraCssText: 'box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); border-radius: 4px;'
   },
-  grid: { left: '3%', right: '4%', bottom: '3%', top: '15%', containLabel: true },
+  grid: {left: '3%', right: '4%', bottom: '3%', top: '15%', containLabel: true},
   xAxis: {
     type: 'category',
-    data: ['/api/login', '/api/getUser', '/api/order/list', '/api/pay', '/api/upload'],
-    axisLine: { show: false },
-    axisTick: { show: false },
-    axisLabel: { color: '#909399', margin: 15, interval: 0, rotate: 15 }
+    data: data.value.array.apiTodayCount.name,
+    axisLine: {show: false},
+    axisTick: {show: false},
+    axisLabel: {color: '#909399', margin: 15, interval: 0, rotate: 15}
   },
   yAxis: {
     type: 'value',
-    axisLabel: { color: '#909399' },
-    splitLine: { lineStyle: { color: '#ebeef5', type: 'dashed' } }
+    axisLabel: {color: '#909399'},
+    splitLine: {lineStyle: {color: '#ebeef5', type: 'dashed'}}
   },
   series: [
     {
       name: '请求次数',
       type: 'bar',
       barWidth: '35%',
-      data: getRandomData(5, 5000, 50000),
+      data: data.value.array.apiTodayCount.count,
       itemStyle: {
         borderRadius: [4, 4, 0, 0],
-        // 同样使用纯对象声明渐变
         color: {
           type: 'linear', x: 0, y: 0, x2: 0, y2: 1,
           colorStops: [
-            { offset: 0, color: '#38D677' },
-            { offset: 1, color: 'rgba(56, 214, 119, 0.1)' }
+            {offset: 0, color: '#38D677'},
+            {offset: 1, color: 'rgba(56, 214, 119, 0.1)'}
           ]
         }
       },
@@ -122,37 +155,117 @@ const chart2Options = ref({
       }
     }
   ]
+}));
+
+// 定时器变量
+let refreshTimer: number | null = null;
+
+onMounted(async () => {
+  // 初始加载
+  await getCardData();
+
+  // 每 5 秒自动刷新
+  refreshTimer = window.setInterval(() => {
+    getCardData();
+  }, 5000);
+});
+
+// 组件卸载时务必清除定时器，防止内存泄漏
+onUnmounted(() => {
+  if (refreshTimer !== null) {
+    clearInterval(refreshTimer);
+    refreshTimer = null;
+  }
 });
 </script>
 
 <template>
-  <div>
-    <div class="grid grid-cols-4 gap-5 mb-5">
-      <div class="card" v-for="item in card" :key="item.text">
+  <div class="p-2 sm:p-0">
+    <div class="grid grid-cols-1 gap-4 md:gap-5">
+      <div class="bg-white rounded-lg p-5 border border-[#ebeef5]" style="box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05)">
+        <p>
+          <PhChatDots :size="32" weight="duotone" class="text-orange-600"/>
+          ヾ(≧▽≦*)o
+        </p>
+        <p>
+          欢迎使用 HelloAPI 系统，GitHub地址：<a href="https://github.com/xiaoyanu/HelloAPI" target="_blank">https://github.com/xiaoyanu/HelloAPI</a>
+        </p>
+        <p>
+          如有建议、使用漏洞、BUG等可在Github提交问题或通过邮箱1872786834@qq.com与我联系
+        </p>
+      </div>
+    </div>
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-5 mt-5 mb-5">
+      <div class="card">
         <div class="flex items-center justify-center mr-3.75 text-[#38D677]">
-          <component :is="item.icon" size="60" weight="duotone" class="stat-icon"/>
+          <PhUserCircle size="60" weight="duotone"/>
         </div>
         <div>
-          <h3 class="text-[14px] text-[#606266]">{{ item.text }}</h3>
-          <div class="font-bold text-[24px]">{{ formatNumber(item.value) }}</div>
-          <div v-if="item?.delta" :class="{'down': item.delta < 0, 'up': item.delta > 0}"
+          <h3 class="text-[14px] text-[#606266]">用户数量</h3>
+          <div class="font-bold text-[24px]">
+            <CountTo :value="data.userCount.count" :formatter="formatNumber"/>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="flex items-center justify-center mr-3.75 text-[#38D677]">
+          <PhChartBar size="60" weight="duotone"/>
+        </div>
+        <div>
+          <h3 class="text-[14px] text-[#606266]">累计调用</h3>
+          <div class="font-bold text-[24px]">
+            <CountTo :value="data.apiAllCount.count" :formatter="formatNumber"/>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="flex items-center justify-center mr-3.75 text-[#38D677]">
+          <PhChartPieSlice size="60" weight="duotone"/>
+        </div>
+        <div>
+          <h3 class="text-[14px] text-[#606266]">今日调用</h3>
+          <div class="font-bold text-[24px]">
+            <CountTo :value="data.apiTodayCount.count" :formatter="formatNumber"/>
+          </div>
+          <div v-if="data.apiTodayCount.change != 0"
+               :class="{'down': data.apiTodayCount.change < 0, 'up':data.apiTodayCount.change > 0}"
                class="text-[12px] flex items-center">
-            <PhArrowBendRightDown v-if="item.delta < 0" class="inline"/>
+            <PhArrowBendRightDown v-if="data.apiTodayCount.change < 0" class="inline"/>
             <PhArrowBendLeftUp v-else class="inline"/>
-            {{ item.tip }} {{ formatNumber(item.delta) }}
+            较昨日
+            <CountTo :value="data.apiTodayCount.change" :formatter="formatNumber"/>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="flex items-center justify-center mr-3.75 text-[#38D677]">
+          <PhCalendar size="60" weight="duotone"/>
+        </div>
+        <div>
+          <h3 class="text-[14px] text-[#606266]">本周调用</h3>
+          <div class="font-bold text-[24px]">
+            <CountTo :value="data.apiWeekCount.count" :formatter="formatNumber"/>
+          </div>
+          <div v-if="data.apiWeekCount.change != 0"
+               :class="{'down': data.apiWeekCount.change < 0, 'up':data.apiWeekCount.change > 0}"
+               class="text-[12px] flex items-center">
+            <PhArrowBendRightDown v-if="data.apiWeekCount.change < 0" class="inline"/>
+            <PhArrowBendLeftUp v-else class="inline"/>
+            较上周
+            <CountTo :value="data.apiWeekCount.change" :formatter="formatNumber"/>
           </div>
         </div>
       </div>
     </div>
 
-    <div class="grid grid-cols-2 gap-5">
-      <div class="chart-card">
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-5">
+      <div class="chart-card overflow-hidden">
         <div class="chart-header">近7天调用统计</div>
-        <BaseChart :options="chart1Options" />
+        <BaseChart :options="chart1Options" class="w-full h-75"/>
       </div>
-      <div class="chart-card">
+      <div class="chart-card overflow-hidden">
         <div class="chart-header">今日热门接口</div>
-        <BaseChart :options="chart2Options" />
+        <BaseChart :options="chart2Options" class="w-full h-75"/>
       </div>
     </div>
   </div>
@@ -169,14 +282,22 @@ const chart2Options = ref({
   border: 1px solid #ebeef5;
   height: 120px;
 }
-.down { color: #fa6161; }
-.up { color: #39b16c; }
+
+.down {
+  color: #fa6161;
+}
+
+.up {
+  color: #39b16c;
+}
+
 .chart-card {
   background: #fff;
   border-radius: 8px;
   padding: 20px;
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
   border: 1px solid #ebeef5;
+
   .chart-header {
     font-size: 16px;
     font-weight: bold;

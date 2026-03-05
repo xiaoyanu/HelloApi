@@ -272,6 +272,10 @@ const handleDelete = (id: number) => {
   ).then(async () => {
     const res = await DeleteApi(id)
     if (res.data.code == 200) {
+      // 如果当前页只有一条数据，并且不是第一页，则删除后请求前一页
+      if (tableData.value && tableData.value.length === 1 && paging.value.page > 1) {
+        paging.value.page--;
+      }
       await fetchData()
       ElMessage.success('删除成功')
     }

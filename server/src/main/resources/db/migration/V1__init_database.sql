@@ -1,7 +1,6 @@
--- V1__Initial_Setup.sql
--- Description: Initialize the HelloAPI database schema
-
--- 1. 用户基础信息表
+-- ----------------------------
+-- Table structure for helloapi_users
+-- ----------------------------
 CREATE TABLE `helloapi_users`
 (
     `id`       int(10)      NOT NULL AUTO_INCREMENT COMMENT '用户唯一ID',
@@ -14,9 +13,12 @@ CREATE TABLE `helloapi_users`
     `updated`  datetime     NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
     PRIMARY KEY (`id`)
 ) ENGINE = InnoDB
-  DEFAULT CHARSET = utf8mb4 COMMENT ='用户基础信息表';
+  AUTO_INCREMENT = 1
+  DEFAULT CHARSET = utf8mb4 COMMENT = '用户基础信息表';
 
--- 2. 接口主表
+-- ----------------------------
+-- Table structure for helloapi_api_apps
+-- ----------------------------
 CREATE TABLE `helloapi_api_apps`
 (
     `id`            int(10)      NOT NULL AUTO_INCREMENT COMMENT '唯一ID',
@@ -34,9 +36,12 @@ CREATE TABLE `helloapi_api_apps`
     `view_status`   int(2)       NOT NULL COMMENT '展示状态，0正常，1审核中，2拒绝',
     PRIMARY KEY (`id`)
 ) ENGINE = InnoDB
-  DEFAULT CHARSET = utf8mb4 COMMENT ='接口主表';
+  AUTO_INCREMENT = 1
+  DEFAULT CHARSET = utf8mb4 COMMENT = '接口主表';
 
--- 3. API授权密钥表
+-- ----------------------------
+-- Table structure for helloapi_api_keys
+-- ----------------------------
 CREATE TABLE `helloapi_api_keys`
 (
     `api_id`  int(10)      NOT NULL COMMENT '对应的API的ID',
@@ -50,9 +55,11 @@ CREATE TABLE `helloapi_api_keys`
     `desc`    varchar(255)          DEFAULT NULL COMMENT '备注',
     PRIMARY KEY (`key`)
 ) ENGINE = InnoDB
-  DEFAULT CHARSET = utf8mb4 COMMENT ='API授权密钥表';
+  DEFAULT CHARSET = utf8mb4 COMMENT = 'API授权密钥表';
 
--- 4. 接口请求参数表
+-- ----------------------------
+-- Table structure for helloapi_api_params
+-- ----------------------------
 CREATE TABLE `helloapi_api_params`
 (
     `api_id`   int(10)      NOT NULL COMMENT '对应的Api唯一ID',
@@ -61,31 +68,44 @@ CREATE TABLE `helloapi_api_params`
     `type`     varchar(255) NOT NULL COMMENT '参数类型',
     `msg`      varchar(255) NOT NULL COMMENT '描述'
 ) ENGINE = InnoDB
-  DEFAULT CHARSET = utf8mb4 COMMENT ='接口请求参数表';
+  DEFAULT CHARSET = utf8mb4 COMMENT = '接口请求参数表';
 
--- 5. API调用日志表
+-- ----------------------------
+-- Table structure for helloapi_api_request_logs
+-- ----------------------------
 CREATE TABLE `helloapi_api_request_logs`
 (
-    `api_id` int(10)  NOT NULL COMMENT '对应的API ID',
-    `ip`     varchar(255)      DEFAULT NULL COMMENT '请求IP',
-    `time`   datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '请求时间',
-    `header` json              DEFAULT NULL COMMENT '请求头',
-    `body`   json              DEFAULT NULL COMMENT '请求参数',
+    `log_id`  bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键',
+    `api_id`  int(10)    NOT NULL COMMENT '对应的API ID',
+    `ip`      varchar(255)        DEFAULT NULL COMMENT '请求IP',
+    `time`    datetime   NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '请求时间',
+    `header`  json                DEFAULT NULL COMMENT '请求头',
+    `body`    json                DEFAULT NULL COMMENT '请求参数',
+    `api_key` varchar(255)        DEFAULT NULL COMMENT '请求APIKey',
+    `user_id` int(10)    NOT NULL COMMENT '用户ID',
+    PRIMARY KEY (`log_id`),
     INDEX `idx_api_id` (`api_id`),
-    INDEX `idx_time` (`time`)
+    INDEX `idx_time` (`time`),
+    INDEX `idx_user_id` (`user_id`),
+    INDEX `idx_api_key` (`api_key`)
 ) ENGINE = InnoDB
-  DEFAULT CHARSET = utf8mb4 COMMENT ='API调用日志表';
+  AUTO_INCREMENT = 1
+  DEFAULT CHARSET = utf8mb4 COMMENT = 'API调用日志表';
 
--- 6. 接口调用次数统计
+-- ----------------------------
+-- Table structure for helloapi_api_views
+-- ----------------------------
 CREATE TABLE `helloapi_api_views`
 (
     `api_id` int(10)    NOT NULL,
     `count`  bigint(13) NOT NULL,
     PRIMARY KEY (`api_id`)
 ) ENGINE = InnoDB
-  DEFAULT CHARSET = utf8mb4 COMMENT ='接口调用次数统计';
+  DEFAULT CHARSET = utf8mb4 COMMENT = '接口调用次数统计';
 
--- 7. 系统全局设置
+-- ----------------------------
+-- Table structure for helloapi_settings
+-- ----------------------------
 CREATE TABLE `helloapi_settings`
 (
     `key`     varchar(255) NOT NULL,
@@ -93,9 +113,11 @@ CREATE TABLE `helloapi_settings`
     `updated` datetime     NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
     PRIMARY KEY (`key`)
 ) ENGINE = InnoDB
-  DEFAULT CHARSET = utf8mb4 COMMENT ='系统全局设置';
+  DEFAULT CHARSET = utf8mb4 COMMENT = '系统全局设置';
 
--- 8. 用户身份凭证表
+-- ----------------------------
+-- Table structure for helloapi_user_keys
+-- ----------------------------
 CREATE TABLE `helloapi_user_keys`
 (
     `user_id` int(10)      NOT NULL COMMENT '对应的用户id',
@@ -104,4 +126,4 @@ CREATE TABLE `helloapi_user_keys`
     `updated` datetime     NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
     PRIMARY KEY (`user_id`)
 ) ENGINE = InnoDB
-  DEFAULT CHARSET = utf8mb4 COMMENT ='用户身份凭证表';
+  DEFAULT CHARSET = utf8mb4 COMMENT = '用户身份凭证表';

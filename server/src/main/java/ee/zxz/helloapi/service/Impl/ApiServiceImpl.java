@@ -4,15 +4,13 @@ import com.alibaba.fastjson.JSON;
 import ee.zxz.helloapi.domain.ApiApp;
 import ee.zxz.helloapi.domain.ApiKey;
 import ee.zxz.helloapi.domain.ApiParam;
-import ee.zxz.helloapi.domain.ApiRequestLog;
 import ee.zxz.helloapi.mapper.ApiMapper;
+import ee.zxz.helloapi.mapper.StatMapper;
 import ee.zxz.helloapi.mapper.UserMapper;
-import ee.zxz.helloapi.service.ApiLogManager;
 import ee.zxz.helloapi.service.ApiService;
 import ee.zxz.helloapi.utils.Finals;
 import ee.zxz.helloapi.utils.ResponseUtil;
 import ee.zxz.helloapi.utils.Tools;
-import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.stereotype.Service;
 
@@ -23,10 +21,12 @@ import java.util.*;
 public class ApiServiceImpl implements ApiService {
     private final ApiMapper apiMapper;
     private final UserMapper userMapper;
+    private final StatMapper statMapper;
 
-    public ApiServiceImpl(ApiMapper apiMapper, UserMapper userMapper) {
+    public ApiServiceImpl(ApiMapper apiMapper, UserMapper userMapper, StatMapper statMapper) {
         this.apiMapper = apiMapper;
         this.userMapper = userMapper;
+        this.statMapper = statMapper;
     }
 
     /**
@@ -44,9 +44,6 @@ public class ApiServiceImpl implements ApiService {
         map.put("type", apiApp.getType());
         list.add(map);
     }
-
-    @Resource
-    private ApiLogManager apiLogManager;
 
     @Override
     public Map<String, Object> getApiList(Map<String, String> requestParam, HttpServletRequest request) {
@@ -235,8 +232,8 @@ public class ApiServiceImpl implements ApiService {
 
             apiMapper.deleteApiApp(intApiId);
             apiMapper.deleteApiParamAll(intApiId);
-            apiMapper.deleteApiCount(intApiId);
-            apiMapper.deleteApiLog(intApiId);
+            statMapper.deleteApiCount(intApiId);
+            statMapper.deleteApiLog(intApiId);
             apiMapper.deleteApiKeyAll(intApiId);
             return ResponseUtil.success();
 
@@ -518,59 +515,6 @@ public class ApiServiceImpl implements ApiService {
         apiMapper.resetApiKey(finalKey, key);
 
         return ResponseUtil.success(key);
-    }
-
-    @Override
-    public Map<String, Object> logApi(String userKey, String key, ApiRequestLog apiRequestLog, HttpServletRequest request) {
-        // 检查用户密钥是否存在
-        if (userMapper.checkUserKeyExists(userKey) < 1) {
-            return ResponseUtil.error(Finals.MESSAGES_ERROR_KEY_NOT_FOUND);
-        }
-
-        ApiApp apiApp = apiMapper.getApiApp(apiRequestLog.getApp_id());
-
-        // 校验ApiId是否存在
-        if (apiApp == null) {
-            return ResponseUtil.error(Finals.MESSAGES_ERROR_API_NOT_FOUND);
-        }
-
-        if (key != null) {
-            ApiKey apiKey = apiMapper.getApiKey(key);
-            if (apiKey == null) {
-                return ResponseUtil.error(Finals.MESSAGES_ERROR_KEY_NOT_FOUND);
-            }
-            // 判断密钥类型
-            if (apiKey.getType() == 0) {
-                // 0 时间类型
-                // 检查是否过期
-                if (LocalDateTime.now().isAfter(apiKey.getExpired())) {
-                    return ResponseUtil.error(Finals.MESSAGES_ERROR_KEY_EXPIRED);
-                }
-            } else {
-                // 1 计数类型
-                // 检查是否用完
-                if (apiKey.getCount() <= 0) {
-                    return ResponseUtil.error(Finals.MESSAGES_ERROR_KEY_COUNT_EXPIRED);
-                }
-                // 减少次数
-                apiMapper.reduceApiKeyCount(key);
-            }
-        }
-
-        // 记录日志
-        if (apiRequestLog.getHeader().equals("")) {
-            apiRequestLog.setHeader(null);
-        }
-        if (apiRequestLog.getBody().equals("")) {
-            apiRequestLog.setBody(null);
-        }
-        apiLogManager.saveLogAsync(
-                apiRequestLog.getApp_id(),
-                apiRequestLog.getIp(),
-                apiRequestLog.getHeader(),
-                apiRequestLog.getBody()
-        );
-        return ResponseUtil.success();
     }
 
     @Override

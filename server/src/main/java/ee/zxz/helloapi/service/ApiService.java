@@ -1,6 +1,5 @@
 package ee.zxz.helloapi.service;
 
-import ee.zxz.helloapi.domain.ApiRequestLog;
 import jakarta.servlet.http.HttpServletRequest;
 
 import java.util.Map;
@@ -42,9 +41,6 @@ public interface ApiService {
 
     // 重置API密钥
     Map<String, Object> resetApiKey(String finalKey, HttpServletRequest request);
-
-    // 记录API日志/消耗等
-    Map<String, Object> logApi(String userKey, String key, ApiRequestLog apiRequestLog, HttpServletRequest request);
 
     // 搜索用户API密钥列表
     Map<String, Object> userApiKeyListSearch(String userId, Map<String, String> requestParam, HttpServletRequest request);

@@ -115,10 +115,4 @@ public class ApiController {
         String finalKey = (key == null) ? "0" : key;
         return apiService.resetApiKey(finalKey, request);
     }
-
-    // LogApi - 记录API日志/消耗等 - POST
-    @PostMapping({"/log/{userKey}/{key}", "/log/", "/log/{userKey}", "/log/{userKey}/"})
-    public Map<String, Object> LogApi(@PathVariable(required = false) String userKey, @PathVariable(required = false) String key, @RequestBody ApiRequestLog apiRequestLog, HttpServletRequest request) {
-        return apiService.logApi(userKey, key, apiRequestLog, request);
-    }
 }

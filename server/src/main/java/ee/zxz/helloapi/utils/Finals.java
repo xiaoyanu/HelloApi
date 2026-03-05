@@ -8,6 +8,7 @@ public class Finals {
 
     public static final String userUrl = "/api/v1/user";
     public static final String apiUrl = "/api/v1/app";
+    public static final String statUrl = "/api/v1/stat";
     // 适合 code 401 主要是用于告诉用户重新登陆
     public static final String MESSAGES_TOKEN_TIME_OUT = "Token过期/无效";
     public static final String MESSAGES_ERROR_NOT_ADMIN = "非管理员用户，没有操作权限";

@@ -8,6 +8,8 @@ public class ApiRequestLog {
     private LocalDateTime time;
     private Object header;
     private Object body;
+    private String api_key;
+    private String user_id;
 
     public int getApp_id() {
         return app_id;
@@ -47,5 +49,21 @@ public class ApiRequestLog {
 
     public void setBody(Object body) {
         this.body = body;
+    }
+
+    public String getApi_key() {
+        return api_key;
+    }
+
+    public void setApi_key(String api_key) {
+        this.api_key = api_key;
+    }
+
+    public String getUser_id() {
+        return user_id;
+    }
+
+    public void setUser_id(String user_id) {
+        this.user_id = user_id;
     }
 }

@@ -9,6 +9,7 @@ import ee.zxz.helloapi.domain.Setting;
 import ee.zxz.helloapi.domain.User;
 import ee.zxz.helloapi.domain.UserKey;
 import ee.zxz.helloapi.mapper.ApiMapper;
+import ee.zxz.helloapi.mapper.StatMapper;
 import ee.zxz.helloapi.mapper.UserMapper;
 import ee.zxz.helloapi.service.UserService;
 import ee.zxz.helloapi.utils.Finals;
@@ -25,10 +26,12 @@ import java.util.*;
 public class UserServiceImpl implements UserService {
     private final UserMapper userMapper;
     private final ApiMapper apiMapper;
+    private final StatMapper statMapper;
 
-    public UserServiceImpl(UserMapper userMapper, ApiMapper apiMapper) {
+    public UserServiceImpl(UserMapper userMapper, ApiMapper apiMapper, StatMapper statMapper) {
         this.userMapper = userMapper;
         this.apiMapper = apiMapper;
+        this.statMapper = statMapper;
     }
 
     @Override
@@ -287,7 +290,7 @@ public class UserServiceImpl implements UserService {
                         // 删除API参数
                         apiMapper.deleteApiParamAll(apiApp.getId());
                         // 删除APIlog
-                        apiMapper.deleteApiLog(apiApp.getId());
+                        statMapper.deleteApiLog(apiApp.getId());
                         // 删除API应用
                         apiMapper.deleteApiApp(apiApp.getId());
                     }
