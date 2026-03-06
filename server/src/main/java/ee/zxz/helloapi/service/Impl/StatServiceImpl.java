@@ -103,42 +103,42 @@ public class StatServiceImpl implements StatService {
         try {
             // 检查用户密钥是否存在
             if (userMapper.checkUserKeyExists(requestBody.get("user_key")) < 1) {
-                return ResponseUtil.error("user_key用户密钥不存在");
+                return ResponseUtil.response(400, "调用失败，请联系站长/开发者 代码：ERROR_1", "user_key用户密钥不存在");
             }
 
             // 检查userID与Key是否匹配
             if (userMapper.getUserIdByUserKey(requestBody.get("user_key")) != Tools.strToInt(requestBody.get("user_id"))) {
-                return ResponseUtil.error("user_id与user_key不匹配");
+                return ResponseUtil.response(400, "调用失败，请联系站长/开发者 代码：ERROR_2", "user_id与user_key不匹配");
             }
 
 
             // 校验ApiId是否存在
             int api_id = Tools.strToInt(requestBody.get("api_id"));
             if (apiMapper.checkApiExist(api_id) < 1) {
-                return ResponseUtil.error("api_id不存在");
+                return ResponseUtil.response(400, "调用失败，请联系站长/开发者 代码：ERROR_3", "api_id不存在");
             }
 
             String api_key = requestBody.get("api_key");
             if (api_key != null && !api_key.isEmpty()) {
                 ApiKey apiKey = apiMapper.getApiKey(api_key);
                 if (apiKey == null) {
-                    return ResponseUtil.error("api_key不存在");
+                    return ResponseUtil.response(400, "API密钥 / APIKey不存在", "api_key不存在");
                 }
                 if (apiKey.getApi_id() != api_id) {
-                    return ResponseUtil.error("api_id与api_key不匹配");
+                    return ResponseUtil.response(400, "API密钥 / APIKey错误", "api_id与api_key不匹配");
                 }
                 // 判断密钥类型
                 if (apiKey.getType() == 0) {
                     // 0 时间类型
                     // 检查是否过期
                     if (LocalDateTime.now().isAfter(apiKey.getExpired())) {
-                        return ResponseUtil.error(Finals.MESSAGES_ERROR_KEY_EXPIRED);
+                        return ResponseUtil.response(400, "API密钥 / APIKey过期", Finals.MESSAGES_ERROR_KEY_EXPIRED);
                     }
                 } else {
                     // 1 计数类型
                     // 检查是否用完
                     if (apiKey.getCount() <= 0) {
-                        return ResponseUtil.error(Finals.MESSAGES_ERROR_KEY_COUNT_EXPIRED);
+                        return ResponseUtil.response(400, "API密钥 / APIKey耗尽", Finals.MESSAGES_ERROR_KEY_COUNT_EXPIRED);
                     }
                     // 减少次数
                     apiMapper.reduceApiKeyCount(api_key);

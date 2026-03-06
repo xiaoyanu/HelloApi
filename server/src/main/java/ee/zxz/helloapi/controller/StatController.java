@@ -1,6 +1,5 @@
 package ee.zxz.helloapi.controller;
 
-import ee.zxz.helloapi.annotation.RequiresLogin;
 import ee.zxz.helloapi.service.Impl.StatServiceImpl;
 import ee.zxz.helloapi.utils.Finals;
 import jakarta.servlet.http.HttpServletRequest;
@@ -25,7 +24,6 @@ public class StatController {
 
     // Post - 获取指定类型数据 - Post
     @PostMapping("/")
-    @RequiresLogin()
     public Map<String, Object> GetStat(@RequestParam(required = false) Map<String, String> requestParam, @RequestBody(required = false) Map<String, String> requestBody, HttpServletRequest request) {
         return statService.getStat(requestParam, requestBody, request);
     }

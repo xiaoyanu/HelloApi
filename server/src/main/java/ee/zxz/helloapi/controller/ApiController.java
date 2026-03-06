@@ -1,7 +1,6 @@
 package ee.zxz.helloapi.controller;
 
 import ee.zxz.helloapi.annotation.RequiresLogin;
-import ee.zxz.helloapi.domain.ApiRequestLog;
 import ee.zxz.helloapi.service.ApiService;
 import ee.zxz.helloapi.utils.Finals;
 import jakarta.servlet.http.HttpServletRequest;

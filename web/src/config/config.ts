@@ -2,8 +2,8 @@
 const HelloAPIConfig = {
 
     // 后端接口地址
-    // serverURL: 'http://localhost:8080',
-    serverURL: 'https://api-server.zxz.ee',
+    serverURL: 'http://localhost:8080',
+    // serverURL: 'https://api.zxz.ee/service',
 
     // 前端域名
     domain: 'api.zxz.ee',
@@ -16,6 +16,10 @@ const HelloAPIConfig = {
         index: {
             // 每页显示数量，影响范围：前台页面
             pageSize: 16,
+            // 放行的网站路径，只有在这里放行的路径才不会报404，起始位置是根目录，比如你要放行根目录下的/api
+            folder_paths: ['/api','/Robot'],
+            // 要放行的文件，同上
+            file_paths:['/log.php']
         },
         admin: {
             // 每页显示数量，影响范围：后台页面

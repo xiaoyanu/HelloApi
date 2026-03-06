@@ -15,6 +15,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 public class WebConfig implements WebMvcConfigurer {
 
     private final JwtInterceptor jwtInterceptor;
+
     public WebConfig(JwtInterceptor jwtInterceptor) {
         this.jwtInterceptor = jwtInterceptor;
     }
@@ -37,25 +38,10 @@ public class WebConfig implements WebMvcConfigurer {
     public void addCorsMappings(CorsRegistry registry) {
         // 允许所有路径进行跨域访问
         registry.addMapping("/**")
-                /*
-                  # 请将伪静态规则或自定义NGINX配置填写到此处
-                  add_header 'Access-Control-Allow-Origin' 'https://pm.zxz.ee' always;
-                  add_header 'Access-Control-Allow-Methods' 'GET, POST, PUT, DELETE, OPTIONS' always;
-                  add_header 'Access-Control-Allow-Headers' '*' always;
-                  add_header 'Access-Control-Allow-Credentials' 'true' always;
-                 */
-
-                // 允许的源模式
-                .allowedOriginPatterns("http://localhost:*", "http://127.0.0.1:*", "http://*.zxz.ee", "https://*.zxz.ee")
-                // 允许的请求方法
-                .allowedMethods("GET", "POST",  "OPTIONS", "DELETE", "PUT")
-                // 允许的请求头
-                .allowedHeaders("*")
-                // 允许暴露的响应头
-                .exposedHeaders("*")
-                // 允许携带cookie
+                .allowedOriginPatterns("*") // 允许所有来源的跨域请求
+                .allowedMethods("*")
                 .allowCredentials(true)
-                // 设置预检请求结果的缓存时间（秒）
                 .maxAge(3600);
+        
     }
 }

@@ -2,6 +2,7 @@ import {createRouter, createWebHistory} from 'vue-router'
 import IndexLayout from "@/layouts/IndexLayout.vue";
 import AdminLayout from "@/layouts/AdminLayout.vue";
 import {useUserStore} from "@/stores";
+import {HelloAPIConfig} from "@/config/config.ts";
 
 const router = createRouter({
     history: createWebHistory(import.meta.env.BASE_URL),
@@ -90,7 +91,10 @@ const router = createRouter({
             path: '/:pathMatch(.*)*', // 404 页面不存在
             component: () => import('@/views/NotFound.vue'),
             beforeEnter: (to, _, next) => {
-                if (to.path.startsWith('/api')) {
+                // 检测放行组
+                const isFolderMatch = HelloAPIConfig.website.index.folder_paths.some(path => to.path.startsWith(path));
+                const isFileMatch = HelloAPIConfig.website.index.file_paths.some(path => to.path === path);
+                if (isFolderMatch || isFileMatch) {
                     return false;
                 }
                 next();
