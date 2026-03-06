@@ -109,6 +109,9 @@ public class ApiServiceImpl implements ApiService {
                     if (p.getMsg() == null || p.getMsg().trim().isEmpty()) {
                         return ResponseUtil.response(400, "第 " + (i + 1) + " 行参数的描述不能为空");
                     }
+                    if (p.getMsg().length() > 245) {
+                        return ResponseUtil.response(400, "第 " + (i + 1) + " 行参数的描述不能超过245个字符");
+                    }
                 }
             }
             // 创建应用
@@ -175,6 +178,9 @@ public class ApiServiceImpl implements ApiService {
                     }
                     if (p.getMsg() == null || p.getMsg().trim().isEmpty()) {
                         return ResponseUtil.response(400, "第 " + (i + 1) + " 行参数的描述不能为空");
+                    }
+                    if (p.getMsg().length() > 245) {
+                        return ResponseUtil.response(400, "第 " + (i + 1) + " 行参数的描述不能超过245个字符");
                     }
                 }
             }
@@ -288,6 +294,7 @@ public class ApiServiceImpl implements ApiService {
         map.put("sendType", apiApp.getSendType());
         map.put("returnType", apiApp.getReturnType());
         map.put("returnContent", apiApp.getReturnContent());
+        map.put("view_status", apiApp.getView_status());
         for (ApiParam apiParam : apiParams) {
             Map<String, Object> paramMap = new LinkedHashMap<>();
             paramMap.put("name", apiParam.getName());
@@ -359,7 +366,13 @@ public class ApiServiceImpl implements ApiService {
             key = Tools.getTextMd5(String.valueOf(intApiId) + System.currentTimeMillis());
         }
 
-        apiMapper.createApiKey(intApiId, key, type, started, expired, count, (String) requestBody.get("desc"));
+        String desc = (String) requestBody.get("desc");
+        if (desc != null && !desc.isEmpty()) {
+            if (desc.length() > 245) {
+                return ResponseUtil.response(400, "备注不能超过245个字符");
+            }
+        }
+        apiMapper.createApiKey(intApiId, key, type, started, expired, count, desc);
 
         return ResponseUtil.success(key);
     }
@@ -440,8 +453,13 @@ public class ApiServiceImpl implements ApiService {
                 return ResponseUtil.response(400, Finals.MESSAGES_ERROR_PARAM);
             }
         }
-
-        apiMapper.updateApiKey(finalKey, type, started, expired, count, (String) requestBody.get("desc"));
+        String desc = (String) requestBody.get("desc");
+        if (desc != null && !desc.isEmpty()) {
+            if (desc.length() > 245) {
+                return ResponseUtil.response(400, "备注不能超过245个字符");
+            }
+        }
+        apiMapper.updateApiKey(finalKey, type, started, expired, count, desc);
 
         return ResponseUtil.success();
     }

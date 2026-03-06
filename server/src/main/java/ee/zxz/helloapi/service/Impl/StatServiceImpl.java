@@ -118,6 +118,11 @@ public class StatServiceImpl implements StatService {
                 return ResponseUtil.response(400, "调用失败，请联系站长/开发者 代码：ERROR_3", "api_id不存在");
             }
 
+            // 校验过审没有
+            if (apiMapper.checkApiViewStatus(api_id) < 1) {
+                return ResponseUtil.response(400, "调用失败，请联系站长/开发者 代码：ERROR_4", "api_id未过审");
+            }
+
             String api_key = requestBody.get("api_key");
             if (api_key != null && !api_key.isEmpty()) {
                 ApiKey apiKey = apiMapper.getApiKey(api_key);

@@ -330,6 +330,10 @@ onMounted(() => {
             <el-option :value="2" label="维护">
               <el-tag size="small" type="info">维护</el-tag>
             </el-option>
+
+            <el-option :value="3" label="隐藏">
+              <el-tag effect="dark" size="small" type="info">隐藏</el-tag>
+            </el-option>
           </el-select>
         </el-form-item>
 
@@ -391,8 +395,10 @@ onMounted(() => {
       </el-table-column>
       <el-table-column label="状态">
         <template #default="{ row }">
-          <el-tag :type="row.status === 2 ? 'info' : row.status === 1 ? 'danger' : 'success'">
-            {{ row.status === 2 ? '维护' : row.status === 1 ? '异常' : '正常' }}
+          <el-tag
+              :effect="row.status === 3 ? 'dark' : 'light'"
+              :type=" row.status === 3 ? 'info' :row.status === 2 ? 'info' : row.status === 1 ? 'danger' : 'success'">
+            {{ row.status === 3 ? '隐藏' : row.status === 2 ? '维护' : row.status === 1 ? '异常' : '正常' }}
           </el-tag>
         </template>
       </el-table-column>
@@ -459,6 +465,7 @@ onMounted(() => {
               <el-radio-button :value="0" label="正常"/>
               <el-radio-button :value="1" label="异常"/>
               <el-radio-button :value="2" label="维护"/>
+              <el-radio-button :value="3" label="隐藏"/>
             </el-radio-group>
           </el-form-item>
           <el-form-item label="接口名称" prop="title">

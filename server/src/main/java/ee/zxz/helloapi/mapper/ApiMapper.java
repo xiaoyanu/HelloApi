@@ -18,7 +18,7 @@ public interface ApiMapper {
      * @param offset   偏移量 = (page - 1) * pageSize
      * @return ApiApp列表
      */
-    @Select("select * from helloapi_api_apps where `view_status` = 0 ORDER BY created DESC LIMIT #{pageSize} OFFSET #{offset}")
+    @Select("select * from helloapi_api_apps where `view_status` = 0 AND `status` != 3 ORDER BY created DESC LIMIT #{pageSize} OFFSET #{offset}")
     List<ApiApp> getApiList(int pageSize, int offset);
 
     /**
@@ -26,7 +26,7 @@ public interface ApiMapper {
      *
      * @return 所有API总数
      */
-    @Select("select count(*) from helloapi_api_apps where `view_status` = 0")
+    @Select("select count(*) from helloapi_api_apps where `view_status` = 0  AND `status` != 3")
     int getApiListAllCount();
 
     /**
@@ -128,7 +128,7 @@ public interface ApiMapper {
      * @param offset   偏移量
      * @return ApiApp列表
      */
-    @Select("select * from helloapi_api_apps where  (`title` LIKE CONCAT('%',#{keyword},'%') OR `smalltitle` LIKE CONCAT('%',#{keyword},'%')) ORDER BY created DESC LIMIT #{pageSize} OFFSET #{offset}")
+    @Select("select * from helloapi_api_apps where `view_status` = 0 AND `status` != 3 AND (`title` LIKE CONCAT('%',#{keyword},'%') OR `smalltitle` LIKE CONCAT('%',#{keyword},'%')) ORDER BY created DESC LIMIT #{pageSize} OFFSET #{offset}")
     List<ApiApp> searchApiList(String keyword, int pageSize, int offset);
 
     /**
@@ -137,7 +137,7 @@ public interface ApiMapper {
      * @param keyword 搜索关键词
      * @return 搜索到的Api接口总数
      */
-    @Select("select count(*) from helloapi_api_apps where  (`title` LIKE CONCAT('%',#{keyword},'%') OR `smalltitle` LIKE CONCAT('%',#{keyword},'%'))")
+    @Select("select count(*) from helloapi_api_apps where `view_status` = 0 AND `status` != 3 AND (`title` LIKE CONCAT('%',#{keyword},'%') OR `smalltitle` LIKE CONCAT('%',#{keyword},'%'))")
     int searchApiListCount(String keyword);
 
     /**
@@ -294,4 +294,13 @@ public interface ApiMapper {
             "     OR (#{status} = 1 AND ((`type` = 0 AND expired IS NOT NULL AND expired <= NOW()) OR (`type` = 1 AND `count` <= 0)))) " +
             "ORDER BY created DESC")
     int ApiKeyListSearchCount(int userId, String keyword, int type, int status);
+
+    /**
+     * 检测API是否是过审状态
+     *
+     * @param apiId API ID
+     * @return 大于0表示已过审
+     */
+    @Select("select count(*) from helloapi_api_apps where id = #{apiId} and view_status = 0")
+    int checkApiViewStatus(int apiId);
 }
