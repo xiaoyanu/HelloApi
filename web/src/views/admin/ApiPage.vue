@@ -11,6 +11,11 @@ import {formatNativeDate} from "@/utils/module/more.ts";
 const userStore = useUserStore();
 const tableData = ref<AppList[]>();
 
+// --- Loading 状态 ---
+const loading = ref(false); // 表格加载状态
+const drawerLoading = ref(false); // 抽屉详情加载状态
+const submitLoading = ref(false); // 表单提交加载状态
+
 // 搜索筛选表单
 const searchForm = ref<SelectFormApi>({
   keywords: '',
@@ -21,6 +26,7 @@ const searchForm = ref<SelectFormApi>({
 
 // 统一数据获取
 const fetchData = async () => {
+  loading.value = true;
   const isSearching = searchForm.value.keywords !== '' || searchForm.value.type !== -1 || searchForm.value.status !== -1 || searchForm.value.view_status !== -1;
   const apiCall = isSearching
       ? UserAppListSearch(searchForm.value, paging.value.pageSize, paging.value.page)
@@ -35,6 +41,8 @@ const fetchData = async () => {
     }
   } catch (error) {
     console.error("Failed to fetch data:", error);
+  } finally {
+    loading.value = false;
   }
 }
 
@@ -145,15 +153,20 @@ const submitFormCreate = async () => {
   // 校验表单
   const isValid = await formRef.value?.validate().catch(() => false);
   if (isValid) {
-    // 提交表单
-    if (userStore.user.mode || 0 > 0) {
-      formData.value.view_status = 0
-    }
-    const res = await CreateApi(formData.value)
-    if (res.data.code == 200) {
-      await fetchData()
-      ElMessage.success('发布成功')
-      showDrawer.value = false
+    submitLoading.value = true; // 开启提交 Loading
+    try {
+      // 提交表单
+      if (userStore.user.mode || 0 > 0) {
+        formData.value.view_status = 0
+      }
+      const res = await CreateApi(formData.value)
+      if (res.data.code == 200) {
+        await fetchData()
+        ElMessage.success('发布成功')
+        showDrawer.value = false
+      }
+    } finally {
+      submitLoading.value = false; // 关闭提交 Loading
     }
   }
 }
@@ -168,15 +181,20 @@ const submitFormUpdate = () => {
     // 校验表单
     const isValid = await formRef.value?.validate().catch(() => false);
     if (isValid) {
-      // 提交表单
-      if (userStore.user.mode || 0 > 0) {
-        formData.value.view_status = 0
-      }
-      const res = await UpdateApi(nowRow.value.id, formData.value)
-      if (res.data.code == 200) {
-        await fetchData()
-        ElMessage.success('编辑成功')
-        showDrawer.value = false
+      submitLoading.value = true;
+      try {
+        // 提交表单
+        if (userStore.user.mode || 0 > 0) {
+          formData.value.view_status = 0
+        }
+        const res = await UpdateApi(nowRow.value.id, formData.value)
+        if (res.data.code == 200) {
+          await fetchData()
+          ElMessage.success('编辑成功')
+          showDrawer.value = false
+        }
+      } finally {
+        submitLoading.value = false;
       }
     }
   }).catch(() => {
@@ -248,10 +266,15 @@ const rules: FormRules = {
 
 const onDrawerLoadOver = async () => {
   if (nowRow.value?.id) {
-    const res = await GetApiInfo(nowRow.value.id)
-    if (res.data.code == 200) {
-      formData.value = res.data.data
-      formData.value.view_status = 2
+    drawerLoading.value = true;
+    try {
+      const res = await GetApiInfo(nowRow.value.id)
+      if (res.data.code == 200) {
+        formData.value = res.data.data
+        formData.value.view_status = 2
+      }
+    } finally {
+      drawerLoading.value = false;
     }
   }
 }
@@ -293,259 +316,267 @@ onMounted(() => {
       <el-button :icon="Plus" type="primary" @click="openDrawer('create')">发布 API</el-button>
     </template>
     <template #default>
-    <div class="pl-2">
-      <el-form :inline="true" :model="searchForm" class="searchForm">
-        <el-form-item>
-          <el-input
-              v-model="searchForm.keywords"
-              placeholder="Api ID / 关键字"
-              @keyup.enter="handleSearch"
-          />
-        </el-form-item>
-
-        <el-form-item label="接口类型">
-          <el-select v-model="searchForm.type" placeholder="请选择">
-            <el-option :value="-1" label="不限"/>
-            <el-option :value="0" label="免费">
-              <el-tag size="small" type="success">免费</el-tag>
-            </el-option>
-            <el-option :value="1" label="收费">
-              <el-tag size="small" type="warning">收费</el-tag>
-            </el-option>
-          </el-select>
-        </el-form-item>
-
-        <el-form-item label="接口状态">
-          <el-select v-model="searchForm.status" placeholder="请选择">
-            <el-option :value="-1" label="不限"/>
-            <el-option :value="0" label="正常">
-              <el-tag size="small" type="success">正常</el-tag>
-            </el-option>
-
-            <el-option :value="1" label="异常">
-              <el-tag size="small" type="danger">异常</el-tag>
-            </el-option>
-
-            <el-option :value="2" label="维护">
-              <el-tag size="small" type="info">维护</el-tag>
-            </el-option>
-
-            <el-option :value="3" label="隐藏">
-              <el-tag effect="dark" size="small" type="info">隐藏</el-tag>
-            </el-option>
-          </el-select>
-        </el-form-item>
-
-        <el-form-item label="审核状态">
-          <el-select v-model="searchForm.view_status" placeholder="请选择">
-            <el-option :value="-1" label="不限"/>
-            <el-option :value="0" label="通过">
-              <el-tag size="small" type="success">通过</el-tag>
-            </el-option>
-
-            <el-option :value="1" label="拒绝">
-              <el-tag size="small" type="danger">拒绝</el-tag>
-            </el-option>
-
-            <el-option :value="2" label="审核中">
-              <el-tag size="small" type="warning">审核中</el-tag>
-            </el-option>
-          </el-select>
-        </el-form-item>
-
-        <el-form-item>
-          <el-button :icon="Search" plain type="primary" @click="handleSearch">查询</el-button>
-          <el-button :icon="Refresh" @click="resetSearch">重置</el-button>
-        </el-form-item>
-        <el-form-item>
-          <el-tag size="large" type="info">当前条件共 {{ paging.total }} 条数据</el-tag>
-        </el-form-item>
-      </el-form>
-    </div>
-    <el-table :data="tableData" class="w-full">
-      <el-table-column label="Api ID">
-        <template #default="{row}">
-          {{ row.id }}
-        </template>
-      </el-table-column>
-      <el-table-column label="接口名称" minWidth="250">
-        <template #default="{row}">
-          <el-link
-              :href="'/info/' + row.id"
-              target="_blank"
-              type="primary"
-              underline="never"
-          >
-            {{ row.title }}
-          </el-link>
-        </template>
-      </el-table-column>
-      <el-table-column label="类型">
-        <template #default="{ row }">
-          <el-tag :type="row.type === 1 ? 'warning' : 'success'">
-            {{ row.type === 1 ? '收费' : '免费' }}
-          </el-tag>
-        </template>
-      </el-table-column>
-      <el-table-column label="创建日期" minWidth="150">
-        <template #default="{ row }">
-          {{ row.createdText }}
-        </template>
-      </el-table-column>
-      <el-table-column label="状态">
-        <template #default="{ row }">
-          <el-tag
-              :effect="row.status === 3 ? 'dark' : 'light'"
-              :type=" row.status === 3 ? 'info' :row.status === 2 ? 'info' : row.status === 1 ? 'danger' : 'success'">
-            {{ row.status === 3 ? '隐藏' : row.status === 2 ? '维护' : row.status === 1 ? '异常' : '正常' }}
-          </el-tag>
-        </template>
-      </el-table-column>
-      <el-table-column label="审核状态">
-        <template #default="{ row }">
-          <el-tag :type="row.view_status === 2 ? 'warning' : row.view_status === 1 ? 'danger' : 'success'">
-            {{ row.view_status === 2 ? '审核中' : row.view_status === 1 ? '拒绝' : '通过' }}
-          </el-tag>
-        </template>
-      </el-table-column>
-      <el-table-column label="操作" width="120">
-        <template #default="{ row }">
-          <el-button
-              :icon="Edit"
-              circle
-              plain
-              type="primary"
-              @click="openDrawer('edit', row)"
-          />
-          <el-button
-              :icon="Delete"
-              circle
-              plain
-              type="danger"
-              @click="handleDelete(row.id)"
-          />
-        </template>
-      </el-table-column>
-      <template #empty>
-        <el-empty description="空空的什么也没有＞﹏＜" style="user-select: none"/>
-      </template>
-    </el-table>
-    <div class="flex items-center justify-center mt-6">
-      <el-pagination
-          :current-page="paging.page"
-          :page-size="paging.pageSize"
-          :total="paging.total"
-          layout="prev, pager, next"
-          @current-change="handlePageChange"
-      />
-    </div>
-
-    <el-drawer
-        v-model="showDrawer"
-        :destroy-on-close="true"
-        :resizable="resizable"
-        :size="drawerSize"
-        :title="drawerTitle"
-        class="rounded-tl-[20px] rounded-tr-[20px] m-auto custom-btt-drawer"
-        direction="btt"
-        @closed="onDrawerClose"
-        @open="onDrawerLoadOver"
-    >
-      <div class="m-auto max-w-[90%]">
-        <el-form ref="formRef" :model="formData" :rules="rules">
-          <el-form-item label="接口类型" prop="type">
-            <el-radio-group v-model="formData.type">
-              <el-radio-button :value="0" label="免费"/>
-              <el-radio-button :value="1" label="收费"/>
-            </el-radio-group>
-          </el-form-item>
-          <el-form-item label="接口状态" prop="status">
-            <el-radio-group v-model="formData.status">
-              <el-radio-button :value="0" label="正常"/>
-              <el-radio-button :value="1" label="异常"/>
-              <el-radio-button :value="2" label="维护"/>
-              <el-radio-button :value="3" label="隐藏"/>
-            </el-radio-group>
-          </el-form-item>
-          <el-form-item label="接口名称" prop="title">
-            <el-input v-model="formData.title" placeholder="请输入接口名称，例如：随机一言"/>
-          </el-form-item>
-          <el-form-item label="接口描述" prop="smallTitle">
-            <el-input v-model="formData.smallTitle" placeholder="请输入接口描述，例如：返回随机一条名言、台词"/>
-          </el-form-item>
-          <el-form-item label="接口地址" prop="url">
-            <el-input v-model="formData.url" placeholder="请输入接口地址，例如：/api/demo 或 https://example.com/random"/>
-          </el-form-item>
-          <el-form-item label="请求方式" prop="sendType">
-            <el-radio-group v-model="formData.sendType">
-              <el-radio-button :value="0" label="Get"/>
-              <el-radio-button :value="1" label="Post"/>
-              <el-radio-button :value="2" label="Put"/>
-              <el-radio-button :value="3" label="Delete"/>
-            </el-radio-group>
-          </el-form-item>
-          <el-form-item label="返回类型" prop="returnType">
-            <el-input v-model="formData.returnType" placeholder="请输入返回类型，例如：Json / Text / Image"/>
+      <div class="pl-2">
+        <el-form :inline="true" :model="searchForm" class="searchForm">
+          <el-form-item>
+            <el-input
+                v-model="searchForm.keywords"
+                placeholder="Api ID / 关键字"
+                @keyup.enter="handleSearch"
+            />
           </el-form-item>
 
-          <el-form-item label="请求参数" prop="params">
-            <div class="rounded-sm overflow-hidden border border-[#DCDFE6] w-full">
-              <el-table :data="formData.params" class="table-4px-border" style="width: 100%">
-                <el-table-column label="参数名" width="180">
-                  <template #default="{row}">
-                    <el-input v-model="row.name" placeholder="参数名"/>
-                  </template>
-                </el-table-column>
-                <el-table-column label="必填" width="85">
-                  <template #default="{row}">
-                    <el-select v-model="row.required">
-                      <el-option :value="0" label="否"/>
-                      <el-option :value="1" label="是"/>
-                    </el-select>
-                  </template>
-                </el-table-column>
-                <el-table-column label="类型" width="150">
-                  <template #default="{row}">
-                    <el-input v-model="row.type" placeholder="参数类型"/>
-                  </template>
-                </el-table-column>
-                <el-table-column label="描述">
-                  <template #default="{row}">
-                    <el-input v-model="row.msg" autosize placeholder="参数描述" type="textarea"/>
-                  </template>
-                </el-table-column>
-                <el-table-column align="center" label="操作" width="70">
-                  <template #default="scope">
-                    <el-button
-                        :icon="Close"
-                        circle
-                        size="small"
-                        type="danger"
-                        @click="removeParam(scope.$index)"
-                    />
-                  </template>
-                </el-table-column>
-                <template #empty>
-                  没有参数
-                </template>
-              </el-table>
-            </div>
-            <el-button plain style="margin-top: 4px;" type="primary" @click="addParam">
-              添加参数
-            </el-button>
+          <el-form-item label="接口类型">
+            <el-select v-model="searchForm.type" placeholder="请选择">
+              <el-option :value="-1" label="不限"/>
+              <el-option :value="0" label="免费">
+                <el-tag size="small" type="success">免费</el-tag>
+              </el-option>
+              <el-option :value="1" label="收费">
+                <el-tag size="small" type="warning">收费</el-tag>
+              </el-option>
+            </el-select>
           </el-form-item>
-          <el-form-item label="返回示例" prop="returnContent">
-            <MDEdit v-model="formData.returnContent"/>
+
+          <el-form-item label="接口状态">
+            <el-select v-model="searchForm.status" placeholder="请选择">
+              <el-option :value="-1" label="不限"/>
+              <el-option :value="0" label="正常">
+                <el-tag size="small" type="success">正常</el-tag>
+              </el-option>
+
+              <el-option :value="1" label="异常">
+                <el-tag size="small" type="danger">异常</el-tag>
+              </el-option>
+
+              <el-option :value="2" label="维护">
+                <el-tag size="small" type="info">维护</el-tag>
+              </el-option>
+
+              <el-option :value="3" label="隐藏">
+                <el-tag effect="dark" size="small" type="info">隐藏</el-tag>
+              </el-option>
+            </el-select>
+          </el-form-item>
+
+          <el-form-item label="审核状态">
+            <el-select v-model="searchForm.view_status" placeholder="请选择">
+              <el-option :value="-1" label="不限"/>
+              <el-option :value="0" label="通过">
+                <el-tag size="small" type="success">通过</el-tag>
+              </el-option>
+
+              <el-option :value="1" label="拒绝">
+                <el-tag size="small" type="danger">拒绝</el-tag>
+              </el-option>
+
+              <el-option :value="2" label="审核中">
+                <el-tag size="small" type="warning">审核中</el-tag>
+              </el-option>
+            </el-select>
+          </el-form-item>
+
+          <el-form-item>
+            <el-button :icon="Search" plain type="primary" @click="handleSearch">查询</el-button>
+            <el-button :icon="Refresh" @click="resetSearch">重置</el-button>
+          </el-form-item>
+          <el-form-item>
+            <el-tag size="large" type="info">当前条件共 {{ paging.total }} 条数据</el-tag>
           </el-form-item>
         </el-form>
-        <div class="flex justify-center">
-          <el-button class="w-50" size="large" type="primary" @click="nowRow ? submitFormUpdate() : submitFormCreate()">
-            {{ nowRow ? '编辑' : '发布' }} API
-          </el-button>
-        </div>
       </div>
 
-    </el-drawer>
+      <el-table :data="tableData" class="w-full" v-loading="loading">
+        <el-table-column label="Api ID">
+          <template #default="{row}">
+            {{ row.id }}
+          </template>
+        </el-table-column>
+        <el-table-column label="接口名称" minWidth="250">
+          <template #default="{row}">
+            <el-link
+                :href="'/info/' + row.id"
+                target="_blank"
+                type="primary"
+                underline="never"
+            >
+              {{ row.title }}
+            </el-link>
+          </template>
+        </el-table-column>
+        <el-table-column label="类型">
+          <template #default="{ row }">
+            <el-tag :type="row.type === 1 ? 'warning' : 'success'">
+              {{ row.type === 1 ? '收费' : '免费' }}
+            </el-tag>
+          </template>
+        </el-table-column>
+        <el-table-column label="创建日期" minWidth="150">
+          <template #default="{ row }">
+            {{ row.createdText }}
+          </template>
+        </el-table-column>
+        <el-table-column label="状态">
+          <template #default="{ row }">
+            <el-tag
+                :effect="row.status === 3 ? 'dark' : 'light'"
+                :type=" row.status === 3 ? 'info' :row.status === 2 ? 'info' : row.status === 1 ? 'danger' : 'success'">
+              {{ row.status === 3 ? '隐藏' : row.status === 2 ? '维护' : row.status === 1 ? '异常' : '正常' }}
+            </el-tag>
+          </template>
+        </el-table-column>
+        <el-table-column label="审核状态">
+          <template #default="{ row }">
+            <el-tag :type="row.view_status === 2 ? 'warning' : row.view_status === 1 ? 'danger' : 'success'">
+              {{ row.view_status === 2 ? '审核中' : row.view_status === 1 ? '拒绝' : '通过' }}
+            </el-tag>
+          </template>
+        </el-table-column>
+        <el-table-column label="操作" width="120">
+          <template #default="{ row }">
+            <el-button
+                :icon="Edit"
+                circle
+                plain
+                type="primary"
+                @click="openDrawer('edit', row)"
+            />
+            <el-button
+                :icon="Delete"
+                circle
+                plain
+                type="danger"
+                @click="handleDelete(row.id)"
+            />
+          </template>
+        </el-table-column>
+        <template #empty>
+          <el-empty description="空空的什么也没有＞﹏＜" style="user-select: none"/>
+        </template>
+      </el-table>
+      <div class="flex items-center justify-center mt-6">
+        <el-pagination
+            :current-page="paging.page"
+            :page-size="paging.pageSize"
+            :total="paging.total"
+            layout="prev, pager, next"
+            @current-change="handlePageChange"
+        />
+      </div>
+
+      <el-drawer
+          v-model="showDrawer"
+          :destroy-on-close="true"
+          :resizable="resizable"
+          :size="drawerSize"
+          :title="drawerTitle"
+          class="rounded-tl-[20px] rounded-tr-[20px] m-auto custom-btt-drawer"
+          direction="btt"
+          @closed="onDrawerClose"
+          @open="onDrawerLoadOver"
+      >
+        <div class="m-auto max-w-[90%]" v-loading="drawerLoading">
+          <el-form ref="formRef" :model="formData" :rules="rules">
+            <el-form-item label="接口类型" prop="type">
+              <el-radio-group v-model="formData.type">
+                <el-radio-button :value="0" label="免费"/>
+                <el-radio-button :value="1" label="收费"/>
+              </el-radio-group>
+            </el-form-item>
+            <el-form-item label="接口状态" prop="status">
+              <el-radio-group v-model="formData.status">
+                <el-radio-button :value="0" label="正常"/>
+                <el-radio-button :value="1" label="异常"/>
+                <el-radio-button :value="2" label="维护"/>
+                <el-radio-button :value="3" label="隐藏"/>
+              </el-radio-group>
+            </el-form-item>
+            <el-form-item label="接口名称" prop="title">
+              <el-input v-model="formData.title" placeholder="请输入接口名称，例如：随机一言"/>
+            </el-form-item>
+            <el-form-item label="接口描述" prop="smallTitle">
+              <el-input v-model="formData.smallTitle" placeholder="请输入接口描述，例如：返回随机一条名言、台词"/>
+            </el-form-item>
+            <el-form-item label="接口地址" prop="url">
+              <el-input v-model="formData.url"
+                        placeholder="请输入接口地址，例如：/api/demo 或 https://example.com/random"/>
+            </el-form-item>
+            <el-form-item label="请求方式" prop="sendType">
+              <el-radio-group v-model="formData.sendType">
+                <el-radio-button :value="0" label="Get"/>
+                <el-radio-button :value="1" label="Post"/>
+                <el-radio-button :value="2" label="Put"/>
+                <el-radio-button :value="3" label="Delete"/>
+              </el-radio-group>
+            </el-form-item>
+            <el-form-item label="返回类型" prop="returnType">
+              <el-input v-model="formData.returnType" placeholder="请输入返回类型，例如：Json / Text / Image"/>
+            </el-form-item>
+
+            <el-form-item label="请求参数" prop="params">
+              <div class="rounded-sm overflow-hidden border border-[#DCDFE6] w-full">
+                <el-table :data="formData.params" class="table-4px-border" style="width: 100%">
+                  <el-table-column label="参数名" width="180">
+                    <template #default="{row}">
+                      <el-input v-model="row.name" placeholder="参数名"/>
+                    </template>
+                  </el-table-column>
+                  <el-table-column label="必填" width="85">
+                    <template #default="{row}">
+                      <el-select v-model="row.required">
+                        <el-option :value="0" label="否"/>
+                        <el-option :value="1" label="是"/>
+                      </el-select>
+                    </template>
+                  </el-table-column>
+                  <el-table-column label="类型" width="150">
+                    <template #default="{row}">
+                      <el-input v-model="row.type" placeholder="参数类型"/>
+                    </template>
+                  </el-table-column>
+                  <el-table-column label="描述">
+                    <template #default="{row}">
+                      <el-input v-model="row.msg" autosize placeholder="参数描述" type="textarea"/>
+                    </template>
+                  </el-table-column>
+                  <el-table-column align="center" label="操作" width="70">
+                    <template #default="scope">
+                      <el-button
+                          :icon="Close"
+                          circle
+                          size="small"
+                          type="danger"
+                          @click="removeParam(scope.$index)"
+                      />
+                    </template>
+                  </el-table-column>
+                  <template #empty>
+                    没有参数
+                  </template>
+                </el-table>
+              </div>
+              <el-button plain style="margin-top: 4px;" type="primary" @click="addParam">
+                添加参数
+              </el-button>
+            </el-form-item>
+            <el-form-item label="返回示例" prop="returnContent">
+              <MDEdit v-model="formData.returnContent"/>
+            </el-form-item>
+          </el-form>
+          <div class="flex justify-center">
+            <el-button
+                class="w-50"
+                size="large"
+                type="primary"
+                :loading="submitLoading"
+                @click="nowRow ? submitFormUpdate() : submitFormCreate()"
+            >
+              {{ nowRow ? '编辑' : '发布' }} API
+            </el-button>
+          </div>
+        </div>
+
+      </el-drawer>
     </template>
   </admin-main-body>
 </template>

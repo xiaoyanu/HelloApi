@@ -9,6 +9,10 @@ import {useUserStore} from "@/stores";
 
 const userStore = useUserStore();
 const tableData = ref<User[]>();
+
+// --- Loading 状态 ---
+const loading = ref(false); // 表格加载状态
+
 const dialogVisible = ref({
   user: false,
   password: false,
@@ -33,6 +37,7 @@ const resetDialog = () => {
 
 // 统一数据获取
 const fetchData = async () => {
+  loading.value = true; // 开启表格 Loading
   const isSearching = searchForm.value.keywords !== '' || searchForm.value.mode !== -1;
   const apiCall = isSearching
       ? UserListSearch(searchForm.value.keywords, searchForm.value.mode, paging.value.page, paging.value.pageSize)
@@ -47,6 +52,8 @@ const fetchData = async () => {
     }
   } catch (error) {
     console.error("Failed to fetch data:", error);
+  } finally {
+    loading.value = false; // 关闭表格 Loading
   }
 }
 
@@ -195,7 +202,8 @@ onMounted(() => {
         </el-form-item>
       </el-form>
     </div>
-    <el-table :data="tableData" class="w-full">
+
+    <el-table :data="tableData" class="w-full" v-loading="loading">
       <el-table-column label="ID">
         <template #default="{row}">
           {{ row.id }}
@@ -273,7 +281,6 @@ onMounted(() => {
     </div>
 
 
-    <!-- 用户信息 -->
     <el-dialog
         v-model="dialogVisible.user"
         title="用户信息"

@@ -8,6 +8,9 @@ import {formatNativeDate} from "@/utils/module/more.ts";
 
 const tableData = ref<AppList[]>();
 
+// --- Loading 状态 ---
+const loading = ref(false); // 表格加载状态
+
 // 搜索筛选表单
 const searchForm = ref<SelectFormApi>({
   keywords: '',
@@ -18,6 +21,7 @@ const searchForm = ref<SelectFormApi>({
 
 // 统一数据获取
 const fetchData = async () => {
+  loading.value = true; // 开启表格 Loading
   const isSearching = searchForm.value.keywords !== '' || searchForm.value.type !== -1 || searchForm.value.status !== -1 || searchForm.value.view_status !== -1;
   const apiCall = isSearching
       ? CheckAppListSearch(searchForm.value, paging.value.pageSize, paging.value.page)
@@ -32,6 +36,8 @@ const fetchData = async () => {
     }
   } catch (error) {
     console.error("Failed to fetch data:", error);
+  } finally {
+    loading.value = false; // 关闭表格 Loading
   }
 }
 
@@ -181,7 +187,8 @@ onMounted(() => {
           </el-form-item>
         </el-form>
       </div>
-      <el-table :data="tableData" class="w-full">
+
+      <el-table :data="tableData" class="w-full" v-loading="loading">
         <el-table-column label="Api ID">
           <template #default="{row}">
             {{ row.id }}

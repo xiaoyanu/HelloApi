@@ -16,6 +16,11 @@ import {HelloAPIConfig} from "@/config/config.ts";
 import {useUserStore} from "@/stores";
 import {copyText, formatDuration, formatNativeDate, isMobile} from "@/utils";
 
+// --- Loading 状态 ---
+const loading = ref(false); // 表格加载状态
+const drawerLoading = ref(false); // 抽屉详情加载状态
+const submitLoading = ref(false); // 表单提交加载状态
+
 // 分页
 const paging = ref<Pagination>({
   page: 1,
@@ -25,16 +30,23 @@ const paging = ref<Pagination>({
 
 // 统一数据获取
 const fetchData = async () => {
+  loading.value = true; // 开启表格 Loading
   const isSearching = searchForm.value.keywords !== '' || searchForm.value.type !== -1 || searchForm.value.status !== -1;
   const apiCall = isSearching
       ? UserApiKeyListSearch(searchForm.value, userStore.user.id, paging.value.page, paging.value.pageSize)
       : GetUserApiKeyList(userStore.user.id, paging.value.page, paging.value.pageSize);
 
-  const res = await apiCall;
-  if (res.data.code === 200) {
-    const {list, total} = res.data.data;
-    paging.value.total = total;
-    tableData.value = processTableData(list);
+  try {
+    const res = await apiCall;
+    if (res.data.code === 200) {
+      const {list, total} = res.data.data;
+      paging.value.total = total;
+      tableData.value = processTableData(list);
+    }
+  } catch (error) {
+    console.error("Failed to fetch data:", error);
+  } finally {
+    loading.value = false; // 关闭表格 Loading
   }
 }
 
@@ -146,18 +158,23 @@ const submitFormCreate = async () => {
   // 校验表单
   const isValid = await formRef.value?.validate().catch(() => false);
   if (isValid) {
-    // 提交表单
-    if (formData.value.type == 0) {
-      formData.value.count = 0
-    } else {
-      formData.value.started = ''
-      formData.value.expired = ''
-    }
-    const res = await CreateApiKey(formData.value)
-    if (res.data.code == 200) {
-      await fetchData()
-      ElMessage.success('创建成功')
-      showDrawer.value = false
+    submitLoading.value = true; // 开启提交 Loading
+    try {
+      // 提交表单
+      if (formData.value.type == 0) {
+        formData.value.count = 0
+      } else {
+        formData.value.started = ''
+        formData.value.expired = ''
+      }
+      const res = await CreateApiKey(formData.value)
+      if (res.data.code == 200) {
+        await fetchData()
+        ElMessage.success('创建成功')
+        showDrawer.value = false
+      }
+    } finally {
+      submitLoading.value = false; // 关闭提交 Loading
     }
   }
 }
@@ -167,18 +184,23 @@ const submitFormUpdate = async () => {
   // 校验表单
   const isValid = await formRef.value?.validate().catch(() => false);
   if (isValid) {
-    // 提交表单
-    if (formData.value.type == 0) {
-      formData.value.count = 0
-    } else {
-      formData.value.started = ''
-      formData.value.expired = ''
-    }
-    const res = await UpdateApiKey(nowRow.value.key, formData.value)
-    if (res.data.code == 200) {
-      await fetchData()
-      ElMessage.success('编辑成功')
-      showDrawer.value = false
+    submitLoading.value = true; // 开启提交 Loading
+    try {
+      // 提交表单
+      if (formData.value.type == 0) {
+        formData.value.count = 0
+      } else {
+        formData.value.started = ''
+        formData.value.expired = ''
+      }
+      const res = await UpdateApiKey(nowRow.value.key, formData.value)
+      if (res.data.code == 200) {
+        await fetchData()
+        ElMessage.success('编辑成功')
+        showDrawer.value = false
+      }
+    } finally {
+      submitLoading.value = false; // 关闭提交 Loading
     }
   }
 }
@@ -218,10 +240,15 @@ const rules: FormRules = reactive({
 
 const onDrawerLoadOver = async () => {
   if (nowRow.value?.api_id) {
-    const res = await GetApiKeyInfo(nowRow.value.key)
-    if (res.data.code == 200) {
-      formData.value = res.data.data
-      dateArray.value = [res.data.data.started, res.data.data.expired]
+    drawerLoading.value = true; // 开启详情 Loading
+    try {
+      const res = await GetApiKeyInfo(nowRow.value.key)
+      if (res.data.code == 200) {
+        formData.value = res.data.data
+        dateArray.value = [res.data.data.started, res.data.data.expired]
+      }
+    } finally {
+      drawerLoading.value = false; // 关闭详情 Loading
     }
   }
 }
@@ -367,7 +394,8 @@ onMounted(() => {
           </el-form-item>
         </el-form>
       </div>
-      <el-table :data="tableData" class="w-full">
+
+      <el-table :data="tableData" class="w-full" v-loading="loading">
         <el-table-column label="Api ID">
           <template #default="{row}">
             {{ row.api_id }}
@@ -467,7 +495,7 @@ onMounted(() => {
           @closed="onDrawerClose"
           @open="onDrawerLoadOver"
       >
-        <div>
+        <div v-loading="drawerLoading">
           <el-form ref="formRef" :model="formData" :rules="rules">
             <el-form-item label="接口类型" prop="type">
               <el-radio-group v-model="formData.type">
@@ -501,6 +529,7 @@ onMounted(() => {
           </el-form>
           <div class="flex justify-center">
             <el-button class="w-50" size="large" type="primary"
+                       :loading="submitLoading"
                        @click="nowRow ? submitFormUpdate() : submitFormCreate()">
               {{ nowRow ? '编辑' : '创建' }} APIKey
             </el-button>
