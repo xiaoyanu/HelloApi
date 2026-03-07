@@ -30,7 +30,7 @@ const menus = [
   {label: 'APIKey 管理', path: '/admin/key', icon: PhKey, mode: 0},
   {label: '我的信息', path: '/admin/user', icon: PhIdentificationCard, mode: 0},
   {label: '数据概括', path: '/admin/stat', icon: PhPresentationChart, mode: 0},
-  {label: '审核API', path: '/admin/check', icon: PhCheckSquareOffset, mode: 1},
+  {label: '审核 API', path: '/admin/check', icon: PhCheckSquareOffset, mode: 1},
   {label: '用户管理', path: '/admin/manage', icon: PhUsers, mode: 1},
   {label: '全局设置', path: '/admin/setting', icon: PhSlidersHorizontal, mode: 1},
   {label: '使用文档', path: '/admin/doc', icon: PhBookBookmark, mode: 0},

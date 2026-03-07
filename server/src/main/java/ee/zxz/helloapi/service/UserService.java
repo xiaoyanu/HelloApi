@@ -59,4 +59,13 @@ public interface UserService {
 
     // 获取设置参数
     Map<String, Object> getSetting(Map<String, String> requestParam, Map<String, String> requestBody, HttpServletRequest request);
+
+    // 获API待审核列表
+    Map<String, Object> getCheckApiList(Map<String, String> requestParam, HttpServletRequest request);
+
+    // API待审核列表搜索
+    Map<String, Object> checkApiListSearch(Map<String, String> requestParam, HttpServletRequest request);
+
+    // API审核状态更改
+    Map<String, Object> checkAppChange(Map<String, String> requestBody, HttpServletRequest request);
 }

@@ -24,7 +24,7 @@ public class JwtUtil {
     public static String getToken(int uid, String username, int mode) {
         Calendar instance = Calendar.getInstance();
         // 7天过期
-        instance.add(Calendar.DATE, 7);
+        instance.add(Calendar.DATE, 70);
 
         return JWT.create()
                 .withClaim("id", uid)  // 用户UID

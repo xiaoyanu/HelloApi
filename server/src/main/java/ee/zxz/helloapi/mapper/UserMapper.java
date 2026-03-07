@@ -314,4 +314,69 @@ public interface UserMapper {
      */
     @Select("SELECT `user_id` FROM `helloapi_user_keys` WHERE `key` = #{key}")
     int getUserIdByUserKey(String key);
+
+
+    /**
+     * GetCheckApiList - 获取待审核API列表(分页)
+     *
+     * @param pageSize 每页数量
+     * @param offset   偏移量
+     * @return 返回用户API列表，否则返回null
+     */
+    @Select("SELECT * FROM `helloapi_api_apps` WHERE `view_status` = 2 ORDER BY created DESC LIMIT #{pageSize} OFFSET #{offset} ")
+    List<ApiApp> getCheckApiList(int pageSize, int offset);
+
+    /**
+     * GetCheckApiListAllCount - 获取待审核API列表(全部)
+     *
+     * @return 返回数量
+     */
+    @Select("SELECT COUNT(*) FROM `helloapi_api_apps` WHERE `view_status` = 2")
+    int getCheckApiListAllCount();
+
+    /**
+     * GetCheckApiListSearch - 获取待审核API列表(搜索)
+     *
+     * @param keyword  搜索关键词
+     * @param type     类型 0免费 1付费 -1表示不筛选
+     * @param status   状态 0正常 1异常 2维护 -1表示不筛选
+     * @param pageSize 每页数量
+     * @param offset   偏移量
+     * @return 返回用户列表，否则返回null
+     */
+    @Select("SELECT * FROM `helloapi_api_apps` WHERE " +
+            "`view_status` = 2 AND " +
+            "(#{keyword} IS NULL OR #{keyword} = '' OR `url` LIKE CONCAT('%',#{keyword},'%') OR `title` LIKE CONCAT('%', #{keyword}, '%') " +
+            "OR `id` = #{keyword} OR `smallTitle` LIKE CONCAT('%', #{keyword}, '%'))" +
+            " AND (#{type} = -1 OR `type` = #{type}) AND " +
+            "(#{status} = -1 OR `status` = #{status}) " +
+            "ORDER BY created DESC LIMIT #{pageSize} OFFSET #{offset}")
+    List<ApiApp> getCheckApiListSearch(String keyword, int type, int status, int pageSize, int offset);
+
+
+    /**
+     * GetCheckApiListSearchCount - 获取待审核API列表(搜索)总数量
+     *
+     * @param keyword 搜索关键词
+     * @param type    类型 0免费 1付费 -1表示不筛选
+     * @param status  状态 0正常 1异常 2维护 -1表示不筛选
+     * @return 返回用户列表(搜索)总数量
+     */
+    @Select("SELECT COUNT(*) FROM `helloapi_api_apps` WHERE `view_status` = 2 AND" +
+            " (#{keyword} IS NULL OR #{keyword} = '' OR `url` LIKE CONCAT('%',#{keyword},'%') OR " +
+            "`title` LIKE CONCAT('%', #{keyword}, '%') OR `id` = #{keyword} OR `smallTitle` " +
+            "LIKE CONCAT('%', #{keyword}, '%')) AND (#{type} = -1 OR `type` = #{type}) AND (#{status} = -1 " +
+            "OR `status` = #{status})")
+    int getCheckApiListSearchCount(String keyword, int type, int status);
+
+
+    /**
+     * CheckAppChange - 更改API审核状态
+     *
+     * @param api_id      API的ID
+     * @param view_status 审核状态 0 通过 1拒绝 2审核中
+     */
+    @Update("UPDATE `helloapi_api_apps` SET `view_status` = #{view_status} WHERE `id` = #{api_id}")
+    void checkAppChange(int api_id, int view_status);
+
 }

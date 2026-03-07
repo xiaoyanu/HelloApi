@@ -4,11 +4,6 @@ import {GetApiList} from "@/api";
 import type {Pagination} from "@/types";
 import {HelloAPIConfig} from "@/config/config.ts";
 
-// 跳转详情页
-const checkID = (id: number) => {
-  window.open("/info/" + id)
-}
-
 // 数组
 const dataList = ref([])
 

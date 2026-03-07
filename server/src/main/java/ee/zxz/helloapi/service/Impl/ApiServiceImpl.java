@@ -304,6 +304,7 @@ public class ApiServiceImpl implements ApiService {
             paramList.add(paramMap);
         }
         map.put("params", paramList);
+        map.put("user_id", apiApp.getUser_id());
         return ResponseUtil.success(map);
     }
 

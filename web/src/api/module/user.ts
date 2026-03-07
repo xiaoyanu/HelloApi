@@ -124,3 +124,31 @@ export const SetUserMode = (id: number, mode: number): any => request.put(apiUrl
         id
     }
 })
+
+// API待审核列表
+export const GetCheckAppList =
+    (page: number = 1, pageSize: number = 30): any => request.get(apiUrl + '/CheckAppList', {
+        params: {
+            page: page,
+            pageSize: pageSize,
+        }
+    })
+
+// API待审核列表搜索
+export const CheckAppListSearch = (form: SelectFormApi, pageSize: number, page: number): any =>
+    request.get(apiUrl + '/CheckAppList/Search', {
+        params: {
+            keywords: form.keywords,
+            type: form.type,
+            status: form.status,
+            pageSize: pageSize,
+            page: page,
+        }
+    })
+
+// 更改API审核状态
+export const CheckAppChange =
+    (api_id: number, view_status: number): any => request.put(apiUrl + '/CheckApp', {
+        api_id,
+        view_status
+    })

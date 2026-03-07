@@ -613,7 +613,6 @@ public class UserServiceImpl implements UserService {
         return ResponseUtil.success(resultMap);
     }
 
-
     @Override
     public Map<String, Object> setUserMode(Map<String, String> requestParam, Map<String, String> requestBody, HttpServletRequest request) {
         int userId = (int) request.getAttribute("userId");
@@ -680,4 +679,93 @@ public class UserServiceImpl implements UserService {
         }
         return ResponseUtil.success(settingList);
     }
+
+    @Override
+    public Map<String, Object> getCheckApiList(Map<String, String> requestParam, HttpServletRequest request) {
+        int pageSize = Tools.strToInt(requestParam.get("pageSize"));
+        int page = Tools.strToInt(requestParam.get("page"));
+        if (pageSize < 1) {
+            pageSize = 30;
+        }
+        if (page < 1) {
+            page = 1;
+        }
+
+        // 获取待审核API列表
+        Map<String, Object> resultMap = new LinkedHashMap<>();
+        List<Map<String, Object>> apiInfoList = new ArrayList<>();
+        // 获取待审核API总数量
+        int total = userMapper.getCheckApiListAllCount();
+        for (ApiApp apiApp : userMapper.getCheckApiList(pageSize, Tools.getPageOffset(page, pageSize))) {
+            Map<String, Object> map = new LinkedHashMap<>();
+            map.put("id", apiApp.getId());
+            map.put("title", apiApp.getTitle());
+            map.put("type", apiApp.getType());
+            map.put("status", apiApp.getStatus());
+            map.put("created", apiApp.getCreated());
+            map.put("updated", apiApp.getUpdated());
+            map.put("user_id", apiApp.getUser_id());
+            map.put("view_status", apiApp.getView_status());
+            apiInfoList.add(map);
+        }
+        resultMap.put("total", total);
+        resultMap.put("list", apiInfoList);
+
+        return ResponseUtil.response(200, "获取成功", resultMap);
+    }
+
+    @Override
+    public Map<String, Object> checkApiListSearch(Map<String, String> requestParam, HttpServletRequest request) {
+        String keyword = requestParam.get("keywords");
+        // statu，type 他们的-1表示不筛选
+        int type = Tools.strToInt(requestParam.get("type"));
+        int status = Tools.strToInt(requestParam.get("status"));
+        int pageSize = Tools.strToInt(requestParam.get("pageSize"));
+        int page = Tools.strToInt(requestParam.get("page"));
+        if (pageSize < 1) {
+            pageSize = 30;
+        }
+        if (page < 1) {
+            page = 1;
+        }
+
+        Map<String, Object> resultMap = new LinkedHashMap<>();
+        List<Map<String, Object>> apiInfoList = new ArrayList<>();
+        // 获取待审核API总数量
+        int total = userMapper.getCheckApiListSearchCount(keyword, type, status);
+        // 获取待审核API列表
+        for (ApiApp apiApp : userMapper.getCheckApiListSearch(keyword, type, status, pageSize, Tools.getPageOffset(page, pageSize))) {
+            Map<String, Object> map = new LinkedHashMap<>();
+            map.put("id", apiApp.getId());
+            map.put("title", apiApp.getTitle());
+            map.put("type", apiApp.getType());
+            map.put("status", apiApp.getStatus());
+            map.put("created", apiApp.getCreated());
+            map.put("updated", apiApp.getUpdated());
+            map.put("user_id", apiApp.getUser_id());
+            map.put("view_status", apiApp.getView_status());
+            apiInfoList.add(map);
+        }
+        resultMap.put("total", total);
+        resultMap.put("list", apiInfoList);
+        return ResponseUtil.response(200, "获取成功", resultMap);
+    }
+
+    @Override
+    public Map<String, Object> checkAppChange(Map<String, String> requestBody, HttpServletRequest request) {
+        int api_id = Tools.strToInt(requestBody.get("api_id"));
+        int view_status = Tools.strToInt(requestBody.get("view_status"));
+
+        // 检测API是否存在
+        if (apiMapper.checkApiExist(api_id) < 1) {
+            return ResponseUtil.response(400, "API不存在");
+        }
+        if (view_status < 0 || view_status > 2) {
+            view_status = 2;
+        }
+        userMapper.checkAppChange(api_id, view_status);
+        return ResponseUtil.success();
+    }
+
+
 }

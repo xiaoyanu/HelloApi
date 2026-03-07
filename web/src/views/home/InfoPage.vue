@@ -6,9 +6,11 @@ import type {App} from "@/types";
 import {GetApiInfo} from "@/api";
 import {PhHouseLine} from "@phosphor-icons/vue";
 import {copyText} from "@/utils";
+import {useUserStore} from "@/stores";
 
 const router = useRouter()
 const route = useRoute()
+const userStore = useUserStore();
 const apiId = route.params.id
 
 const apiInfo = ref<App>({
@@ -24,7 +26,8 @@ const apiInfo = ref<App>({
   returnType: '',
   returnContent: '',
   params: [],
-  view_status: -1
+  view_status: -1,
+  user_id: 0
 })
 
 // 获取 API 详情
@@ -32,6 +35,32 @@ const getApiInfo = async () => {
   const res = await GetApiInfo(Number(apiId));
   if (res.data.code == 200) {
     apiInfo.value = res.data.data
+    if (apiInfo.value.view_status != 0 || apiInfo.value.status == 3) {
+      if (!userStore.token) {
+        await router.push('/')
+        ElMessage.error('🚀呼噜~ 这个接口逃离了地球🌏')
+        return
+      }
+      await userStore.refreshUser()
+      if (userStore.user.mode != 1) {
+        if (userStore.user.id !== apiInfo.value.user_id) {
+          await router.push('/')
+          ElMessage.error('🚀呼噜~ 这个接口逃离了地球🌏')
+          return
+        }
+      }
+
+      if (apiInfo.value.status == 3) {
+        ElMessage.info("此接口目前处于 [ 隐藏 ] 状态，仅您和管理员可见")
+      } else {
+        if (apiInfo.value.view_status == 1) {
+          ElMessage.error("此接口目前处于 [ 拒绝 ] 状态，仅您和管理员可见")
+        } else {
+          ElMessage.warning("此接口目前处于 [ 审核 ] 状态，仅您和管理员可见")
+        }
+      }
+    }
+
     if (apiInfo.value.status == 1) {
       ElMessage.error('此接口目前处于异常状态，可能无法正常响应')
     }

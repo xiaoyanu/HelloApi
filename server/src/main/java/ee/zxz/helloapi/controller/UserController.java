@@ -138,11 +138,30 @@ public class UserController {
     // ResetUserKey - 重置用户密钥 - PUT
     @PutMapping({"/key/", "/key/{userId}", "/key"})
     @RequiresLogin()
-    public Map<String, Object> resetUserKey(
-            @PathVariable(required = false) String userId,
-            HttpServletRequest request
-    ) {
+    public Map<String, Object> resetUserKey(@PathVariable(required = false) String userId, HttpServletRequest request) {
         String finalUserId = (userId == null) ? "0" : userId;
         return userService.resetUserKey(finalUserId, request);
+    }
+
+
+    // GetCheckApiList - 获API待审核列表 - GET
+    @GetMapping("/CheckAppList")
+    @RequiresLogin(mode = Finals.Admin)
+    public Map<String, Object> GetCheckApiList(@RequestParam(required = false) Map<String, String> requestParam, HttpServletRequest request) {
+        return userService.getCheckApiList(requestParam, request);
+    }
+
+    // CheckApiListSearch - API待审核列表搜索 - GET
+    @GetMapping("/CheckAppList/Search")
+    @RequiresLogin(mode = Finals.Admin)
+    public Map<String, Object> CheckApiListSearch(@RequestParam(required = false) Map<String, String> requestParam, HttpServletRequest request) {
+        return userService.checkApiListSearch(requestParam, request);
+    }
+
+    // CheckAppChange - API审核状态更改 - PUT
+    @PutMapping("/CheckApp")
+    @RequiresLogin(mode = Finals.Admin)
+    public Map<String, Object> CheckAppChange(@RequestBody(required = false) Map<String, String> requestBody, HttpServletRequest request) {
+        return userService.checkAppChange(requestBody, request);
     }
 }

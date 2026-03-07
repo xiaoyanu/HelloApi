@@ -36,6 +36,8 @@ export interface App {
     params: Param[];
     // 显示状态 0正常 1拒绝 2审核中
     view_status: number;
+    // 用户ID
+    user_id?: number;
 }
 
 interface Param {
@@ -56,9 +58,9 @@ export interface User {
     mail?: string;
     nick?: string;
     key?: string;
-    created?:string
-    updated?:string
-    createdText?:string
+    created?: string
+    updated?: string
+    createdText?: string
 }
 
 // 用于筛选条件API接口
