@@ -22,9 +22,9 @@ public class StatController {
         return statService.logApi(requestBody, request);
     }
 
-    // Post - 获取指定类型数据 - Post
+    // Post - 获取指定类型数据 - POST
     @PostMapping("/")
-    public Map<String, Object> GetStat(@RequestParam(required = false) Map<String, String> requestParam, @RequestBody(required = false) Map<String, String> requestBody, HttpServletRequest request) {
-        return statService.getStat(requestParam, requestBody, request);
+    public Map<String, Object> GetStat(@RequestParam(required = false) Map<String, String> requestParam, @RequestBody(required = false) Map<String, String> requestBody, HttpServletRequest request, @RequestHeader(value = "Authorization", required = false) String authorizationHeader) {
+        return statService.getStat(requestParam, requestBody, request,authorizationHeader);
     }
 }

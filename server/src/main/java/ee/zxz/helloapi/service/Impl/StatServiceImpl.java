@@ -49,35 +49,68 @@ public class StatServiceImpl implements StatService {
     private ApiLogManager apiLogManager;
 
     @Override
-    public Map<String, Object> getStat(Map<String, String> requestParam, Map<String, String> requestBody, HttpServletRequest request) {
+    public Map<String, Object> getStat(Map<String, String> requestParam, Map<String, String> requestBody, HttpServletRequest request, String authorizationHeader) {
         try {
             String type = requestBody.get("type");
             if (type == null || type.isEmpty()) {
                 return ResponseUtil.response(400, Finals.MESSAGES_ERROR_PARAM);
             }
+
+            boolean isLogin = false;
+            if (authorizationHeader != null && !authorizationHeader.isEmpty()) {
+                if (Tools.tokenToUserId(authorizationHeader) > 0) {
+                    isLogin = true;
+                }
+            }
+
             int count, change = 0;
             switch (type) {
+                // 用户总数
                 case "userCount":
+                    if (!isLogin) {
+                        return ResponseUtil.response(400, Finals.MESSAGES_TOKEN_TIME_OUT);
+                    }
                     count = statMapper.getUserCount();
                     break;
+                // API调用总次数
                 case "apiAllCount":
                     count = statMapper.getApiAllCount();
                     break;
+                // 今天调用总次数
                 case "apiTodayCount":
+                    if (!isLogin) {
+                        return ResponseUtil.response(400, Finals.MESSAGES_TOKEN_TIME_OUT);
+                    }
                     count = statMapper.getApiTodayCount();
                     change = statMapper.getApiTodayCountChange();
                     break;
+                // 本周调用总次数
                 case "apiWeekCount":
+                    if (!isLogin) {
+                        return ResponseUtil.response(400, Finals.MESSAGES_TOKEN_TIME_OUT);
+                    }
                     count = statMapper.getApiWeekCount();
                     change = statMapper.getApiWeekCountChange();
                     break;
+                // 本月调用总次数
                 case "apiMonthCount":
+                    if (!isLogin) {
+                        return ResponseUtil.response(400, Finals.MESSAGES_TOKEN_TIME_OUT);
+                    }
                     count = statMapper.getApiMonthCount();
                     change = statMapper.getApiMonthCountChange();
                     break;
+                // 近7天API调用统计（数组）
                 case "apiWeekCountArray":
+                    if (!isLogin) {
+                        return ResponseUtil.response(400, Finals.MESSAGES_TOKEN_TIME_OUT);
+                    }
                     return ResponseUtil.success(statMapper.getApiWeekCountArray());
+                // 今天API调用数量前7的接口（包含今天调用次数为0的接口）
                 case "apiTodayCountArray":
+                    if (!isLogin) {
+                        return ResponseUtil.response(400, Finals.MESSAGES_TOKEN_TIME_OUT);
+                    }
                     List<ApiTodayArray> list = statMapper.getApiTodayCountArray();
                     while (list.size() < 7) {
                         ApiTodayArray emptyItem = new ApiTodayArray();
