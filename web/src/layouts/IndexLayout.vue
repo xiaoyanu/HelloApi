@@ -6,7 +6,8 @@ import router from "@/router";
 import {ref} from "vue";
 
 const keywords = ref('')
-
+// 统计图片地址
+const imgSrc = '/api/api_count/'
 const search = () => {
   if (keywords.value.trim() === '') {
     ElMessage.warning(getSearchNullMessage())
@@ -26,7 +27,7 @@ const search = () => {
                src="@/assets/images/logo.png">
           <a class="text-[20px] md:text-[24px] ml-3 md:ml-0 md:pl-2" href="/">Hello API</a>
         </div>
-        <img alt="统计" class="hidden lg:block h-15 ml-12.5" draggable="false" src="https://api.zxz.ee/api/api_count/">
+        <img alt="统计" class="hidden lg:block h-15 ml-12.5" draggable="false" :src="imgSrc">
 
         <div class="block md:hidden">
           <a class="wt-btn h-8 leading-8 px-4 inline-block text-center font-semibold rounded-lg bg-[#ecf0f3] text-[14px]"
