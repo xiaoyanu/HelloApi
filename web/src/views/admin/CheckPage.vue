@@ -127,141 +127,139 @@ onMounted(() => {
 })
 </script>
 <template>
-  <div class="rounded-lg bg-white p-6 shadow-sm">
-    <div class="flex items-center justify-between">
-      <h2 class="text-lg font-medium">审核 API</h2>
-    </div>
-    <hr class="border-[#E5E5E5] m-6"/>
-    <div class="pl-2">
-      <el-form :inline="true" :model="searchForm" class="searchForm">
-        <el-form-item>
-          <el-input
-              v-model="searchForm.keywords"
-              placeholder="Api ID / 关键字"
-              @keyup.enter="handleSearch"
-          />
-        </el-form-item>
+  <admin-main-body title="审核 API">
+    <template #default>
+      <div class="pl-2">
+        <el-form :inline="true" :model="searchForm" class="searchForm">
+          <el-form-item>
+            <el-input
+                v-model="searchForm.keywords"
+                placeholder="Api ID / 关键字"
+                @keyup.enter="handleSearch"
+            />
+          </el-form-item>
 
-        <el-form-item label="接口类型">
-          <el-select v-model="searchForm.type" placeholder="请选择">
-            <el-option :value="-1" label="不限"/>
-            <el-option :value="0" label="免费">
-              <el-tag size="small" type="success">免费</el-tag>
-            </el-option>
-            <el-option :value="1" label="收费">
-              <el-tag size="small" type="warning">收费</el-tag>
-            </el-option>
-          </el-select>
-        </el-form-item>
+          <el-form-item label="接口类型">
+            <el-select v-model="searchForm.type" placeholder="请选择">
+              <el-option :value="-1" label="不限"/>
+              <el-option :value="0" label="免费">
+                <el-tag size="small" type="success">免费</el-tag>
+              </el-option>
+              <el-option :value="1" label="收费">
+                <el-tag size="small" type="warning">收费</el-tag>
+              </el-option>
+            </el-select>
+          </el-form-item>
 
-        <el-form-item label="接口状态">
-          <el-select v-model="searchForm.status" placeholder="请选择">
-            <el-option :value="-1" label="不限"/>
-            <el-option :value="0" label="正常">
-              <el-tag size="small" type="success">正常</el-tag>
-            </el-option>
+          <el-form-item label="接口状态">
+            <el-select v-model="searchForm.status" placeholder="请选择">
+              <el-option :value="-1" label="不限"/>
+              <el-option :value="0" label="正常">
+                <el-tag size="small" type="success">正常</el-tag>
+              </el-option>
 
-            <el-option :value="1" label="异常">
-              <el-tag size="small" type="danger">异常</el-tag>
-            </el-option>
+              <el-option :value="1" label="异常">
+                <el-tag size="small" type="danger">异常</el-tag>
+              </el-option>
 
-            <el-option :value="2" label="维护">
-              <el-tag size="small" type="info">维护</el-tag>
-            </el-option>
+              <el-option :value="2" label="维护">
+                <el-tag size="small" type="info">维护</el-tag>
+              </el-option>
 
-            <el-option :value="3" label="隐藏">
-              <el-tag effect="dark" size="small" type="info">隐藏</el-tag>
-            </el-option>
-          </el-select>
-        </el-form-item>
+              <el-option :value="3" label="隐藏">
+                <el-tag effect="dark" size="small" type="info">隐藏</el-tag>
+              </el-option>
+            </el-select>
+          </el-form-item>
 
-        <el-form-item>
-          <el-button :icon="Search" plain type="primary" @click="handleSearch">查询</el-button>
-          <el-button :icon="Refresh" @click="resetSearch">重置</el-button>
-        </el-form-item>
-        <el-form-item>
-          <el-tag size="large" type="info">当前条件共 {{ paging.total }} 条数据</el-tag>
-        </el-form-item>
-      </el-form>
-    </div>
-    <el-table :data="tableData" class="w-full">
-      <el-table-column label="Api ID">
-        <template #default="{row}">
-          {{ row.id }}
+          <el-form-item>
+            <el-button :icon="Search" plain type="primary" @click="handleSearch">查询</el-button>
+            <el-button :icon="Refresh" @click="resetSearch">重置</el-button>
+          </el-form-item>
+          <el-form-item>
+            <el-tag size="large" type="info">当前条件共 {{ paging.total }} 条数据</el-tag>
+          </el-form-item>
+        </el-form>
+      </div>
+      <el-table :data="tableData" class="w-full">
+        <el-table-column label="Api ID">
+          <template #default="{row}">
+            {{ row.id }}
+          </template>
+        </el-table-column>
+        <el-table-column label="接口名称" minWidth="250">
+          <template #default="{row}">
+            <el-link
+                :href="'/info/' + row.id"
+                target="_blank"
+                type="primary"
+                underline="never"
+            >
+              {{ row.title }}
+            </el-link>
+          </template>
+        </el-table-column>
+        <el-table-column label="类型">
+          <template #default="{ row }">
+            <el-tag :type="row.type === 1 ? 'warning' : 'success'">
+              {{ row.type === 1 ? '收费' : '免费' }}
+            </el-tag>
+          </template>
+        </el-table-column>
+        <el-table-column label="创建日期" minWidth="150">
+          <template #default="{ row }">
+            {{ row.createdText }}
+          </template>
+        </el-table-column>
+        <el-table-column label="状态">
+          <template #default="{ row }">
+            <el-tag
+                :effect="row.status === 3 ? 'dark' : 'light'"
+                :type=" row.status === 3 ? 'info' :row.status === 2 ? 'info' : row.status === 1 ? 'danger' : 'success'">
+              {{ row.status === 3 ? '隐藏' : row.status === 2 ? '维护' : row.status === 1 ? '异常' : '正常' }}
+            </el-tag>
+          </template>
+        </el-table-column>
+        <el-table-column label="操作" width="180">
+          <template #default="{ row }">
+            <el-button
+                :icon="Check"
+                circle
+                plain
+                type="success"
+                @click="handleCheckAppChange(row.id,0)"
+            />
+            <el-button
+                :icon="Close"
+                circle
+                plain
+                type="warning"
+                @click="handleCheckAppChange(row.id,1)"
+            />
+            <el-button
+                :icon="Delete"
+                circle
+                plain
+                type="danger"
+                @click="handleDelete(row.id)"
+            />
+          </template>
+        </el-table-column>
+        <template #empty>
+          <el-empty description="空空的什么也没有＞﹏＜" style="user-select: none"/>
         </template>
-      </el-table-column>
-      <el-table-column label="接口名称" minWidth="250">
-        <template #default="{row}">
-          <el-link
-              :href="'/info/' + row.id"
-              target="_blank"
-              type="primary"
-              underline="never"
-          >
-            {{ row.title }}
-          </el-link>
-        </template>
-      </el-table-column>
-      <el-table-column label="类型">
-        <template #default="{ row }">
-          <el-tag :type="row.type === 1 ? 'warning' : 'success'">
-            {{ row.type === 1 ? '收费' : '免费' }}
-          </el-tag>
-        </template>
-      </el-table-column>
-      <el-table-column label="创建日期" minWidth="150">
-        <template #default="{ row }">
-          {{ row.createdText }}
-        </template>
-      </el-table-column>
-      <el-table-column label="状态">
-        <template #default="{ row }">
-          <el-tag
-              :effect="row.status === 3 ? 'dark' : 'light'"
-              :type=" row.status === 3 ? 'info' :row.status === 2 ? 'info' : row.status === 1 ? 'danger' : 'success'">
-            {{ row.status === 3 ? '隐藏' : row.status === 2 ? '维护' : row.status === 1 ? '异常' : '正常' }}
-          </el-tag>
-        </template>
-      </el-table-column>
-      <el-table-column label="操作" width="180">
-        <template #default="{ row }">
-          <el-button
-              :icon="Check"
-              circle
-              plain
-              type="success"
-              @click="handleCheckAppChange(row.id,0)"
-          />
-          <el-button
-              :icon="Close"
-              circle
-              plain
-              type="warning"
-              @click="handleCheckAppChange(row.id,1)"
-          />
-          <el-button
-              :icon="Delete"
-              circle
-              plain
-              type="danger"
-              @click="handleDelete(row.id)"
-          />
-        </template>
-      </el-table-column>
-      <template #empty>
-        <el-empty description="空空的什么也没有＞﹏＜" style="user-select: none"/>
-      </template>
-    </el-table>
-    <div class="flex items-center justify-center mt-6">
-      <el-pagination
-          :current-page="paging.page"
-          :page-size="paging.pageSize"
-          :total="paging.total"
-          layout="prev, pager, next"
-          @current-change="handlePageChange"
-      />
-    </div>
-  </div>
+      </el-table>
+      <div class="flex items-center justify-center mt-6">
+        <el-pagination
+            :current-page="paging.page"
+            :page-size="paging.pageSize"
+            :total="paging.total"
+            layout="prev, pager, next"
+            @current-change="handlePageChange"
+        />
+      </div>
+    </template>
+  </admin-main-body>
 </template>
 <style scoped>
 /* 隐藏表单标签的伪元素 */

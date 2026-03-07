@@ -13,15 +13,22 @@ const keywords = ref(route.params.keywords)
 // 数组
 const dataList = ref([])
 
+// 加载状态
+const isLoading = ref(false);
+
 // 获取 API 列表
 const getApiList = async () => {
-  const res = await SearchApi(keywords.value as string, paging.value.page, paging.value.pageSize);
-  if (res.data.code == 200) {
-    dataList.value = res.data.data.list;
-    paging.value.total = res.data.data.total
+  isLoading.value = true;
+  try {
+    const res = await SearchApi(keywords.value as string, paging.value.page, paging.value.pageSize);
+    if (res.data.code == 200) {
+      dataList.value = res.data.data.list;
+      paging.value.total = res.data.data.total
+    }
+  } finally {
+    isLoading.value = false;
   }
 }
-
 
 // 分页
 const paging = ref<Pagination>({
@@ -35,19 +42,28 @@ function handleNewPageChange(page: number) {
   getApiList();
 }
 
-
 onMounted(() => {
   getApiList();
 })
+
 // 监听路由参数变化
 watch(() => route.params.keywords, (newKeywords) => {
   keywords.value = newKeywords
+  // 建议：当搜索关键词改变时，最好将页码重置为 1，防止在第 2 页搜索新词时因为没有第 2 页数据而显示空列表
+  paging.value.page = 1;
   getApiList();
 })
 </script>
+
 <template>
   <banner>🔍{{ keywords }}</banner>
-  <ApiCardList :dataList="dataList" :paging="paging" empty-text="没有找到相关的接口" @pageChange="handleNewPageChange"/>
+  <ApiCardList
+      :loading="isLoading"
+      :dataList="dataList"
+      :paging="paging"
+      empty-text="没有找到相关的接口"
+      @pageChange="handleNewPageChange"
+  />
   <div class="backHome" @click="router.push('/')">
     <PhHouseLine size="24" weight="bold"/>
   </div>

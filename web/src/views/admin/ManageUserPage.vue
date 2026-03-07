@@ -163,11 +163,7 @@ onMounted(() => {
 })
 </script>
 <template>
-  <div class="rounded-lg bg-white p-6 shadow-sm">
-    <div class="flex items-center justify-between">
-      <h2 class="text-lg font-medium">用户管理</h2>
-    </div>
-    <hr class="border-[#E5E5E5] m-6"/>
+  <admin-main-body title="用户管理">
     <div class="pl-2">
       <el-form :inline="true" :model="searchForm" class="searchForm">
         <el-form-item>
@@ -304,7 +300,7 @@ onMounted(() => {
         </el-descriptions>
       </div>
     </el-dialog>
-  </div>
+  </admin-main-body>
 </template>
 <style scoped>
 :deep(.searchForm .el-input) {

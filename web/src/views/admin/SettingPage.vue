@@ -36,9 +36,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="rounded-lg bg-white p-6 shadow-sm">
-    <h2 class="text-lg font-medium">全局设置</h2>
-    <el-divider/>
+  <admin-main-body title="全局设置">
     <el-form label-width="120px" label-position="left" class="mt-4">
       <el-form-item label="开放注册">
         <div class="flex items-center w-full justify-between">
@@ -67,7 +65,7 @@ onMounted(() => {
         </div>
       </el-form-item>
     </el-form>
-  </div>
+  </admin-main-body>
 </template>
 
 <style scoped lang="scss">

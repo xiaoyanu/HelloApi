@@ -1,74 +1,87 @@
-<!-- ApiCardList 组件 : 用于首页、搜索页的接口列表展示 -->
 <script lang="ts" setup>
-import type {homeApiList} from "@/types";
+import type { homeApiList } from "@/types";
 
 const emit = defineEmits(['pageChange']);
 const checkID = (id: number) => {
   window.open("/info/" + id)
 }
-defineProps(
-    {
-      paging: {
-        type: Object,
-        required: true,
-      },
-      dataList: {
-        type: Array<homeApiList>,
-        required: true
-      },
-      emptyText: {
-        type: String,
-        required: true,
-      }
-    }
-)
+
+defineProps({
+  loading: {
+    type: Boolean,
+    default: false
+  },
+  paging: {
+    type: Object,
+    required: true,
+  },
+  dataList: {
+    type: Array<homeApiList>,
+    required: true
+  },
+  emptyText: {
+    type: String,
+    required: true,
+  }
+})
 
 // 分页改变时触发
 function handleNewPageChange(page: number) {
   emit('pageChange', page);
 }
 </script>
+
 <template>
-  <div v-if="paging.total>0" class="grid grid-cols-[repeat(auto-fill,325px)] justify-center gap-8 mt-10 text-[#61677C]">
-    <div v-for="item in dataList"
-         :key="item.id"
-         class="box flex flex-col justify-between rounded-lg bg-[#ecf0f3] w-81.25 h-40 p-5 font-semibold">
-      <div>
-        <div class="flex justify-between items-center text-[20px]">
-          <div class="w-50 overflow-hidden whitespace-nowrap  text-ellipsis">{{ item.title }}</div>
-          <div class="flex">
-            <div v-if="item.type==1" class="tag tag-buy">收费</div>
-            <div
-                :class="{'tag tag-success': item.status == 0, 'tag tag-danger': item.status == 1, 'tag tag-error': item.status == 2}">
-              {{ item.status == 0 ? '正常' : item.status == 1 ? '异常' : '维护' }}
+  <div v-loading="loading" element-loading-background="#ECF0F3" class="min-h-75 w-full">
+
+    <div v-if="paging.total > 0" class="grid grid-cols-[repeat(auto-fill,325px)] justify-center gap-8 mt-10 text-[#61677C]">
+      <div v-for="item in dataList"
+           :key="item.id"
+           class="box flex flex-col justify-between rounded-lg bg-[#ecf0f3] w-81.25 h-40 p-5 font-semibold">
+        <div>
+          <div class="flex justify-between items-center text-[20px]">
+            <div class="w-50 overflow-hidden whitespace-nowrap text-ellipsis">{{ item.title }}</div>
+            <div class="flex">
+              <div v-if="item.type==1" class="tag tag-buy">收费</div>
+              <div
+                  :class="{'tag tag-success': item.status == 0, 'tag tag-danger': item.status == 1, 'tag tag-error': item.status == 2}">
+                {{ item.status == 0 ? '正常' : item.status == 1 ? '异常' : '维护' }}
+              </div>
             </div>
           </div>
+          <div class="text-sm leading-4.5 mt-1.5 wrap-break-word overflow-hidden line-clamp-2">
+            {{ item.smallTitle }}
+          </div>
         </div>
-        <div class="text-sm leading-4.5 mt-1.5 wrap-break-word overflow-hidden line-clamp-2">
-          {{ item.smallTitle }}
-        </div>
-      </div>
-      <div class="flex items-center justify-end h-10">
-        <div class="btn rounded-lg bg-[#ecf0f3] w-20 leading-9.5 text-center relative" @click="checkID(item.id)">查看
+        <div class="flex items-center justify-end h-10">
+          <div class="btn rounded-lg bg-[#ecf0f3] w-20 leading-9.5 text-center relative cursor-pointer" @click="checkID(item.id)">
+            查看
+          </div>
         </div>
       </div>
     </div>
+
+    <div v-if="paging.total == 0 && !loading" class="mt-10">
+      <el-empty :description="emptyText"/>
+    </div>
+
   </div>
-  <div v-if="paging.total==0" class="mt-10">
-    <el-empty :description="emptyText"/>
-  </div>
+
   <div class="flex items-center justify-center mt-10 mb-10">
     <el-pagination
         :current-page="paging.page"
         :page-size="paging.pageSize"
         :total="paging.total"
+        :disabled="loading"
         class="pageInfo-diy"
         layout="prev, pager, next"
         @current-change="handleNewPageChange"
     />
   </div>
 </template>
+
 <style lang="scss" scoped>
+/* 样式保持不变 */
 .box {
   user-select: none;
   box-shadow: -5px -5px 20px #FFF, 5px 5px 20px #d1d9e6;
@@ -82,7 +95,6 @@ function handleNewPageChange(page: number) {
     padding: 2px 4px;
     margin-left: 8px;
   }
-
 
   .btn {
     box-shadow: -5px -5px 20px #FFF, 5px 5px 20px #d1d9e6;
@@ -118,7 +130,9 @@ function handleNewPageChange(page: number) {
   background-color: #ff888b;
 }
 </style>
+
 <style>
+/* 样式保持不变 */
 :root {
   --pageInfo-diy: 8px;
 }

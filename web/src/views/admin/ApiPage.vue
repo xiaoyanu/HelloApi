@@ -288,12 +288,11 @@ onMounted(() => {
 })
 </script>
 <template>
-  <div class="rounded-lg bg-white p-6 shadow-sm">
-    <div class="flex items-center justify-between">
-      <h2 class="text-lg font-medium">API 管理</h2>
+  <admin-main-body title="API 管理">
+    <template #header>
       <el-button :icon="Plus" type="primary" @click="openDrawer('create')">发布 API</el-button>
-    </div>
-    <hr class="border-[#E5E5E5] m-6"/>
+    </template>
+    <template #default>
     <div class="pl-2">
       <el-form :inline="true" :model="searchForm" class="searchForm">
         <el-form-item>
@@ -547,7 +546,8 @@ onMounted(() => {
       </div>
 
     </el-drawer>
-  </div>
+    </template>
+  </admin-main-body>
 </template>
 <style scoped>
 /* 隐藏表单标签的伪元素 */

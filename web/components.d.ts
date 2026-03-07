@@ -11,6 +11,7 @@ export {}
 /* prettier-ignore */
 declare module 'vue' {
   export interface GlobalComponents {
+    AdminMainBody: typeof import('./src/components/AdminMainBody.vue')['default']
     ApiCardList: typeof import('./src/components/ApiCardList.vue')['default']
     Banner: typeof import('./src/components/banner.vue')['default']
     BaseChart: typeof import('./src/components/BaseChart.vue')['default']
@@ -45,5 +46,8 @@ declare module 'vue' {
     MDView: typeof import('./src/components/MDView.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
+  }
+  export interface GlobalDirectives {
+    vLoading: typeof import('element-plus/es')['ElLoadingDirective']
   }
 }

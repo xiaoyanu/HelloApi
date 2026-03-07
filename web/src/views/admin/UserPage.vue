@@ -168,112 +168,111 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div class="rounded-lg bg-white p-6 shadow-sm">
-    <h2 class="text-lg font-medium">我的信息</h2>
-    <hr class="border-[#E5E5E5] m-6"/>
+  <admin-main-body title="我的信息">
+    <template #default>
+      <el-form
+          :model="userInfo"
+          label-position="right"
+          label-width="50px"
+          class="max-w-lg lg:ml-5"
+          :rules="rulesUser"
+          ref="formRef"
+      >
+        <el-form-item label="权限">
+          <el-tag :type="userInfo.mode==0?'primary':'danger'" size="large">{{
+              userInfo.mode == 0 ? "普通用户" : "管理员"
+            }}
+          </el-tag>
+        </el-form-item>
+        <el-form-item label="UID">
+          <el-input v-model="userInfo.id" disabled/>
+        </el-form-item>
+        <el-form-item label="账号">
+          <el-input v-model="userInfo.username" disabled/>
+        </el-form-item>
+        <el-form-item label="头像">
+          <el-input disabled placeholder="根据邮箱获取Gravatar头像"/>
+        </el-form-item>
+        <el-form-item label="昵称" prop="nick">
+          <el-input v-model="userInfo.nick">
+            <template #append v-if="userInfo.nick !== userStore.user.nick" class="save-btn-container">
+              <el-button @click="updateUserNick">
+                <el-icon>
+                  <Edit/>
+                </el-icon>
+                &nbsp;保存
+              </el-button>
+            </template>
+          </el-input>
+        </el-form-item>
+        <el-form-item label="邮箱" prop="mail">
+          <el-input v-model="userInfo.mail">
+            <template #append v-if="userInfo.mail !== userStore.user.mail" class="save-btn-container">
+              <el-button @click="updateUserMail">
+                <el-icon>
+                  <Edit/>
+                </el-icon>
+                &nbsp;保存
+              </el-button>
+            </template>
+          </el-input>
+        </el-form-item>
+        <el-form-item label="密钥" prop="mail">
+          <el-input placeholder="重置密钥生成" v-model="userInfo.key" disabled>
+            <template #append>
+              <el-button @click="copyText(userInfo.key)">
+                <el-icon>
+                  <DocumentCopy/>
+                </el-icon>
+                &nbsp;复制
+              </el-button>
+            </template>
+          </el-input>
+        </el-form-item>
+        <el-form-item></el-form-item>
+        <el-form-item>
+          <el-button type="warning" plain @click="resetUserKey(userStore.user.id as number)">重置密钥</el-button>
+          <el-button type="primary" plain @click="openPasswordDialog">修改密码</el-button>
+        </el-form-item>
+      </el-form>
 
-    <el-form
-        :model="userInfo"
-        label-position="right"
-        label-width="50px"
-        class="max-w-lg lg:ml-5"
-        :rules="rulesUser"
-        ref="formRef"
-    >
-      <el-form-item label="权限">
-        <el-tag :type="userInfo.mode==0?'primary':'danger'" size="large">{{
-            userInfo.mode == 0 ? "普通用户" : "管理员"
-          }}
-        </el-tag>
-      </el-form-item>
-      <el-form-item label="UID">
-        <el-input v-model="userInfo.id" disabled/>
-      </el-form-item>
-      <el-form-item label="账号">
-        <el-input v-model="userInfo.username" disabled/>
-      </el-form-item>
-      <el-form-item label="头像">
-        <el-input disabled placeholder="根据邮箱获取Gravatar头像"/>
-      </el-form-item>
-      <el-form-item label="昵称" prop="nick">
-        <el-input v-model="userInfo.nick">
-          <template #append v-if="userInfo.nick !== userStore.user.nick" class="save-btn-container">
-            <el-button @click="updateUserNick">
-              <el-icon>
-                <Edit/>
-              </el-icon>
-              &nbsp;保存
-            </el-button>
-          </template>
-        </el-input>
-      </el-form-item>
-      <el-form-item label="邮箱" prop="mail">
-        <el-input v-model="userInfo.mail">
-          <template #append v-if="userInfo.mail !== userStore.user.mail" class="save-btn-container">
-            <el-button @click="updateUserMail">
-              <el-icon>
-                <Edit/>
-              </el-icon>
-              &nbsp;保存
-            </el-button>
-          </template>
-        </el-input>
-      </el-form-item>
-      <el-form-item label="密钥" prop="mail">
-        <el-input placeholder="重置密钥生成" v-model="userInfo.key" disabled>
-          <template #append>
-            <el-button @click="copyText(userInfo.key)">
-              <el-icon>
-                <DocumentCopy/>
-              </el-icon>
-              &nbsp;复制
-            </el-button>
-          </template>
-        </el-input>
-      </el-form-item>
-      <el-form-item></el-form-item>
-      <el-form-item>
-        <el-button type="warning" plain @click="resetUserKey(userStore.user.id as number)">重置密钥</el-button>
-        <el-button type="primary" plain @click="openPasswordDialog">修改密码</el-button>
-      </el-form-item>
-    </el-form>
-  </div>
-
-  <!-- 修改密码对话框 -->
-  <el-dialog
-      v-model="dialogVisible"
-      title="修改密码"
-      width="500px"
-      align-center
-      @closed="clearForm"
-  >
-    <el-form
-        ref="formRef"
-        :model="passwordForm"
-        :rules="rulesPwd"
-        label-position="right"
-        label-width="100px"
-        status-icon
-    >
-      <el-form-item label="旧密码" prop="oldPassword">
-        <el-input v-model="passwordForm.oldPassword" type="password" show-password/>
-      </el-form-item>
-      <el-form-item label="新密码" prop="newPassword">
-        <el-input v-model="passwordForm.newPassword" type="password" show-password/>
-      </el-form-item>
-      <el-form-item label="确认新密码" prop="confirmPassword">
-        <el-input v-model="passwordForm.confirmPassword" type="password" show-password/>
-      </el-form-item>
-    </el-form>
-    <template #footer>
+      <!-- 修改密码对话框 -->
+      <el-dialog
+          v-model="dialogVisible"
+          title="修改密码"
+          width="500px"
+          align-center
+          @closed="clearForm"
+      >
+        <el-form
+            ref="formRef"
+            :model="passwordForm"
+            :rules="rulesPwd"
+            label-position="right"
+            label-width="100px"
+            status-icon
+        >
+          <el-form-item label="旧密码" prop="oldPassword">
+            <el-input v-model="passwordForm.oldPassword" type="password" show-password/>
+          </el-form-item>
+          <el-form-item label="新密码" prop="newPassword">
+            <el-input v-model="passwordForm.newPassword" type="password" show-password/>
+          </el-form-item>
+          <el-form-item label="确认新密码" prop="confirmPassword">
+            <el-input v-model="passwordForm.confirmPassword" type="password" show-password/>
+          </el-form-item>
+        </el-form>
+        <template #footer>
       <span class="dialog-footer">
         <el-button @click="dialogVisible = false">取消</el-button>
         <el-button type="primary" @click="submitPasswordForm">
           确定
         </el-button>
       </span>
+        </template>
+      </el-dialog>
     </template>
-  </el-dialog>
+  </admin-main-body>
 </template>
 
 <style scoped>
