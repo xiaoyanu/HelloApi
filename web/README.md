@@ -1,42 +1,61 @@
-# web
+<h1 align="center">
 
-This template should help get you started developing with Vue 3 in Vite.
+  <img height="100" src="./web/src/assets/images/logo.png" />
 
-## Recommended IDE Setup
+HelloAPI
 
-[VS Code](https://code.visualstudio.com/) + [Vue (Official)](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur).
+[![GitHub release](https://img.shields.io/github/v/release/xiaoyanu/helloapi.svg)](../../releases/latest)
 
-## Recommended Browser Setup
+</h1>
 
-- Chromium-based browsers (Chrome, Edge, Brave, etc.):
-  - [Vue.js devtools](https://chromewebstore.google.com/detail/vuejs-devtools/nhdogjmejiglipccpnnnanhbledajbpd)
-  - [Turn on Custom Object Formatter in Chrome DevTools](http://bit.ly/object-formatters)
-- Firefox:
-  - [Vue.js devtools](https://addons.mozilla.org/en-US/firefox/addon/vue-js-devtools/)
-  - [Turn on Custom Object Formatter in Firefox DevTools](https://fxdx.dev/firefox-devtools-custom-object-formatters/)
+## 简介
 
-## Type Support for `.vue` Imports in TS
+采用拟态风格，简约的API管理程序
 
-TypeScript cannot handle type information for `.vue` imports by default, so we replace the `tsc` CLI with `vue-tsc` for type checking. In editors, we need [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) to make the TypeScript language service aware of `.vue` types.
+- 支持正常、维护、未公开、收费四种状态
+- 自适应PC、PE
+- 轻量化部署
 
-## Customize configuration
+## 技术栈
 
-See [Vite Configuration Reference](https://vite.dev/config/).
+- Spring Boot 4
+- Vue 3 + Vite
 
-## Project Setup
+## 系统要求
 
-```sh
-pnpm install
-```
+- Java 21+
+- MySQL 5.7+
 
-### Compile and Hot-Reload for Development
+## 截图
 
-```sh
-pnpm dev
-```
+![Home](./assets/1.jpg)
 
-### Type-Check, Compile and Minify for Production
+![Admin](./assets/2.jpg)
 
-```sh
-pnpm build
-```
+## Demo演示站
+
+https://api.zxz.ee
+
+## 部署
+
+### 后端
+
+- 目录：`server`
+- 配置文件：`server/src/main/resources/application.yml`
+- 配置好后编译即可，或者将配置文件复制到编译好之后的同级目录，在外部进行配置文件修改
+- 不想自己编译？
+    - 直接前往 [releases](../../releases/latest) 下载编译好的
+
+### 前端
+
+- 目录 `web`
+  ```
+  cd web
+  ```
+- 修改配置文件 `web/src/config/config.ts`
+- 下载依赖 `pnpm i`
+- 直接运行 `pnpm dev`
+- 编译/打包 `pnpm build`
+
+## 部署视频教程
+。。。等我录制
