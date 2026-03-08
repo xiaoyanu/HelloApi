@@ -49,7 +49,7 @@ https://api.zxz.ee
     - 直接前往 [releases](../../releases/latest) 下载编译好的
 
 ### 前端
-
+需要 **Node.js**
 - 目录 `web`
   ```
   cd web
