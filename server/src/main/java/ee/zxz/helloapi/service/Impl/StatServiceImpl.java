@@ -72,6 +72,27 @@ public class StatServiceImpl implements StatService {
                     }
                     count = statMapper.getUserCount();
                     break;
+                // 本月注册用户数
+                case "userMonthRegisterCount":
+                    if (!isLogin) {
+                        return ResponseUtil.response(400, Finals.MESSAGES_TOKEN_TIME_OUT);
+                    }
+                    count = statMapper.getUserMonthCount();
+                    break;
+                // API接口数量
+                case "getApiAppCount":
+                    if (!isLogin) {
+                        return ResponseUtil.response(400, Finals.MESSAGES_TOKEN_TIME_OUT);
+                    }
+                    count = statMapper.getApiAppCount();
+                    break;
+                // 近30天API发布数量
+                case "getApiAppMonthCount":
+                    if (!isLogin) {
+                        return ResponseUtil.response(400, Finals.MESSAGES_TOKEN_TIME_OUT);
+                    }
+                    count = statMapper.getApiAppMonthCount();
+                    break;
                 // API调用总次数
                 case "apiAllCount":
                     count = statMapper.getApiAllCount();

@@ -167,4 +167,26 @@ public interface StatMapper {
             "WHERE `time` >= CURDATE() - INTERVAL 59 DAY " +
             "AND `time` < CURDATE() + INTERVAL 1 DAY")
     int getApiMonthCountChange();
+
+    /**
+     * 查询近30天的用户注册数
+     */
+    @Select("SELECT COUNT(*) FROM `helloapi_users` " +
+            "WHERE `created` >= CURDATE() - INTERVAL 29 DAY " +
+            "AND `created` < CURDATE() + INTERVAL 1 DAY")
+    int getUserMonthCount();
+
+    /**
+     * 查询API总数量
+     */
+    @Select("SELECT COUNT(*) FROM `helloapi_api_apps`")
+    int getApiAppCount();
+
+    /**
+     * 查询近30天的API发布数量
+     */
+    @Select("SELECT COUNT(*) FROM `helloapi_api_apps` " +
+            "WHERE `created` >= CURDATE() - INTERVAL 29 DAY " +
+            "AND `created` < CURDATE() + INTERVAL 1 DAY")
+    int getApiAppMonthCount();
 }

@@ -10,9 +10,8 @@ import java.util.Date;
 
 public class JwtUtil {
 
-    private static final String KEY = "HelloAPI";
     // 使用的这种动态时间的KEY，如果不放心你可以自定义一个静态的KEY
-//    private static final String KEY = "HelloAPI" + new Date();
+    private static final String KEY = "HelloAPI" + new Date();
 
     /**
      * 生成JWT token

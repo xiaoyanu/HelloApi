@@ -23,35 +23,31 @@ const data = ref({
 });
 
 const getCardData = async () => {
-  try {
-    const [
-      userRes, allRes, todayRes, weekRes, weekArrRes, todayArrRes
-    ] = await Promise.all([
-      GetStat('userCount'),
-      GetStat('apiAllCount'),
-      GetStat('apiTodayCount'),
-      GetStat('apiWeekCount'),
-      GetStat('apiWeekCountArray'),
-      GetStat('apiTodayCountArray')
-    ]);
+  const [
+    userRes, allRes, todayRes, weekRes, weekArrRes, todayArrRes
+  ] = await Promise.all([
+    GetStat('userCount'),
+    GetStat('apiAllCount'),
+    GetStat('apiTodayCount'),
+    GetStat('apiWeekCount'),
+    GetStat('apiWeekCountArray'),
+    GetStat('apiTodayCountArray')
+  ]);
 
-    // 赋值基础统计数据
-    if (userRes.data.code === 200) data.value.userCount = userRes.data.data;
-    if (allRes.data.code === 200) data.value.apiAllCount = allRes.data.data;
-    if (todayRes.data.code === 200) data.value.apiTodayCount = todayRes.data.data;
-    if (weekRes.data.code === 200) data.value.apiWeekCount = weekRes.data.data;
+  // 赋值基础统计数据
+  if (userRes.data.code === 200) data.value.userCount = userRes.data.data;
+  if (allRes.data.code === 200) data.value.apiAllCount = allRes.data.data;
+  if (todayRes.data.code === 200) data.value.apiTodayCount = todayRes.data.data;
+  if (weekRes.data.code === 200) data.value.apiWeekCount = weekRes.data.data;
 
-    if (weekArrRes.data.code === 200) {
-      data.value.array.apiWeekCount.date = weekArrRes.data.data.map((item: any) => item.date.slice(5, 10));
-      data.value.array.apiWeekCount.count = weekArrRes.data.data.map((item: any) => item.count);
-    }
+  if (weekArrRes.data.code === 200) {
+    data.value.array.apiWeekCount.date = weekArrRes.data.data.map((item: any) => item.date.slice(5, 10));
+    data.value.array.apiWeekCount.count = weekArrRes.data.data.map((item: any) => item.count);
+  }
 
-    if (todayArrRes.data.code === 200) {
-      data.value.array.apiTodayCount.name = todayArrRes.data.data.map((item: any) => item.name);
-      data.value.array.apiTodayCount.count = todayArrRes.data.data.map((item: any) => item.count);
-    }
-  } catch (error) {
-    console.error("获取统计数据失败:", error);
+  if (todayArrRes.data.code === 200) {
+    data.value.array.apiTodayCount.name = todayArrRes.data.data.map((item: any) => item.name);
+    data.value.array.apiTodayCount.count = todayArrRes.data.data.map((item: any) => item.count);
   }
 };
 
@@ -177,6 +173,12 @@ onUnmounted(() => {
     refreshTimer = null;
   }
 });
+
+const text = `
+ヾ(≧▽≦*)o
+### ✨欢迎使用HelloAPI
+将自己API接入HelloAPI教程请查看 [使用文档](/admin/doc)
+`
 </script>
 
 <template>
@@ -185,14 +187,8 @@ onUnmounted(() => {
       <div class="bg-white rounded-lg p-5 border border-[#ebeef5]" style="box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05)">
         <p>
           <PhChatDots :size="32" weight="duotone" class="text-orange-600"/>
-          ヾ(≧▽≦*)o
         </p>
-        <p>
-          欢迎使用 HelloAPI 系统，GitHub地址：<a href="https://github.com/xiaoyanu/HelloAPI" target="_blank">https://github.com/xiaoyanu/HelloAPI</a>
-        </p>
-        <p>
-          如有建议、使用漏洞、BUG等可在Github提交问题或通过邮箱1872786834@qq.com与我联系
-        </p>
+        <m-d-view :text="text" bg-color="#FFF" font-color="#2C3E50"/>
       </div>
     </div>
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-5 mt-5 mb-5">

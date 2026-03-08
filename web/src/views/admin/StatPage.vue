@@ -11,6 +11,10 @@ import CountTo from "@/components/CountTo.vue";
 const BaseChart = defineAsyncComponent(() => import('@/components/BaseChart.vue'));
 
 const data = ref({
+  userCount: {count: 0, change: 0},
+  userMonthRegisterCount: {count: 0, change: 0},
+  apiAppCount: {count: 0, change: 0},
+  apiAppMonthCount: {count: 0, change: 0},
   apiMonthCount: {count: 0, change: 0},
   apiAllCount: {count: 0, change: 0},
   apiTodayCount: {count: 0, change: 0},
@@ -22,35 +26,39 @@ const data = ref({
 });
 
 const getCardData = async () => {
-  try {
-    const [
-      monthRes, allRes, todayRes, weekRes, weekArrRes, todayArrRes
-    ] = await Promise.all([
-      GetStat('apiMonthCount'),
-      GetStat('apiAllCount'),
-      GetStat('apiTodayCount'),
-      GetStat('apiWeekCount'),
-      GetStat('apiWeekCountArray'),
-      GetStat('apiTodayCountArray')
-    ]);
+  const [
+    getApiAppMonthCountRes, apiAppCountRes,userRegisterRes,userRes, monthRes, allRes, todayRes, weekRes, weekArrRes, todayArrRes
+  ] = await Promise.all([
+    GetStat('getApiAppMonthCount'),
+    GetStat('getApiAppCount'),
+    GetStat('userMonthRegisterCount'),
+    GetStat('userCount'),
+    GetStat('apiMonthCount'),
+    GetStat('apiAllCount'),
+    GetStat('apiTodayCount'),
+    GetStat('apiWeekCount'),
+    GetStat('apiWeekCountArray'),
+    GetStat('apiTodayCountArray')
+  ]);
 
-    // 赋值基础统计数据
-    if (monthRes.data.code === 200) data.value.apiMonthCount = monthRes.data.data;
-    if (allRes.data.code === 200) data.value.apiAllCount = allRes.data.data;
-    if (todayRes.data.code === 200) data.value.apiTodayCount = todayRes.data.data;
-    if (weekRes.data.code === 200) data.value.apiWeekCount = weekRes.data.data;
+  // 赋值基础统计数据
+  if (getApiAppMonthCountRes.data.code === 200) data.value.apiAppMonthCount = getApiAppMonthCountRes.data.data;
+  if (apiAppCountRes.data.code === 200) data.value.apiAppCount = apiAppCountRes.data.data;
+  if (userRegisterRes.data.code === 200) data.value.userMonthRegisterCount = userRegisterRes.data.data;
+  if (userRes.data.code === 200) data.value.userCount = userRes.data.data;
+  if (monthRes.data.code === 200) data.value.apiMonthCount = monthRes.data.data;
+  if (allRes.data.code === 200) data.value.apiAllCount = allRes.data.data;
+  if (todayRes.data.code === 200) data.value.apiTodayCount = todayRes.data.data;
+  if (weekRes.data.code === 200) data.value.apiWeekCount = weekRes.data.data;
 
-    if (weekArrRes.data.code === 200) {
-      data.value.array.apiWeekCount.date = weekArrRes.data.data.map((item: any) => item.date.slice(5, 10));
-      data.value.array.apiWeekCount.count = weekArrRes.data.data.map((item: any) => item.count);
-    }
+  if (weekArrRes.data.code === 200) {
+    data.value.array.apiWeekCount.date = weekArrRes.data.data.map((item: any) => item.date.slice(5, 10));
+    data.value.array.apiWeekCount.count = weekArrRes.data.data.map((item: any) => item.count);
+  }
 
-    if (todayArrRes.data.code === 200) {
-      data.value.array.apiTodayCount.name = todayArrRes.data.data.map((item: any) => item.name);
-      data.value.array.apiTodayCount.count = todayArrRes.data.data.map((item: any) => item.count);
-    }
-  } catch (error) {
-    console.error("获取统计数据失败:", error);
+  if (todayArrRes.data.code === 200) {
+    data.value.array.apiTodayCount.name = todayArrRes.data.data.map((item: any) => item.name);
+    data.value.array.apiTodayCount.count = todayArrRes.data.data.map((item: any) => item.count);
   }
 };
 
@@ -251,28 +259,57 @@ onUnmounted(() => {
           </div>
         </div>
       </div>
+      <div class="card">
+        <div class="flex items-center justify-center mr-3.75 text-[#38D677]">
+          <PhCalendar size="60" weight="duotone"/>
+        </div>
+        <div>
+          <h3 class="text-[14px] text-[#606266]">用户总数</h3>
+          <div class="font-bold text-[24px]">
+            <CountTo :value="data.userCount.count" :formatter="formatNumber"/>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="flex items-center justify-center mr-3.75 text-[#38D677]">
+          <PhCalendar size="60" weight="duotone"/>
+        </div>
+        <div>
+          <h3 class="text-[14px] text-[#606266]">本月注册数</h3>
+          <div class="font-bold text-[24px]">
+            <CountTo :value="data.userMonthRegisterCount.count" :formatter="formatNumber"/>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="flex items-center justify-center mr-3.75 text-[#38D677]">
+          <PhCalendar size="60" weight="duotone"/>
+        </div>
+        <div>
+          <h3 class="text-[14px] text-[#606266]">API总数量</h3>
+          <div class="font-bold text-[24px]">
+            <CountTo :value="data.apiAppCount.count" :formatter="formatNumber"/>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="flex items-center justify-center mr-3.75 text-[#38D677]">
+          <PhCalendar size="60" weight="duotone"/>
+        </div>
+        <div>
+          <h3 class="text-[14px] text-[#606266]">本月API发布数量</h3>
+          <div class="font-bold text-[24px]">
+            <CountTo :value="data.apiAppMonthCount.count" :formatter="formatNumber"/>
+          </div>
+        </div>
+      </div>
     </div>
+
 
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-5">
       <div class="chart-card overflow-hidden">
         <div class="chart-header">近7天调用统计</div>
         <BaseChart :options="chart1Options" class="w-full h-75"/>
-      </div>
-      <div class="chart-card overflow-hidden">
-        <div class="chart-header">今日热门接口</div>
-        <BaseChart :options="chart2Options" class="w-full h-75"/>
-      </div>
-      <div class="chart-card overflow-hidden">
-        <div class="chart-header">今日热门接口</div>
-        <BaseChart :options="chart2Options" class="w-full h-75"/>
-      </div>
-      <div class="chart-card overflow-hidden">
-        <div class="chart-header">今日热门接口</div>
-        <BaseChart :options="chart2Options" class="w-full h-75"/>
-      </div>
-      <div class="chart-card overflow-hidden">
-        <div class="chart-header">今日热门接口</div>
-        <BaseChart :options="chart2Options" class="w-full h-75"/>
       </div>
       <div class="chart-card overflow-hidden">
         <div class="chart-header">今日热门接口</div>
