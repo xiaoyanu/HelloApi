@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import {defineAsyncComponent, onMounted, onUnmounted, ref, computed} from "vue";
 import {
-  PhChartBar, PhArrowBendRightDown, PhArrowBendLeftUp, PhCalendar, PhCalendarDot, PhCalendarDots
+  PhChartBar, PhArrowBendRightDown, PhArrowBendLeftUp, PhCalendar, PhCalendarDot, PhCalendarDots, PhUsers,
+  PhUserCirclePlus, PhColumnsPlusRight, PhColumns
 } from "@phosphor-icons/vue";
 import {formatNumber} from "@/utils";
 import {GetStat} from "@/api/module/stat.ts";
@@ -27,7 +28,7 @@ const data = ref({
 
 const getCardData = async () => {
   const [
-    getApiAppMonthCountRes, apiAppCountRes,userRegisterRes,userRes, monthRes, allRes, todayRes, weekRes, weekArrRes, todayArrRes
+    getApiAppMonthCountRes, apiAppCountRes, userRegisterRes, userRes, monthRes, allRes, todayRes, weekRes, weekArrRes, todayArrRes
   ] = await Promise.all([
     GetStat('getApiAppMonthCount'),
     GetStat('getApiAppCount'),
@@ -261,7 +262,7 @@ onUnmounted(() => {
       </div>
       <div class="card">
         <div class="flex items-center justify-center mr-3.75 text-[#38D677]">
-          <PhCalendar size="60" weight="duotone"/>
+          <PhUsers size="60" weight="duotone"/>
         </div>
         <div>
           <h3 class="text-[14px] text-[#606266]">用户总数</h3>
@@ -272,7 +273,7 @@ onUnmounted(() => {
       </div>
       <div class="card">
         <div class="flex items-center justify-center mr-3.75 text-[#38D677]">
-          <PhCalendar size="60" weight="duotone"/>
+          <PhUserCirclePlus size="60" weight="duotone"/>
         </div>
         <div>
           <h3 class="text-[14px] text-[#606266]">本月注册数</h3>
@@ -283,7 +284,7 @@ onUnmounted(() => {
       </div>
       <div class="card">
         <div class="flex items-center justify-center mr-3.75 text-[#38D677]">
-          <PhCalendar size="60" weight="duotone"/>
+          <PhColumns size="60" weight="duotone"/>
         </div>
         <div>
           <h3 class="text-[14px] text-[#606266]">API总数量</h3>
@@ -294,7 +295,7 @@ onUnmounted(() => {
       </div>
       <div class="card">
         <div class="flex items-center justify-center mr-3.75 text-[#38D677]">
-          <PhCalendar size="60" weight="duotone"/>
+          <PhColumnsPlusRight size="60" weight="duotone"/>
         </div>
         <div>
           <h3 class="text-[14px] text-[#606266]">本月API发布数量</h3>
