@@ -3,7 +3,7 @@
   <img height="100" src="./web/src/assets/images/logo.png" />
 
 HelloAPI
- 
+
 [![GitHub release](https://img.shields.io/github/v/release/xiaoyanu/helloapi.svg)](../../releases/latest)
 
 </h1>
@@ -58,6 +58,13 @@ https://api.zxz.ee
 - 下载依赖 `pnpm i`
 - 直接运行 `pnpm dev`
 - 编译/打包 `pnpm build`
+- 伪静态 Nginx
+  ```
+    location / {
+    try_files $uri $uri/ /index.html;
+    }
+    ```
 
 ## 部署视频教程
+
 。。。等我录制
