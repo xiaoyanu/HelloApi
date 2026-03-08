@@ -68,28 +68,28 @@ public class StatServiceImpl implements StatService {
                 // 用户总数
                 case "userCount":
                     if (!isLogin) {
-                        return ResponseUtil.response(400, Finals.MESSAGES_TOKEN_TIME_OUT);
+                        return ResponseUtil.response(401, Finals.MESSAGES_TOKEN_TIME_OUT);
                     }
                     count = statMapper.getUserCount();
                     break;
                 // 本月注册用户数
                 case "userMonthRegisterCount":
                     if (!isLogin) {
-                        return ResponseUtil.response(400, Finals.MESSAGES_TOKEN_TIME_OUT);
+                        return ResponseUtil.response(401, Finals.MESSAGES_TOKEN_TIME_OUT);
                     }
                     count = statMapper.getUserMonthCount();
                     break;
                 // API接口数量
                 case "getApiAppCount":
                     if (!isLogin) {
-                        return ResponseUtil.response(400, Finals.MESSAGES_TOKEN_TIME_OUT);
+                        return ResponseUtil.response(401, Finals.MESSAGES_TOKEN_TIME_OUT);
                     }
                     count = statMapper.getApiAppCount();
                     break;
                 // 近30天API发布数量
                 case "getApiAppMonthCount":
                     if (!isLogin) {
-                        return ResponseUtil.response(400, Finals.MESSAGES_TOKEN_TIME_OUT);
+                        return ResponseUtil.response(401, Finals.MESSAGES_TOKEN_TIME_OUT);
                     }
                     count = statMapper.getApiAppMonthCount();
                     break;
@@ -100,7 +100,7 @@ public class StatServiceImpl implements StatService {
                 // 今天调用总次数
                 case "apiTodayCount":
                     if (!isLogin) {
-                        return ResponseUtil.response(400, Finals.MESSAGES_TOKEN_TIME_OUT);
+                        return ResponseUtil.response(401, Finals.MESSAGES_TOKEN_TIME_OUT);
                     }
                     count = statMapper.getApiTodayCount();
                     change = statMapper.getApiTodayCountChange();
@@ -108,7 +108,7 @@ public class StatServiceImpl implements StatService {
                 // 本周调用总次数
                 case "apiWeekCount":
                     if (!isLogin) {
-                        return ResponseUtil.response(400, Finals.MESSAGES_TOKEN_TIME_OUT);
+                        return ResponseUtil.response(401, Finals.MESSAGES_TOKEN_TIME_OUT);
                     }
                     count = statMapper.getApiWeekCount();
                     change = statMapper.getApiWeekCountChange();
@@ -116,7 +116,7 @@ public class StatServiceImpl implements StatService {
                 // 本月调用总次数
                 case "apiMonthCount":
                     if (!isLogin) {
-                        return ResponseUtil.response(400, Finals.MESSAGES_TOKEN_TIME_OUT);
+                        return ResponseUtil.response(401, Finals.MESSAGES_TOKEN_TIME_OUT);
                     }
                     count = statMapper.getApiMonthCount();
                     change = statMapper.getApiMonthCountChange();
@@ -124,13 +124,13 @@ public class StatServiceImpl implements StatService {
                 // 近7天API调用统计（数组）
                 case "apiWeekCountArray":
                     if (!isLogin) {
-                        return ResponseUtil.response(400, Finals.MESSAGES_TOKEN_TIME_OUT);
+                        return ResponseUtil.response(401, Finals.MESSAGES_TOKEN_TIME_OUT);
                     }
                     return ResponseUtil.success(statMapper.getApiWeekCountArray());
                 // 今天API调用数量前7的接口（包含今天调用次数为0的接口）
                 case "apiTodayCountArray":
                     if (!isLogin) {
-                        return ResponseUtil.response(400, Finals.MESSAGES_TOKEN_TIME_OUT);
+                        return ResponseUtil.response(401, Finals.MESSAGES_TOKEN_TIME_OUT);
                     }
                     List<ApiTodayArray> list = statMapper.getApiTodayCountArray();
                     while (list.size() < 7) {
