@@ -67,4 +67,5 @@ https://api.zxz.ee
 
 ## 部署视频教程
 
-。。。等我录制
+哔哩哔哩：
+https://www.bilibili.com/video/BV1KqNgziE5p
