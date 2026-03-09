@@ -7,10 +7,16 @@ import AutoImport from 'unplugin-auto-import/vite'
 import Components from 'unplugin-vue-components/vite'
 import {ElementPlusResolver} from 'unplugin-vue-components/resolvers'
 import tailwindcss from '@tailwindcss/vite'
+import { prismjsPlugin } from 'vite-plugin-prismjs'
 // https://vite.dev/config/
 export default defineConfig({
     plugins: [
         vue(),
+        prismjsPlugin({
+            languages: [
+                'javascript', 'html', 'css', 'json', 'python', 'php'
+            ],
+        }),
         vueDevTools(),
         tailwindcss(),
         AutoImport({
