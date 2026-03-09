@@ -14,7 +14,7 @@ export default defineConfig({
         vue(),
         prismjsPlugin({
             languages: [
-                'javascript', 'html', 'css', 'json', 'python', 'php'
+                'javascript', 'html', 'css', 'json', 'python', 'php','go'
             ],
         }),
         vueDevTools(),
