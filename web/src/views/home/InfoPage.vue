@@ -7,6 +7,7 @@ import { GetApiInfo } from "@/api";
 import { PhHouseLine } from "@phosphor-icons/vue";
 import { copyText } from "@/utils";
 import { useUserStore } from "@/stores";
+import '@/utils/module/prism-epl';
 
 const router = useRouter()
 const route = useRoute()
@@ -81,12 +82,19 @@ const currentCodeMarkdown = computed(() => {
       code = `import requests\n\nurl = "${fullUrl}"\n\nresponse = requests.request("${method}", url)\n\nprint(response.text)`;
       break;
     case 'e':
-      code = `易语言的代码`;
+      if (method === 'GET') {
+        code = `.版本 2\n.支持库 spec\n\n.局部变量 局_网址, 文本型\n.局部变量 局_返回源码, 文本型\n\n局_网址 ＝ "${fullUrl}"\n局_返回源码 ＝ 到文本 (网页_访问_对象 (局_网址, 0, , , , , , , , , , , , , , , , , ))\n调试输出 (局_返回源码)`;
+      } else {
+        code = `.版本 2\n.支持库 spec\n\n.局部变量 局_网址, 文本型\n.局部变量 局_提交数据, 文本型\n.局部变量 局_返回源码, 文本型\n\n局_网址 ＝ "${url}"\n局_提交数据 ＝ "key=value"\n局_返回源码 ＝ 到文本 (网页_访问_对象 (局_网址, 1, 局_提交数据, , , , , , , , , , , , , , , , ))\n调试输出 (局_返回源码)`;
+      }
       break;
   }
 
-  // 根据语言类型设置 markdown 标识
-  const mdLang = currentLang.value === 'js' ? 'javascript' : currentLang.value;
+  // 根据语言类型设置 markdown 标识，易语言对应我们注册的 epl 别名
+  let mdLang = currentLang.value;
+  if (currentLang.value === 'js') mdLang = 'javascript';
+  if (currentLang.value === 'e') mdLang = 'epl';
+
   return `\`\`\`${mdLang}\n${code}\n\`\`\``;
 });
 // === 代码示例相关逻辑 结束 ===
