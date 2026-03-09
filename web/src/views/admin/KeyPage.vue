@@ -494,6 +494,7 @@ onMounted(() => {
           direction="rtl"
           @closed="onDrawerClose"
           @open="onDrawerLoadOver"
+          :close-on-press-escape="false"
       >
         <div v-loading="drawerLoading">
           <el-form ref="formRef" :model="formData" :rules="rules">

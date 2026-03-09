@@ -474,6 +474,7 @@ onMounted(() => {
           direction="btt"
           @closed="onDrawerClose"
           @open="onDrawerLoadOver"
+          :close-on-press-escape="false"
       >
         <div class="m-auto max-w-[90%]" v-loading="drawerLoading">
           <el-form ref="formRef" :model="formData" :rules="rules">
