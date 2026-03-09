@@ -330,7 +330,6 @@ onMounted(() => {
 
 .lang-btn.active {
   box-shadow: inset 2px 2px 5px #d1d9e6, inset -2px -2px 5px #FFF;
-  color: #409EFF;
   font-weight: bold;
 }
 
