@@ -26,6 +26,11 @@ const router = createRouter({
                     name: 'Info',
                     path: 'info/:id', // 默认首页
                     component: () => import('@/views/home/InfoPage.vue')
+                },
+                {
+                    name: 'Link',
+                    path: 'links', // 默认首页
+                    component: () => import('@/views/home/LinkPage.vue')
                 }
             ]
         },
@@ -78,6 +83,11 @@ const router = createRouter({
                     name: 'AdminCheck',
                     path: 'check', // 全局审核API页 /admin/check
                     component: () => import('@/views/admin/CheckPage.vue')
+                },
+                {
+                    name: 'AdminLink',
+                    path: 'link', // 全局审核API页 /admin/link
+                    component: () => import('@/views/admin/LinkPage.vue')
                 }
             ]
         },
