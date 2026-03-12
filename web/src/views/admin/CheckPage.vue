@@ -278,11 +278,6 @@ onMounted(() => {
   width: 80%;
 }
 
-/* 移除表格 hover 时的背景颜色变化 */
-:deep(.el-table--enable-row-hover .el-table__row:hover > td.el-table__cell) {
-  background-color: transparent;
-}
-
 :deep(.searchForm .el-input) {
   --el-input-width: 150px;
 }
