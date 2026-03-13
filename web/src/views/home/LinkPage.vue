@@ -39,8 +39,6 @@ const getLinkList = async () => {
         linkSetting.value[key] = res.data.data;
       }
     });
-  } catch (error) {
-    console.error('获取友链数据失败:', error);
   } finally {
     loading.value = false;
   }
@@ -85,7 +83,7 @@ onMounted(async () => {
         <span class="mr-2 text-2xl">📝</span> 申请友情链接
       </h3>
       <div class="space-y-4 text-[#61677C]">
-        <p class="leading-relaxed">欢迎各位小伙伴交换友链，只要是内容健康、积极向上的技术类或生活类博客/站点均可。</p>
+        <p class="leading-relaxed">欢迎各位小伙伴交换友链，只要是内容健康、积极向上的相关API类站点均可。</p>
         <div class="bg-white/40 p-5 rounded-xl border border-white/60 shadow-inner">
           <p class="font-mono text-sm space-y-1">
             <span class="block text-blue-600/70 font-bold mb-1">// 本站信息</span>
@@ -96,6 +94,7 @@ onMounted(async () => {
           </p>
         </div>
         <div class="pt-2">
+          <p class="text-sm opacity-90">Tips：申请前请先将本站添加为友链</p>
           <p class="text-sm opacity-90">
             申请方式：发送邮件至 <a :href="'mailto:' + linkSetting.link_email"
                                    class="text-blue-500 hover:underline font-semibold">{{ linkSetting.link_email }}</a>，并在邮件中附上您的站点信息。
