@@ -49,23 +49,23 @@ const search = () => {
           <template #dropdown>
             <el-dropdown-menu>
               <el-dropdown-item v-if="$route.path !== '/'">
-                <router-link to="/" class="flex items-center justify-center w-full h-full custom-link">
+                <a href="/" class="flex items-center justify-center w-full h-full custom-link">
                   <PhHouse weight="duotone"/>
                   首页
-                </router-link>
+                </a>
               </el-dropdown-item>
               <el-dropdown-item>
-                <router-link to="/admin" target="_blank"
+                <a href="/admin" target="_blank"
                              class="flex items-center justify-center w-full h-full custom-link">
                   <PhSignIn weight="duotone"/>
                   登录 / 注册
-                </router-link>
+                </a>
               </el-dropdown-item>
               <el-dropdown-item>
-                <router-link to="/links" class="flex items-center justify-center w-full h-full custom-link">
+                <a href="/links" class="flex items-center justify-center w-full h-full custom-link">
                   <PhLink weight="duotone"/>
                   友人帐
-                </router-link>
+                </a>
               </el-dropdown-item>
             </el-dropdown-menu>
           </template>
