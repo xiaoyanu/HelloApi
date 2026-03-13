@@ -1,6 +1,6 @@
 package ee.zxz.helloapi.controller;
 
-import ee.zxz.helloapi.service.Impl.StatServiceImpl;
+import ee.zxz.helloapi.service.StatService;
 import ee.zxz.helloapi.utils.Finals;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.web.bind.annotation.*;
@@ -10,9 +10,9 @@ import java.util.Map;
 @RestController
 @RequestMapping(Finals.statUrl)
 public class StatController {
-    private final StatServiceImpl statService;
+    private final StatService statService;
 
-    public StatController(StatServiceImpl statService) {
+    public StatController(StatService statService) {
         this.statService = statService;
     }
 
@@ -25,6 +25,6 @@ public class StatController {
     // Post - 获取指定类型数据 - POST
     @PostMapping("/")
     public Map<String, Object> GetStat(@RequestParam(required = false) Map<String, String> requestParam, @RequestBody(required = false) Map<String, String> requestBody, HttpServletRequest request, @RequestHeader(value = "Authorization", required = false) String authorizationHeader) {
-        return statService.getStat(requestParam, requestBody, request,authorizationHeader);
+        return statService.getStat(requestParam, requestBody, request, authorizationHeader);
     }
 }

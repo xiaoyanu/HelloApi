@@ -1,2 +1,5 @@
 export * from './module/api'
 export * from './module/user'
+export * from './module/stat'
+export * from './module/link'
+export * from './module/setting'

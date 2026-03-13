@@ -1,10 +1,11 @@
-package ee.zxz.helloapi.service.Impl;
+package ee.zxz.helloapi.service.impl;
 
 import com.alibaba.fastjson.JSON;
 import ee.zxz.helloapi.domain.ApiApp;
 import ee.zxz.helloapi.domain.ApiKey;
 import ee.zxz.helloapi.domain.ApiParam;
 import ee.zxz.helloapi.mapper.ApiMapper;
+import ee.zxz.helloapi.mapper.SettingMapper;
 import ee.zxz.helloapi.mapper.StatMapper;
 import ee.zxz.helloapi.mapper.UserMapper;
 import ee.zxz.helloapi.service.ApiService;
@@ -22,11 +23,13 @@ public class ApiServiceImpl implements ApiService {
     private final ApiMapper apiMapper;
     private final UserMapper userMapper;
     private final StatMapper statMapper;
+    private final SettingMapper settingMapper;
 
-    public ApiServiceImpl(ApiMapper apiMapper, UserMapper userMapper, StatMapper statMapper) {
+    public ApiServiceImpl(ApiMapper apiMapper, UserMapper userMapper, StatMapper statMapper, SettingMapper settingMapper) {
         this.apiMapper = apiMapper;
         this.userMapper = userMapper;
         this.statMapper = statMapper;
+        this.settingMapper = settingMapper;
     }
 
     /**
@@ -71,7 +74,7 @@ public class ApiServiceImpl implements ApiService {
         try {
             // 全局设置检测
             int tokenMode = (int) request.getAttribute("userMode");
-            String settingValue = userMapper.getSettingValue("api");
+            String settingValue = settingMapper.getSettingValue("api");
             if (settingValue != null && tokenMode != Finals.Admin && settingValue.equals("false")) {
                 return ResponseUtil.response(400, "发布API已关闭");
             }
@@ -312,7 +315,7 @@ public class ApiServiceImpl implements ApiService {
     public Map<String, Object> createApiKey(String finalApiID, Map<String, Object> requestBody, HttpServletRequest request) {
         // 全局设置检测
         int tokenMode = (int) request.getAttribute("userMode");
-        String settingValue = userMapper.getSettingValue("api_key");
+        String settingValue = settingMapper.getSettingValue("api_key");
         if (settingValue != null && tokenMode != Finals.Admin && settingValue.equals("false")) {
             return ResponseUtil.response(400, "创建APIKey已关闭");
         }

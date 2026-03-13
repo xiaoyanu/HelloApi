@@ -5,7 +5,7 @@ import {
   PhChatDots
 } from "@phosphor-icons/vue";
 import {formatNumber} from "@/utils";
-import {GetStat} from "@/api/module/stat.ts";
+import {GetStat} from "@/api";
 import CountTo from "@/components/CountTo.vue";
 
 // 异步按需加载图表组件

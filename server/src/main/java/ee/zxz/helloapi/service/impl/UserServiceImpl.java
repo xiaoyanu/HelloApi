@@ -1,14 +1,14 @@
-package ee.zxz.helloapi.service.Impl;
+package ee.zxz.helloapi.service.impl;
 
 import com.pig4cloud.captcha.GifCaptcha;
 import com.pig4cloud.captcha.SpecCaptcha;
 import com.pig4cloud.captcha.base.Captcha;
 import com.pig4cloud.captcha.utils.CaptchaJakartaUtil;
 import ee.zxz.helloapi.domain.ApiApp;
-import ee.zxz.helloapi.domain.Setting;
 import ee.zxz.helloapi.domain.User;
 import ee.zxz.helloapi.domain.UserKey;
 import ee.zxz.helloapi.mapper.ApiMapper;
+import ee.zxz.helloapi.mapper.SettingMapper;
 import ee.zxz.helloapi.mapper.StatMapper;
 import ee.zxz.helloapi.mapper.UserMapper;
 import ee.zxz.helloapi.service.UserService;
@@ -27,11 +27,13 @@ public class UserServiceImpl implements UserService {
     private final UserMapper userMapper;
     private final ApiMapper apiMapper;
     private final StatMapper statMapper;
+    private final SettingMapper settingMapper;
 
-    public UserServiceImpl(UserMapper userMapper, ApiMapper apiMapper, StatMapper statMapper) {
+    public UserServiceImpl(UserMapper userMapper, ApiMapper apiMapper, StatMapper statMapper, SettingMapper settingMapper) {
         this.userMapper = userMapper;
         this.apiMapper = apiMapper;
         this.statMapper = statMapper;
+        this.settingMapper = settingMapper;
     }
 
     @Override
@@ -112,7 +114,7 @@ public class UserServiceImpl implements UserService {
         CaptchaJakartaUtil.clear(request);
 
         // 全局设置检测
-        String settingValue = userMapper.getSettingValue("register");
+        String settingValue = settingMapper.getSettingValue("register");
         if (settingValue != null && settingValue.equals("false")) {
             return ResponseUtil.response(400, "注册已关闭");
         }
@@ -358,7 +360,7 @@ public class UserServiceImpl implements UserService {
     public Map<String, Object> resetUserKey(String userId, HttpServletRequest request) {
         // 全局设置检测
         int tokenUserMode = (int) request.getAttribute("userMode");
-        String settingValue = userMapper.getSettingValue("user_key");
+        String settingValue = settingMapper.getSettingValue("user_key");
         if (settingValue != null && tokenUserMode != Finals.Admin && settingValue.equals("false")) {
             return ResponseUtil.response(400, "重置密钥已关闭");
         }
@@ -637,47 +639,6 @@ public class UserServiceImpl implements UserService {
         } else {
             return ResponseUtil.response(400, Finals.MESSAGES_ERROR_PARAM);
         }
-    }
-
-    @Override
-    public Map<String, Object> updateSettingValue(Map<String, String> requestParam, Map<String, String> requestBody, HttpServletRequest request) {
-        int userId = (int) request.getAttribute("userId");
-        if (userMapper.checkUserIdExists(userId) < 1) {
-            return ResponseUtil.response(401, Finals.MESSAGES_ERROR_USER_NOT_FOUND);
-        }
-        if ((int) request.getAttribute("userMode") != Finals.Admin) {
-            return ResponseUtil.response(403, Finals.MESSAGES_ERROR_NOT_ADMIN);
-        }
-
-        String key = requestBody.get("key");
-        String value = requestBody.get("value");
-        if (key == null || value == null || key.isEmpty() || value.isEmpty()) {
-            return ResponseUtil.response(400, Finals.MESSAGES_ERROR_PARAM);
-        }
-
-        userMapper.updateSettingValue(key, value);
-        return ResponseUtil.success();
-    }
-
-    @Override
-    public Map<String, Object> getSetting(Map<String, String> requestParam, Map<String, String> requestBody, HttpServletRequest request) {
-        int userId = (int) request.getAttribute("userId");
-        if (userMapper.checkUserIdExists(userId) < 1) {
-            return ResponseUtil.response(401, Finals.MESSAGES_ERROR_USER_NOT_FOUND);
-        }
-        if ((int) request.getAttribute("userMode") != Finals.Admin) {
-            return ResponseUtil.response(403, Finals.MESSAGES_ERROR_NOT_ADMIN);
-        }
-
-        List<Map<String, Object>> settingList = new ArrayList<>();
-        for (Setting setting : userMapper.getSettingValueAll()) {
-            Map<String, Object> map = new LinkedHashMap<>();
-            map.put("key", setting.getKey());
-            map.put("value", Boolean.parseBoolean(setting.getValue()));
-            settingList.add(map);
-
-        }
-        return ResponseUtil.success(settingList);
     }
 
     @Override

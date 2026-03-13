@@ -1,4 +1,4 @@
-package ee.zxz.helloapi.service.Impl;
+package ee.zxz.helloapi.service.impl;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONException;

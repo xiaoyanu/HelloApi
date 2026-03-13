@@ -107,15 +107,6 @@ export const SetUserPassword = (id: number, password: string): any => request.pu
     }
 })
 
-// 获取全局设置
-export const GetSettingValue = (): any => request.get(apiUrl + '/setting')
-
-// 更改全局设置
-export const UpdateSettingValue = (key: string, value: boolean): any => request.put(apiUrl + '/setting', {
-    key,
-    value
-})
-
 // 设置用户权限
 export const SetUserMode = (id: number, mode: number): any => request.put(apiUrl + '/setMode', {
     mode

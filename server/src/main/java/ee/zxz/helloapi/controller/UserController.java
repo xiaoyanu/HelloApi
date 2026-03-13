@@ -78,20 +78,6 @@ public class UserController {
         return userService.setUserMode(requestParam, requestBody, request);
     }
 
-    // UpdateSettingValue - 更新设置的参数值 - PUT
-    @PutMapping("/setting")
-    @RequiresLogin(mode = Finals.Admin)
-    public Map<String, Object> UpdateSettingValue(@RequestParam(required = false) Map<String, String> requestParam, @RequestBody(required = false) Map<String, String> requestBody, HttpServletRequest request) {
-        return userService.updateSettingValue(requestParam, requestBody, request);
-    }
-
-    // GetSetting - 获取设置的所有参数 - GET
-    @GetMapping("/setting")
-    @RequiresLogin(mode = Finals.Admin)
-    public Map<String, Object> GetSetting(@RequestParam(required = false) Map<String, String> requestParam, @RequestBody(required = false) Map<String, String> requestBody, HttpServletRequest request) {
-        return userService.getSetting(requestParam, requestBody, request);
-    }
-
     // GetUserKey - 获取用户密钥 - GET
     @GetMapping("/key")
     @RequiresLogin
