@@ -34,7 +34,7 @@ function handleNewPageChange(page: number) {
 <template>
   <div v-loading="loading" element-loading-background="#ECF0F3" class="min-h-75 w-full">
 
-    <div v-if="paging.total > 0" class="grid grid-cols-[repeat(auto-fill,325px)] justify-center gap-8 mt-10 text-[#61677C]">
+    <div v-if="paging.total > 0 && !loading" class="grid grid-cols-[repeat(auto-fill,325px)] justify-center gap-8 mt-10 text-[#61677C]">
       <div v-for="item in dataList"
            :key="item.id"
            class="box flex flex-col justify-between rounded-lg bg-[#ecf0f3] w-81.25 h-40 p-5 font-semibold">
