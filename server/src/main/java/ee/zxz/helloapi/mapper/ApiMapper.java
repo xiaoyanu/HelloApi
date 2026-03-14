@@ -83,7 +83,7 @@ public interface ApiMapper {
      * @param apiApp ApiApp对象
      * @return 更新成功的行数
      */
-    @Update("update helloapi_api_apps set title = #{title}, smallTitle = #{smallTitle}, status = #{status}, type = #{type}, url = #{url}, sendType = #{sendType}, returnType = #{returnType}, returnContent = #{returnContent} where id = #{id}")
+    @Update("update helloapi_api_apps set `view_status` = #{view_status}, title = #{title}, smallTitle = #{smallTitle}, status = #{status}, type = #{type}, url = #{url}, sendType = #{sendType}, returnType = #{returnType}, returnContent = #{returnContent} where id = #{id}")
     int updateApiApp(ApiApp apiApp);
 
     /**
