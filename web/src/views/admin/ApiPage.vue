@@ -158,6 +158,8 @@ const submitFormCreate = async () => {
       // 提交表单
       if (userStore.user.mode || 0 > 0) {
         formData.value.view_status = 0
+      }else {
+        formData.value.view_status = 2
       }
       const res = await CreateApi(formData.value)
       if (res.data.code == 200) {
@@ -186,6 +188,8 @@ const submitFormUpdate = () => {
         // 提交表单
         if (userStore.user.mode || 0 > 0) {
           formData.value.view_status = 0
+        }else {
+          formData.value.view_status = 2
         }
         const res = await UpdateApi(nowRow.value.id, formData.value)
         if (res.data.code == 200) {
